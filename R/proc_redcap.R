@@ -120,7 +120,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   #
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
-  # parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, prepost_v1_data$demo[c('participant_id', 'v1_date')])
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
   # child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
   # parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1)
   # child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
@@ -158,25 +158,31 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   # participant_data <- merge(participant_data, double_enter_data$bodpod_data$data, by = 'participant_id')
   #
   #
-  # #### Merge visit data/notes ###
-  # visit data and notes?
-  # meal data (child visits 1, 3, 4, 5)
-  # demo data (parent visits baseline and v5)
-  # anthro? data (parent visits baseline and v5)
-  # household data (parent visits baseline and v5)
-  # cebq data (parent visits baseline and v5)
-  # cbq data (parent visits baseline and v5)
-  # cshq data (parent visits baseline and v5)
-  # class data (parent visits baseline and v5)
-  # audit data (parent visits baseline and v5)
-  # pstca data (parent visits baseline and v5)
-  # cfpq data (parent visits baseline and v5)
-  # pmum data (parent visits baseline and v5)
-  # loc data (child visits baseline and v5)
-  # kbas data (child visits baseline and v5)
-  # stq data (child visits baseline and v5)
+  # #### Merge/stack visit data/notes ###
 
-  #
+  # merge intake data
+
+  # merge notes/visit data?
+
+  # stack data collected on 2 visits
+  # stacked_cebq <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype)
+  # stacked_cbq <- rbind(parent_v2_data$cbq_data$bids_phenotype, parent_v5_data$cbq_data$bids_phenotype)
+  # stacked_cshq <- rbind(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
+  # stacked_audit <- rbind(parent_v4_data$audit_data$bids_phenotype, parent_v5_data$audit_data$bids_phenotype)
+  # stacked_pstca <- rbind(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype)
+  # stacked_pmum <- rbind(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype)
+  # stacked_cfpq <- rbind(parent_v4_data$cfpq_data$bids_phenotype, parent_v5_data$cfpq_data$bids_phenotype)
+# stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
+# stacked_puberty <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype) # will this be bids_phenotype/scored
+# stacked_class <-
+# stacked_household <-
+# stacked_demo <-
+# stacked_kbas <-
+# stacked_stq <-
+# stacked_loc <-
+# stacked_anthro <-
+
+
   # #### Export Phenotype Data ####
   #
 
@@ -186,51 +192,47 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   }
 
   # ## child visit 1
-  #
-  # #sleep log
+
   write.csv(child_v1_data$meal_info, paste0(phenotype_wd, slash, 'v1_meal_info.tsv'), row.names = FALSE)
   # #write(child_v1_data$sleep_wk_data$meta, paste0(phenotype_wd, slash, 'sleep_log.json'))
-  #
+
+  # cfq
+  write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE)
+
+
   # #hfi
   # write.csv(child_v1_data$hfi_data$data, paste0(phenotype_wd, slash, 'hfi.tsv'), row.names = FALSE)
-  # #write(child_v1_data$hfi_data$meta, paste0(phenotype_wd, slash, 'home_food_inventory.json'))
-  #
-  # ## child visit 2
-  #
+
+
   # #loc
   # write.csv(child_v2_data$loc_data$data, paste0(phenotype_wd, slash, 'loc.tsv'), row.names = FALSE)
-  # #write(child_v2_data$loc_data$meta, paste0(phenotype_wd, slash, 'loc.json'))
-  #
+
   # #sic
   # write.csv(child_v2_data$sic_data$data, paste0(phenotype_wd, slash, 'stess_children.tsv'), row.names = FALSE)
-  # #write(child_v2_data$loc_data$meta, paste0(phenotype_wd, slash, 'stress_children.json'))
-  #
+
   # ## parent visit 1
   #
   # #cfq
   # write.csv(parent_v1_data$cfq_data$data, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$cfq_data$meta, paste0(phenotype_wd, slash, 'cfq.json'))
-  #
+
   # #cebq
   # write.csv(parent_v1_data$cebq_data$data, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$cebq_data$meta, paste0(phenotype_wd, slash, 'cebq.json'))
-  #
+
   # #efcr
   # write.csv(parent_v1_data$efcr_data$data, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$efcr_data$meta, paste0(phenotype_wd, slash, 'efcr.json'))
-  #
+
   # #lbc
   # write.csv(parent_v1_data$lbc_data$data, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$lbc_data$meta, paste0(phenotype_wd, slash, 'lbc.json'))
-  #
+
   # #brief
   # write.csv(parent_v1_data$brief_data$data, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$brief_data$meta, paste0(phenotype_wd, slash, 'brief.json'))
-  #
+
   # #ffq
   # write.csv(parent_v1_data$ffq_data$data, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE)
-  # #write(parent_v1_data$ffq_data$meta, paste0(phenotype_wd, slash, 'ffq.json'))
-  #
+
+
+  # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
+
   if (isTRUE(return_data)){
     return(list( child_visit_1_arm_1 = child_visit_1_arm_1,
                  parent_visit_1_arm_1 = parent_visit_1_arm_1))
