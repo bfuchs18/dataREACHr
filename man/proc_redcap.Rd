@@ -26,7 +26,7 @@ This function:
 \item reads REDCap data from sourcedata
 \item cleans data to save in BIDS format in phenotype. Produces the following files:
 *
-\item calls functions to create .json files for each phoneypte/x.tsv file
+\item calls functions to create .json files for each phenotype/x.tsv file
 }
 }
 \details{

@@ -4,7 +4,7 @@
 #' 1) reads REDCap data from sourcedata
 #' 2) cleans data to save in BIDS format in phenotype. Produces the following files:
 #'    *
-#' 3) calls functions to create .json files for each phoneypte/x.tsv file
+#' 3) calls functions to create .json files for each phenotype/x.tsv file
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
@@ -52,7 +52,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
     slash <- '/'
   } else {
     slash <- "\\"
-    print('The proc_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Alaina at azp271@psu.edu if there are errors')
+    print('The proc_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   # find location of slashes so can decompose filepaths
@@ -116,21 +116,34 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   child_visit_5_arm_1 <- redcap_long_wide('child_visit_5_arm_1', redcap_visit_data)
   parent_visit_5_arm_1 <- redcap_long_wide('parent_visit_5_arm_1', redcap_visit_data)
 
+  # get visit 1 date data
+  v1_date_data <- child_visit_1_arm_1[, c("record_id", "v1_date")]
+  names(v1_date_data)[names(v1_date_data) == "record_id"] <- "participant_id"
 
-  #
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
-  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = v1_date_data)
   # child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
-  # parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1)
+  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1)
   # child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
-  # parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
+  parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
   # child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
-  # parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
+  parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
   # child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
   # parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
 
 
+  # check cog task completion for RPPR ####
+
+  sum(child_visit_1_arm_1$toolbox_age_7_flanker_check == 1 | child_visit_1_arm_1$toolbox_age_8_flanker_check == 1, na.rm = TRUE)
+  sum(child_visit_1_arm_1$toolbox_age_7_dccs_check == 1 | child_visit_1_arm_1$toolbox_age_8_dccs_check == 1, na.rm = TRUE)
+  sum(child_visit_1_arm_1$toolbox_list_sorting_check == 1, na.rm = TRUE)
+  sum(child_visit_3_arm_1$spaec_game_check == 1, na.rm = TRUE)
+  sum(child_visit_5_arm_1$toolbox_list_sorting_check == 1, na.rm = TRUE)
+  sum(child_visit_5_arm_1$toolbox_age_8_dccs_check == 1, na.rm = TRUE)
+  sum(child_visit_5_arm_1$toolbox_age_8_flanker_check == 1, na.rm = TRUE)
+  sum(child_visit_3_arm_1$pit_task_completed_check == 1, na.rm = TRUE)
+  sum(child_visit_5_arm_1$pit_task_completed_check == 1, na.rm = TRUE)
 
 
   # #### Load and organize double-entry data ####
@@ -191,51 +204,44 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
     dir.create(file.path(phenotype_wd))
   }
 
-  # ## child visit 1
+  # export forms collected at 1 visit only (i.e., not stacked data) -- can this be done using a list of lists and a loop?
 
   write.csv(child_v1_data$meal_info, paste0(phenotype_wd, slash, 'v1_meal_info.tsv'), row.names = FALSE)
-  # #write(child_v1_data$sleep_wk_data$meta, paste0(phenotype_wd, slash, 'sleep_log.json'))
 
   # cfq
   write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE)
 
+  # efcr
+  write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE)
 
-  # #hfi
-  # write.csv(child_v1_data$hfi_data$data, paste0(phenotype_wd, slash, 'hfi.tsv'), row.names = FALSE)
+  # lbc
+  write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE)
 
-
-  # #loc
-  # write.csv(child_v2_data$loc_data$data, paste0(phenotype_wd, slash, 'loc.tsv'), row.names = FALSE)
-
-  # #sic
-  # write.csv(child_v2_data$sic_data$data, paste0(phenotype_wd, slash, 'stess_children.tsv'), row.names = FALSE)
-
-  # ## parent visit 1
-  #
-  # #cfq
-  # write.csv(parent_v1_data$cfq_data$data, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE)
-
-  # #cebq
-  # write.csv(parent_v1_data$cebq_data$data, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
-
-  # #efcr
-  # write.csv(parent_v1_data$efcr_data$data, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE)
-
-  # #lbc
-  # write.csv(parent_v1_data$lbc_data$data, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE)
+  # pss -- will this be bids_phenotype?
+  # write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE)
 
   # #brief
-  # write.csv(parent_v1_data$brief_data$data, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE)
+  # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE)
 
-  # #ffq
-  # write.csv(parent_v1_data$ffq_data$data, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE)
+  # #bes
+  # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE)
 
+  # #ffbs
+  # write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE)
+
+  # stacked dataframes
+  # #cebq
+  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
 
   # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
 
   if (isTRUE(return_data)){
-    return(list( child_visit_1_arm_1 = child_visit_1_arm_1,
-                 parent_visit_1_arm_1 = parent_visit_1_arm_1))
+    return(list( child_v1_data = child_v1_data,
+                 parent_v1_data = parent_v1_data,
+                 parent_v2_data = parent_v2_data,
+                 parent_v3_data = parent_v3_data,
+                 parent_v4_data = parent_v4_data
+                 ))
   }
 }
 

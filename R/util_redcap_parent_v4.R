@@ -40,7 +40,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   ## HFI Data ####
   hfi_data <- data[, grepl('participant_id', names(data)) | grepl('^hfi', names(data))]
-  hfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id') #cant currently handle base 0 scoring
+  hfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id')
 
   ## PMUM Data ####
   pmum_data <- data[, grepl('participant_id', names(data)) | grepl('pmum', names(data))]
