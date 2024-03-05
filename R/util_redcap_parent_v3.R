@@ -41,11 +41,12 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   ## PWLB Data ####
   pwlb_data <- data[, grepl('participant_id', names(data)) | grepl('pwlb', names(data))]
   pwlb_data <- pwlb_data[, !(names(pwlb_data) %in% c('pwlb_missingcheck'))]
-#  pwlb_scored <- dataprepr::score_pwlb(pwlb_data, score_base = TRUE, id = 'participant_id') #cant currently handle base 0 scoring
+  pwlb_scored <- dataprepr::score_pwlb(pwlb_data, score_base = TRUE, id = 'participant_id')
 
   ## TFEQ Data ####
+  #note: REACH used tfeq-r18 (revised scale)
   tfeq_data <- data[, grepl('participant_id', names(data)) | grepl('tfeq', names(data))]
-  # tfeq_scored <- dataprepr::score_tfeq(tfeq_data, score_base = TRUE, id = 'participant_id') #cant currently handle base 0 scoring
+  tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, score_base = TRUE, id = 'participant_id')
 
   ## CLASS Data ####
   class_data <- data[, grepl('participant_id', names(data)) | grepl('class', names(data))]
@@ -53,7 +54,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
 
   ## BISBAS Data ####
   bisbas_data <- data[, grepl('participant_id', names(data)) | grepl('bisbas', names(data))]
-  # score -- need to develop score script
+  bisbas_scored <- dataprepr::score_bisbas(bisbas_data, score_base = TRUE, id = 'participant_id')
 
   ## PTSCA Data ####
   ptsca_data <- data[, grepl('participant_id', names(data)) | grepl('ptsca', names(data))]
@@ -74,12 +75,10 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
       v3_data = v3_data,
       spsrq_data = spsrq_scored,
       pwlb_data = pwlb_data,
-      # pwlb_data = pwlb_scored,
-      tfeq_data = tfeq_data,
-      # tfeq_data = tfeq_scored,
+      pwlb_data = pwlb_scored,
+      tfeq_data = tfeq_scored,
       class_data = class_data,
-      bisbas_data = bisbas_data,
-      #      bisbas_data = bisbas_scored,
+      bisbas_data = bisbas_scored,
       ptsca_data = ptsca_data,
       #      ptsca_data = ptsca_scored,
       #     debq_data = debq_scored,

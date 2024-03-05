@@ -108,8 +108,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   # bind girls and boys dfs -- dplyr::bind_rows fills missing values with NA where columns don't match.
   puberty_data_for_scoring <- dplyr::bind_rows(puberty_data_girls, puberty_data_boys)
 
-  # this requires debugging:
-  #puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "1", female = "0", id = 'participant_id')
+  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "1", female = "0", id = 'participant_id')
 
   ## CFQ Data ####
   cfq_data <- data[, grepl('participant_id', names(data)) | grepl('cfq', names(data))]
@@ -148,8 +147,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
       demo_data = list(data = demo_data),
       household_data = household_data,
       rank_data = rank_data,
-#      puberty_data = puberty_scored, # score script needs to be debugged and applied
-      puberty_data = puberty_data,
+      puberty_data = puberty_scored,
       cfq_data = cfq_scored,
       cebq_data = cebq_scored,
       efcr_data = efcr_scored,

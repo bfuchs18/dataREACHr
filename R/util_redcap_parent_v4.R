@@ -48,12 +48,12 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   ## CCHIP Data ####
   cchip_data <- data[, grepl('participant_id', names(data)) | grepl('cchip', names(data))]
-  # score -- need to develop score script
+  cchip_scored <- dataprepr::score_cchip(cchip_data, id = 'participant_id')
 
   ## AUDIT Data ####
   audit_data <- data[, grepl('participant_id', names(data)) | grepl('audit', names(data))]
   audit_data <- audit_data[, !(names(audit_data) %in% c('audit_missingcheck'))]
-  # score -- need to develop score script
+  audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id')
 
   ## FHFI Data ####
   fhfi_data <- data[, grepl('participant_id', names(data)) | grepl('fhfi', names(data))]
@@ -72,10 +72,8 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
       # hfssm_data = hfssm_scored,
       pmum_data = pmum_data,
       # pmum_data = pmum_scored,
-      cchip_data = cchip_data,
-      # cchip_data = pmum_scored,
-      audit_data = audit_data,
-      #      audit_data = audit_scored,
+      cchip_data = cchip_scored,
+      audit_data = audit_scored,
       fhfi_data = fhfi_data,
       # fhfi_data = fhfi_scored,
       # cfpq_data = cfpq_scored,
