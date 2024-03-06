@@ -41,28 +41,36 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   # child bmi and percentile values were determined using the online form and entered into redcap -- recalculate?
 
   names(anthro_data)[names(anthro_data) == "child_bmi_v1"] <- "child_bmi"
-  colnames(anthro_data)[11:19] <- c('parent1_sex', 'parent1_height_1_cm', 'parent1_height_2_cm', 'parent1_weight_1_kg', 'parent1_weight_2_kg', 'parent1_height_average_cm', 'parent1_weight_average_kg', 'parent1_bmi_measured', 'parent2_bmi_partner_report')
+  names(anthro_data)[names(anthro_data) == "parent_height_sex"] <- "parent1_sex"
+  names(anthro_data)[names(anthro_data) == "parent_height_1_cm"] <- "parent1_height_1_cm"
+  names(anthro_data)[names(anthro_data) == "parent_height_2_cm"] <- "parent1_height_2_cm"
+  names(anthro_data)[names(anthro_data) == "parent_weight_1_kg"] <- "parent1_weight_1_kg"
+  names(anthro_data)[names(anthro_data) == "parent_weight_2_kg"] <- "parent1_weight_2_kg"
+  names(anthro_data)[names(anthro_data) == "parent_height_average_cm"] <- "parent1_height_average_cm"
+  names(anthro_data)[names(anthro_data) == "parent_weight_average_kg"] <- "parent1_weight_average_kg"
+  names(anthro_data)[names(anthro_data) == "parent_bmi_redcap_calc"] <- "parent1_bmi_measured"
+  names(anthro_data)[names(anthro_data) == "parent_bmi_v1_self_report"] <- "parent2_bmi_partner_report"
 
 
   ## meal information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
   meal_info <- data[, grepl('vas', names(data)) |
                          grepl('test_meal', names(data)) |
-                         names(data) %in% c('participant_id', 'advertisement_condition', 'meal_intake_notes')]
+                         names(data) %in% c('participant_id', 'advertisement_condition', 'meal_intake_notes', 'test_meal_notes')]
 
   ## kbas ####
-  kbas_data <- data[, grepl('participant_id', names(data)) | grepl('toy_', names(data)) | grepl('food_', names(data)) | grepl("^q.*score", names(data))]
+  kbas_data <-data[, grep("participant_id|toy_|food_|^q.*score", names(data))]
   # score this data?
 
   ## stq data ####
-  stq_data <- data[, grepl('participant_id', names(data)) | grepl('stq', names(data))]
+  stq_data <-data[, grep("participant_id|stq", names(data))]
 
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 anthro_data = anthro_data,
                 meal_info = meal_info,
-                 kbas_data = kbas_data,
-                 stq_data = stq_data))
+                kbas_data = kbas_data,
+                stq_data = stq_data))
   }
 
 }
