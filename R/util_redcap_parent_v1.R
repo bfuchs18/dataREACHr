@@ -118,12 +118,10 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   ## CFQ Data ####
   cfq_data <- data[, grepl('participant_id', names(data)) | grepl('cfq', names(data))]
   cfq_data <- cfq_data[, !(names(cfq_data) %in% c('cfq_missingcheck'))]
-  cfq_data$visit <- 1
   cfq_scored <- dataprepr::score_cfq(cfq_data, score_base = TRUE, restriction_split = FALSE, id = 'participant_id')
 
   ## CEBQ Data ####
   cebq_data <- data[, grepl('participant_id', names(data)) | grepl('cebq', names(data))]
-  cebq_data$visit <- 1
   cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id')
 
   ## EFCR Data ####
