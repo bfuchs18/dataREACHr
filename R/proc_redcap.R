@@ -173,11 +173,20 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   #
   # #### Merge/stack visit data/notes ###
 
+  # merge demo data?? parent-reported parent2 height and weight are in household_data
+
   # merge intake data
 
   # merge notes/visit data?
 
   # stack data collected on 2 visits
+
+  # Combine the datasets with an additional "visit" column
+  # stacked_cebq <- rbind(
+  #   transform(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
+  #   transform(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
+  # )
+
   # stacked_cebq <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype)
   # stacked_cbq <- rbind(parent_v2_data$cbq_data$bids_phenotype, parent_v5_data$cbq_data$bids_phenotype)
   # stacked_cshq <- rbind(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
@@ -206,32 +215,20 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
 
   # export forms collected at 1 visit only (i.e., not stacked data) -- can this be done using a list of lists and a loop?
 
-  write.csv(child_v1_data$meal_info, paste0(phenotype_wd, slash, 'v1_meal_info.tsv'), row.names = FALSE)
+  write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE) # cfq
+  write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
+  write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
+  # write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss -- will this be bids_phenotype
+  # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE) #brief
+  # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
+  # write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
 
-  # cfq
-  write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE)
+  # export stacked dataframes
 
-  # efcr
-  write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE)
-
-  # lbc
-  write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE)
-
-  # pss -- will this be bids_phenotype?
-  # write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE)
-
-  # #brief
-  # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE)
-
-  # #bes
-  # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE)
-
-  # #ffbs
-  # write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE)
-
-  # stacked dataframes
-  # #cebq
-  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
+  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cebq
+  # write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cbq
+  # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cshq
+  # ...
 
   # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
 

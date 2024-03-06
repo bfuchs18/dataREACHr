@@ -44,6 +44,11 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
                                                                     'demo_missingcheck', 'demo_missingcheck_2', 'demo_missingcheck_3',
                                                                     'parent_household_demographics_questionnaire_complete',
                                                                     child_demo_vars))]
+
+  names(data)[names(data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft_component"
+  names(data)[names(data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_inch_component"
+  names(data)[names(data) == "demo_self_report_weight"] <- "demo_parent2_reported_weight_lbs"
+
   # subset demo_data
   demo_data <- demo_data_all[, c('participant_id', child_demo_vars)]
 
@@ -144,7 +149,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   ## compile and return data ####
   if (isTRUE(return_data)){
     return(list(
-      demo_data = list(data = demo_data),
+      demo_data = demo_data,
       household_data = household_data,
       rank_data = rank_data,
       puberty_data = puberty_scored,

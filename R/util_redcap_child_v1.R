@@ -29,58 +29,41 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
 
   #reduce columns and update names
 
-  # ## demo ####
-  # child_v1demo_data <- data[c('record_id', 'v1_general_notes', 'relationship', 'c_height1_cm', 'c_height2_cm', 'c_weight1_kg', 'c_weight2_kg', 'c_height_avg_cm', 'c_weight_avg_kg', 'c_bmi', 'c_bmi_pcent', 'c_weightstatus', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
-  #
-  # names(child_v1demo_data)[1] <- 'participant_id'
-  #
-  # ## household ####
-  # child_household_data <- data[c('record_id', 'p_height1_cm', 'p_height2_cm', 'p_weight1_kg', 'p_weight2_kg', 'p_height_avg_cm', 'p_weight_avg_kg', 'p_bmi', 'p_weightstatus', 'heightweight_notes')]
-  #
-  # names(child_household_data)[1] <- 'participant_id'
+  ## visit data ####
+  visit_data_child <- data[c('participant_id', 'v1_post_check_notes', 'v1_date', 'child_assent', 'dxa_notes', 'rrv_task_notes')]
+  names(visit_data_child)[names(visit_data_child) == "v1_post_check_notes"] <- "v1_notes"
+
+  # ## anthropometrics ####
+  anthro_data <- data[c('participant_id', 'child_height_1_cm', 'child_height_2_cm', 'child_weight_1_kg', 'child_weight_2_kg', 'child_height_average', 'child_average_weight', 'child_bmi_v1', 'child_bmi_percentile', 'child_bmi_screenout',
+                        'parent_height_sex', 'parent_height_1_cm', 'parent_height_2_cm', 'parent_weight_1_kg', 'parent_weight_2_kg', 'parent_height_average_cm', 'parent_weight_average_kg', 'parent_bmi_redcap_calc', 'parent_bmi_v1_self_report',
+                        'parent_bmi_screenout', 'heightweight_notes')]
+
+  # child bmi and percentile values were determined using the online form and entered into redcap -- recalculate?
+
+  names(anthro_data)[names(anthro_data) == "child_bmi_v1"] <- "child_bmi"
+  colnames(anthro_data)[11:19] <- c('parent1_sex', 'parent1_height_1_cm', 'parent1_height_2_cm', 'parent1_weight_1_kg', 'parent1_weight_2_kg', 'parent1_height_average_cm', 'parent1_weight_average_kg', 'parent1_bmi_measured', 'parent2_bmi_partner_report')
+
 
   ## meal information ####
+  # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
   meal_info <- data[, grepl('vas', names(data)) |
                          grepl('test_meal', names(data)) |
-                         grepl('freddy', names(data)) |
-                         grepl('pre_w_o_plate', names(data)) |
-                         grepl('pre_w_plate', names(data)) |
-                         grepl('post_w_plate', names(data)) |
-                         grepl('consumed', names(data)) |
                          names(data) %in% c('participant_id', 'advertisement_condition', 'meal_intake_notes')]
-
-#  names(v1_meal_info)[c(1, 11:15, 17:20, 39:40, 52, 54:55)] <- c('participant_id', 'meal_book', 'meal_start', 'meal_end', 'meal_duration', 'meal_notes', 'nih_listsort_notes', 'pre_want_ff_time', 'pre_want_ff_notes', 'eah_likewant_time', 'eah_likewant_notes', 'eah_game_want_time', 'eah_game_want_notes', 'eah_start', 'eah_end')
 
   ## kbas ####
   kbas_data <- data[, grepl('participant_id', names(data)) | grepl('toy_', names(data)) | grepl('food_', names(data)) | grepl("^q.*score", names(data))]
-
   # score this data?
-  # return json
 
   ## stq data ####
   stq_data <- data[, grepl('participant_id', names(data)) | grepl('stq', names(data))]
 
-  #hfi_scored <- dataprepr::score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
-  #hfi_scored <- score_hfi(hfi_data, id = 'participant_id', score_base = TRUE)
-  #hfi_json <- json_hfi()
-
-  ## dexa  ####
-  #or will this come from data double entry?
-
   if (isTRUE(return_data)){
-    return(list( meal_info = meal_info,
+    return(list(visit_data_child = visit_data_child,
+                anthro_data = anthro_data,
+                meal_info = meal_info,
+                 kbas_data = kbas_data,
                  stq_data = stq_data))
   }
 
-  # if (isTRUE(return_data)){
-  #   return(list(
-  #     demo_data = list(child_v1demo_data = child_v1demo_data,
-  #                      child_household_data = child_household_data),
-  #     otherdata = list(fnirs_cap = fnirs_cap,
-  #                      task_info = task_info,
-  #                      meal_info = meal_info),
-  #     sleep_wk_data = list(data = sleep_wk_scored, meta = child_sleep_json),
-  #     hfi_data = list(data = hfi_scored, meta = hfi_json)))
-  # }
 }
 
