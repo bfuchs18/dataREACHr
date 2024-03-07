@@ -36,11 +36,15 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   ## HFSSM Data ####
   hfssm_data <- data[, grepl('participant_id', names(data)) | grepl('hfssm', names(data))]
-  # score -- need to develop score script
+  hfssm_scored <- dataprepr::score_hfssm(hfssm_data, score_base = TRUE, id = "participant_id")
 
-  ## HFI Data ####
-  hfi_data <- data[, grepl('participant_id', names(data)) | grepl('^hfi', names(data))]
-  hfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id')
+  ## HFIAS Data ####
+  # this refers to the household_food_insecurity_access_scale (HFIAS)
+  #hfias_data <-
+  hfias_data <- data[, grepl('participant_id', names(data)) | grepl('^hfi', names(data))]
+  names(hfias_data) <- gsub('hfi', 'hfias', names(hfias_data))
+
+  #hfias_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id')
 
   ## PMUM Data ####
   pmum_data <- data[, grepl('participant_id', names(data)) | grepl('pmum', names(data))]
@@ -56,28 +60,27 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id')
 
   ## FHFI Data ####
+  # this refers to the fulkerson_home_food_inventory
   fhfi_data <- data[, grepl('participant_id', names(data)) | grepl('fhfi', names(data))]
-  # score -- need to develop score script
+  #fhfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
 
   ## CFPQ Data ####
   cfpq_data <- data[, grepl('participant_id', names(data)) | grepl('cfpq', names(data))]
-  # score -- need to develop score script
+  cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id')
 
   ## compile and return data ####
   if (isTRUE(return_data)){
     return(list(
       v4_data = v4_data,
-      hfi_data = hfi_scored,
-      hfssm_data = hfssm_data,
-      # hfssm_data = hfssm_scored,
+      # hfias_data = hfias_scored,
+      hfssm_data = hfssm_scored,
       pmum_data = pmum_data,
       # pmum_data = pmum_scored,
       cchip_data = cchip_scored,
       audit_data = audit_scored,
       fhfi_data = fhfi_data,
       # fhfi_data = fhfi_scored,
-      # cfpq_data = cfpq_scored,
-      cfpq_data = cfpq_data
+      cfpq_data = cfpq_scored
     ))
   }
 }

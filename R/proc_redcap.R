@@ -123,13 +123,13 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = v1_date_data)
-  # child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
+  child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
   parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1)
-  # child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
+  child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
   parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
-  # child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
+  child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
   parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
-  # child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
+  child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
   # parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
 
 
@@ -173,7 +173,8 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   #
   # #### Merge/stack visit data/notes ###
 
-  # merge demo data?? parent-reported parent2 height and weight are in household_data
+    # merge demo data?? parent-reported parent2 height and weight are in household_data -- BMI not automatically calculated for parent2 v5 in child form
+    # merge dexa_notes with dexa_data? task notes with task data?
 
   # merge intake data
 
@@ -181,11 +182,27 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
 
   # stack data collected on 2 visits
 
-  # Combine the datasets with an additional "visit" column
-  # stacked_cebq <- rbind(
-  #   transform(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
-  #   transform(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
-  # )
+  # Combine the datasets with an additional "visit" column, move "visit" to column 2
+
+  stacked_anthro <- dplyr::bind_rows(
+    transform(child_v1_data$anthro_data, visit = "1"),
+    transform(child_v5_data$anthro_data, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_stq <- dplyr::bind_rows(
+    transform(child_v1_data$stq_data, visit = "1"),
+    transform(child_v5_data$stq_data, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_kbas <- dplyr::bind_rows(
+    transform(child_v1_data$kbas_data, visit = "1"),
+    transform(child_v5_data$kbas_data, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  # stacked_cebq <- dplyr::bind_rows(
+  #   mutate(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
+  #   mutate(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
+  # ) %>% dplyr::relocate(visit, .after = 1)
 
   # stacked_cebq <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype)
   # stacked_cbq <- rbind(parent_v2_data$cbq_data$bids_phenotype, parent_v5_data$cbq_data$bids_phenotype)
@@ -199,10 +216,8 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
 # stacked_class <-
 # stacked_household <-
 # stacked_demo <-
-# stacked_kbas <-
-# stacked_stq <-
 # stacked_loc <-
-# stacked_anthro <-
+
 
 
   # #### Export Phenotype Data ####
@@ -225,6 +240,9 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
 
   # export stacked dataframes
 
+  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
+  write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
+  write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
   # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cebq
   # write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cbq
   # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cshq

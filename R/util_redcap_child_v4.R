@@ -42,7 +42,11 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
 
   ## pptq ####
   pptq_data <-data[, grep("participant_id|^pptq", names(data))]
-  # score?
+
+  # if scoring - update. for example, but this doesnt work, probably if not 0, then NA.
+  # pptq_data$pptq_1 <- ifelse(pptq_data$pptq_play_on_own == 0, 1, ifelse(pptq_data$pptq_play_depends == 0, 2, ifelse(pptq_data$pptq_play_with_others == 0, 3, NA)))
+  # instead: if sum of all three options > 1, NA, else ... 3 separate ifs (not ifelse )
+  # score? likert scale (3-point) does not match that used by Maćkiewicz and Cieciuch 2016 (5-point) -- was this implemented in REACH correctly?
 
   ## sic ####
   sic_data <-data[, grep("participant_id|^sic", names(data))]
