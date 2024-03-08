@@ -4,10 +4,12 @@
 \alias{util_redcap_parent_v2}
 \title{util_redcap_parent_v2: Organize parent visit 2 data from REDCap (called within proc_redcap.R)}
 \usage{
-util_redcap_parent_v2(data, return_data = TRUE)
+util_redcap_parent_v2(data, agesex_data, return_data = TRUE)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_2_arm_1e'}
+
+\item{agesex_data}{a dataframe with child age and sex -- required for scoring the BRIEF2}
 
 \item{return_data}{If return_data is set to TRUE, will return a list including:
 \enumerate{

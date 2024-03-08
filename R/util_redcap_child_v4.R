@@ -55,7 +55,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   ## wasi ####
   # get wasi scores through double-entry?
   wasi_data <-data[, grep("participant_id|^wasi", names(data))]
-  wasi_data <- wasi_score[, !(names(wasi_score) %in% c('wasi_age_y', 'wasi_age_m','wasi_iq_scoring_form_complete'))]
+  wasi_data <- wasi_data[, !(names(wasi_data) %in% c('wasi_age_y', 'wasi_age_m','wasi_iq_scoring_form_complete'))]
 
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
