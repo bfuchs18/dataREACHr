@@ -62,11 +62,10 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   ## Fulkerson HFI Data ####
   # this refers to the fulkerson_home_food_inventory
   fhfi_data <- data[, grepl('participant_id', names(data)) | grepl('fhfi', names(data))]
-  names(fhfi_data) <- gsub('fhfi', 'hfi', names(fhfi_data))
 
-  # fhfi_data <- util_format_fhfi_data(fhfi_data) # move everything into a separate function
+  # fhfi_data <- util_format_fhfi_data(fhfi_data) # need to deal with visible_27 and visible_28 before this function is ready
 
-  #fhfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
+  # fhfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
 
   ## CFPQ Data ####
   cfpq_data <- data[, grepl('participant_id', names(data)) | grepl('cfpq', names(data))]

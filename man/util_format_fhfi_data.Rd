@@ -4,10 +4,10 @@
 \alias{util_format_fhfi_data}
 \title{util_format_fhfi_data: Prepare Fulkerson HFI data for scoring (called within util_redcap_parent_v4.R)}
 \usage{
-util_format_fhfi_data(data)
+util_format_fhfi_data(fhfi_data)
 }
 \arguments{
-\item{data}{Fulkerson HFI extracted from data from REDCap event parent_visit_4_arm_1'}
+\item{fhfi_data}{Fulkerson HFI extracted from data from REDCap event parent_visit_4_arm_1'}
 }
 \description{
 This function prepares Fulkerson HFI data for scoring with dataprepr::score_hfi()
