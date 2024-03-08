@@ -116,15 +116,24 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   child_visit_5_arm_1 <- redcap_long_wide('child_visit_5_arm_1', redcap_visit_data)
   parent_visit_5_arm_1 <- redcap_long_wide('parent_visit_5_arm_1', redcap_visit_data)
 
-  # get visit 1 date data
+  # get visit 1 date data - needed for util_redcap_parent_v1()
   v1_date_data <- child_visit_1_arm_1[, c("record_id", "v1_date")]
   names(v1_date_data)[names(v1_date_data) == "record_id"] <- "participant_id"
+
+  # get age and sex data - needed for util_redcap_parent_v2()
+  agesex_data <- parent_visit_1_arm_1[, c("record_id", "prs_sex", "demo_child_birthdate")]
+  agesex_data <- merge(agesex_data, child_visit_2_arm_1[, c("record_id", "v2_date")], by = "record_id")
+  agesex_data[['demo_child_birthdate']] <- lubridate::as_date(agesex_data[['demo_child_birthdate']])
+  agesex_data[['v2_date']] <- lubridate::as_date(agesex_data[['v2_date']])
+  agesex_data[['v2_age']] <- lubridate::interval(agesex_data[['demo_child_birthdate']], agesex_data[['v2_date']])/lubridate::years(1)
+  agesex_data <- agesex_data[, c("record_id", "prs_sex", "v2_age")]
+  colnames(agesex_data) <- c("participant_id", "sex", "age")
 
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = v1_date_data)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
-  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1)
+  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = agesex_data)
   child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
   parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
@@ -234,9 +243,18 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
   write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
   # write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss -- will this be bids_phenotype
+
   # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE) #brief
   # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
   # write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
+  # write.csv(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE) #ffq -- will this be bids_phenotype
+
+  write.csv(parent_v3_data$spsrq_data$bids_phenotype, paste0(phenotype_wd, slash, 'spsrq.tsv'), row.names = FALSE) # spsrq
+  write.csv(parent_v3_data$pwlb_data$bids_phenotype, paste0(phenotype_wd, slash, 'pwlb.tsv'), row.names = FALSE) # pwlb
+  write.csv(parent_v3_data$tfeq_data$bids_phenotype, paste0(phenotype_wd, slash, 'tfeq.tsv'), row.names = FALSE) # tfeq
+  write.csv(parent_v3_data$bisbas_data$bids_phenotype, paste0(phenotype_wd, slash, 'bisbas.tsv'), row.names = FALSE) # bisbas
+  write.csv(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # debq
+  # write.csv(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # scpf -- will this be bids_phenotype
 
   # export stacked dataframes
 

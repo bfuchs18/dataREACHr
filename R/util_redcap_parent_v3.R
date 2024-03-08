@@ -63,7 +63,8 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
 
   ## DEBQ Data ####
   debq_data <- data[, grepl('participant_id', names(data)) | grepl('debq', names(data))]
-  # score -- need to develop score script
+  debq_data$debq_20 <- NA # debq question 20 was not administered in REACH -- debq question 23 was repeated in its place
+  debq_scored <- dataprepr::score_debq(debq_data, score_base = TRUE, id = 'participant_id')
 
   ## SCPF Data ####
   scpf_data <- data[, grepl('participant_id', names(data)) | grepl('scpf', names(data))]
@@ -74,15 +75,13 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
     return(list(
       v3_data = v3_data,
       spsrq_data = spsrq_scored,
-      pwlb_data = pwlb_data,
       pwlb_data = pwlb_scored,
       tfeq_data = tfeq_scored,
       class_data = class_data,
       bisbas_data = bisbas_scored,
       ptsca_data = ptsca_data,
       #      ptsca_data = ptsca_scored,
-      #     debq_data = debq_scored,
-      debq_data = debq_data,
+      debq_data = debq_scored,
       #     scpf_data = scpf_scored, #need to develop score script
       scpf_data = scpf_data
     ))
