@@ -129,6 +129,11 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   agesex_data <- agesex_data[, c("record_id", "prs_sex", "v2_age")]
   colnames(agesex_data) <- c("participant_id", "sex", "age")
 
+  # get visit 5 date data - needed for util_redcap_parent_v5()
+  v5_date_data <- child_visit_5_arm_1[, c("record_id", "v5_date")]
+  v5_date_data <- merge(v5_date_data, parent_visit_1_arm_1[, c("record_id", "demo_child_birthdate")], by = "record_id")
+  names(v5_date_data)[names(v5_date_data) == "record_id"] <- "participant_id"
+
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = v1_date_data)
@@ -139,7 +144,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
   parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
-  # parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
+  # parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v1_date_data = v1_date_data)
 
 
   # check cog task completion for RPPR ####
