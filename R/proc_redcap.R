@@ -144,21 +144,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
   parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
-  # parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v1_date_data = v1_date_data)
-
-
-  # check cog task completion for RPPR ####
-
-  sum(child_visit_1_arm_1$toolbox_age_7_flanker_check == 1 | child_visit_1_arm_1$toolbox_age_8_flanker_check == 1, na.rm = TRUE)
-  sum(child_visit_1_arm_1$toolbox_age_7_dccs_check == 1 | child_visit_1_arm_1$toolbox_age_8_dccs_check == 1, na.rm = TRUE)
-  sum(child_visit_1_arm_1$toolbox_list_sorting_check == 1, na.rm = TRUE)
-  sum(child_visit_3_arm_1$spaec_game_check == 1, na.rm = TRUE)
-  sum(child_visit_5_arm_1$toolbox_list_sorting_check == 1, na.rm = TRUE)
-  sum(child_visit_5_arm_1$toolbox_age_8_dccs_check == 1, na.rm = TRUE)
-  sum(child_visit_5_arm_1$toolbox_age_8_flanker_check == 1, na.rm = TRUE)
-  sum(child_visit_3_arm_1$pit_task_completed_check == 1, na.rm = TRUE)
-  sum(child_visit_5_arm_1$pit_task_completed_check == 1, na.rm = TRUE)
-
+  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= v5_date_data)
 
   # #### Load and organize double-entry data ####
   # redcap_de_data <- read.csv(data_de_path, header = TRUE)
@@ -213,25 +199,62 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
     transform(child_v5_data$kbas_data, visit = "5")
   ) %>% dplyr::relocate(visit, .after = 1)
 
-  # stacked_cebq <- dplyr::bind_rows(
-  #   mutate(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
-  #   mutate(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
+  # stacked_loc <- dplyr::bind_rows(
+  #   transform(child_v4_data$loc_data, visit = "4"),
+  #   transform(child_v5_data$loc_data, visit = "5")
   # ) %>% dplyr::relocate(visit, .after = 1)
 
-  # stacked_cebq <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype)
-  # stacked_cbq <- rbind(parent_v2_data$cbq_data$bids_phenotype, parent_v5_data$cbq_data$bids_phenotype)
-  # stacked_cshq <- rbind(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
-  # stacked_audit <- rbind(parent_v4_data$audit_data$bids_phenotype, parent_v5_data$audit_data$bids_phenotype)
-  # stacked_pstca <- rbind(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype)
-  # stacked_pmum <- rbind(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype)
-  # stacked_cfpq <- rbind(parent_v4_data$cfpq_data$bids_phenotype, parent_v5_data$cfpq_data$bids_phenotype)
-# stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
-# stacked_puberty <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype) # will this be bids_phenotype/scored
-# stacked_class <-
-# stacked_household <-
-# stacked_demo <-
-# stacked_loc <-
+  stacked_demo <- dplyr::bind_rows(
+    transform(parent_v1_data$demo_data, visit = "1"),
+    transform(parent_v5_data$demo_data, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
 
+  stacked_household <- dplyr::bind_rows(
+    transform(parent_v1_data$household_data, visit = "1"),
+    transform(parent_v5_data$household_data, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_cebq <- dplyr::bind_rows(
+    transform(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
+    transform(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_cbq <- dplyr::bind_rows(
+    transform(parent_v2_data$cbq_data$bids_phenotype, visit = "2"),
+    transform(parent_v5_data$cbq_data$bids_phenotype, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  # not scored/in bids_phenotype yet
+  # stacked_cshq <- dplyr::bind_rows(
+  #   transform(parent_v2_data$cshq_data$bids_phenotype, visit = "2"),
+  #   transform(parent_v5_data$cshq_data$bids_phenotype, visit = "5")
+  # ) %>% dplyr::relocate(visit, .after = 1)
+
+  # not scored/in bids_phenotype yet
+  # stacked_pstca <- dplyr::bind_rows(
+  #   transform(parent_v3_data$pstca_data$bids_phenotype, visit = "3"),
+  #   transform(parent_v5_data$pstca_data$bids_phenotype, visit = "5")
+  # ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_audit <- dplyr::bind_rows(
+    transform(parent_v4_data$audit_data$bids_phenotype, visit = "4"),
+    transform(parent_v5_data$audit_data$bids_phenotype, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  # not scored/in bids_phenotype yet
+  # stacked_pmum <- dplyr::bind_rows(
+  #   transform(parent_v4_data$pmum_data$bids_phenotype, visit = "4"),
+  #   transform(parent_v5_data$pmum_data$bids_phenotype, visit = "5")
+  # ) %>% dplyr::relocate(visit, .after = 1)
+
+  stacked_cfpq <- dplyr::bind_rows(
+    transform(parent_v4_data$cfpq_data$bids_phenotype, visit = "4"),
+    transform(parent_v5_data$cfpq_data$bids_phenotype, visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  # stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
+  # stacked_puberty <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype) # will this be bids_phenotype/scored, add child response to this?
+  # stacked_class <-  # will this be bids_phenotype/scored
 
 
   # #### Export Phenotype Data ####
@@ -259,26 +282,39 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   write.csv(parent_v3_data$tfeq_data$bids_phenotype, paste0(phenotype_wd, slash, 'tfeq.tsv'), row.names = FALSE) # tfeq
   write.csv(parent_v3_data$bisbas_data$bids_phenotype, paste0(phenotype_wd, slash, 'bisbas.tsv'), row.names = FALSE) # bisbas
   write.csv(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # debq
-  # write.csv(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # scpf -- will this be bids_phenotype
+  # write.csv(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'scpf.tsv'), row.names = FALSE) # scpf -- will this be bids_phenotype
 
   # export stacked dataframes
 
+  # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
   write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
   write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
   write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
-  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cebq
-  # write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cbq
-  # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE) #cshq
-  # ...
+  write.csv(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), row.names = FALSE) # should this be the participants.tsv?
+
+  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
+  # write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), row.names = FALSE)
+  # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cshq.tsv'), row.names = FALSE)
+  # write.csv(stacked_pstca, paste0(phenotype_wd, slash, 'pstca.tsv'), row.names = FALSE)
+  # write.csv(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), row.names = FALSE)
+  # write.csv(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), row.names = FALSE)
+  # write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
+  # write.csv(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), row.names = FALSE)
+
 
   # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
 
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
+                 child_v2_data = child_v2_data,
+                 child_v3_data = child_v3_data,
+                 child_v4_data = child_v4_data,
+                 child_v5_data = child_v5_data,
                  parent_v1_data = parent_v1_data,
                  parent_v2_data = parent_v2_data,
                  parent_v3_data = parent_v3_data,
-                 parent_v4_data = parent_v4_data
+                 parent_v4_data = parent_v4_data,
+                 parent_v5_data = parent_v5_data
                  ))
   }
 }
