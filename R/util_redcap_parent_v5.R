@@ -70,7 +70,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   # score?
 
   ## Puberty Data ####
-  puberty_data <- data[, grepl('participant_id', names(data)) | grepl('prs', names(data))]
+  puberty_data <-data[, grep("participant_id|^prs|tanner_", names(data))]
   names(puberty_data) <- gsub('prs_sex', 'sex', names(puberty_data))
 
   # scoring prep: update puberty_data to adhere to dataprepr::score_pds requirements:
@@ -88,7 +88,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
 
   # subset and rename girls variables
   puberty_data_girls <- subset(puberty_data, sex == 0)
-  puberty_data_girls <- puberty_data_girls[, !grepl('boys', names(puberty_data_girls))]
+  puberty_data_girls <- puberty_data_girls[, -grep("boys|tanner_male_choice", names(puberty_data_girls))]
   puberty_data_girls <- puberty_data_girls %>% dplyr::rename(
     pds_1 = prs_girls_1,
     pds_2 = prs_girls_2,
@@ -96,11 +96,12 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
     pds_4f = prs_girls_4,
     pds_5fa = prs_girls_5,
     pds_6 = prs_girls_6,
+    tanner_choice = tanner_female_choice
   )
 
   # subset and rename boys variables
   puberty_data_boys <- subset(puberty_data, sex == 1)
-  puberty_data_boys <- puberty_data_boys[, !grepl('girls', names(puberty_data_boys))]
+  puberty_data_boys <- puberty_data_boys[, -grep("girls|tanner_female_choice", names(puberty_data_boys))]
   puberty_data_boys <- puberty_data_boys %>% dplyr::rename(
     pds_1 = prs_boys_1,
     pds_2 = prs_boys_2,
@@ -108,8 +109,8 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
     pds_4m = prs_boys_4,
     pds_5m = prs_boys_5,
     pds_6 = prs_boys_6,
+    tanner_choice = tanner_male_choice
   )
-
   # bind girls and boys dfs -- dplyr::bind_rows fills missing values with NA where columns don't match.
   puberty_data_for_scoring <- dplyr::bind_rows(puberty_data_girls, puberty_data_boys)
 
