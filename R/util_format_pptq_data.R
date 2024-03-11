@@ -76,9 +76,9 @@ util_format_pptq_data <- function(pptq_data) {
     pptq_data[[question]] <- NA
 
     pptq_data[[question]] <-
-      ifelse(sapply(pptq_data[[left_var]] == 0, isTRUE), 1,
-             ifelse(sapply(pptq_data[[mid_var]] == 0, isTRUE), 2,
-                    ifelse(sapply(pptq_data[[right_var]] == 0, isTRUE), 3, NA)))
+      ifelse(sapply(pptq_data[[left_var]] == 0, isTRUE) & is.na(pptq_data[[mid_var]]) & is.na(pptq_data[[right_var]]), 1,
+             ifelse(sapply(pptq_data[[mid_var]] == 0, isTRUE) & is.na(pptq_data[[left_var]]) & is.na(pptq_data[[right_var]]), 2,
+                    ifelse(sapply(pptq_data[[right_var]] == 0, isTRUE) & is.na(pptq_data[[left_var]]) & is.na(pptq_data[[mid_var]]), 3, NA)))
   }
 
   # return data
