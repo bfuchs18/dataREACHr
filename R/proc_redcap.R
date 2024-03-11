@@ -284,6 +284,8 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   write.csv(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # debq
   # write.csv(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'scpf.tsv'), row.names = FALSE) # scpf -- will this be bids_phenotype
 
+  write.csv(child_v4_data$pptq_data$bids_phenotype, paste0(phenotype_wd, slash, 'pptq.tsv'), row.names = FALSE) # debq
+
   # export stacked dataframes
 
   # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?

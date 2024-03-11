@@ -48,12 +48,9 @@ util_format_pptq_data <- function(pptq_data) {
   names(pptq_data)[names(pptq_data) == "pptq_jokes_no_laugh"] <- "pptq_11_left"
   names(pptq_data)[names(pptq_data) == "pptq_jokes_laugh"] <- "pptq_11_right"
   names(pptq_data)[names(pptq_data) == "pptq_jokes_depends"] <- "pptq_11_middle"
-
-  # determine how to name these -- in the original scale, the images do not correspond to the text
   names(pptq_data)[names(pptq_data) == "pptq_usually_worried"] <- "pptq_12_left"
   names(pptq_data)[names(pptq_data) == "pptq_usually_not_worried"] <- "pptq_12_right"
   names(pptq_data)[names(pptq_data) == "pptq_usually_depends"] <- "pptq_12_middle"
-
   names(pptq_data)[names(pptq_data) == "pptq_learning_not_enjoyed"] <- "pptq_13_left"
   names(pptq_data)[names(pptq_data) == "pptq_learning_is_enjoyed"] <- "pptq_13_right"
   names(pptq_data)[names(pptq_data) == "pptq_learning_depends"] <- "pptq_13_middle"
@@ -82,7 +79,7 @@ util_format_pptq_data <- function(pptq_data) {
   }
 
   # return data
-  return(pptq_for_scoring)
+  return(pptq_data[, (names(pptq_data) %in% c('participant_id', primary_qs))])
 
 }
 

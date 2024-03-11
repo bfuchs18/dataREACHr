@@ -42,9 +42,8 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
 
   ## pptq ####
   pptq_data <-data[, grep("participant_id|^pptq", names(data))]
-  # pptq_data_for_scoring <- util_format_pptq_data(pptq_data)
-  # score
-  # pptq_scored <- dataprepr::score_pptq(pptq_data_for_scoring, pptq_scale = 3, score_base = TRUE)
+  pptq_data_for_scoring <- util_format_pptq_data(pptq_data)
+  pptq_scored <- dataprepr::score_pptq(pptq_data_for_scoring, pptq_scale = 3, score_base = FALSE, id = "participant_id")
 
   ## sic ####
   sic_data <-data[, grep("participant_id|^sic", names(data))]
@@ -59,7 +58,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
     return(list(visit_data_child = visit_data_child,
                 meal_info = meal_info,
                 loc_data = loc_data,
-                pptq_data = pptq_data,
+                pptq_data = pptq_scored,
                 sic_data = sic_data,
                 wasi_data = wasi_data))
   }
