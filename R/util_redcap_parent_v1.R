@@ -45,9 +45,16 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
                                                                     'parent_household_demographics_questionnaire_complete',
                                                                     child_demo_vars))]
 
-  names(data)[names(data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft_component"
-  names(data)[names(data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_inch_component"
-  names(data)[names(data) == "demo_self_report_weight"] <- "demo_parent2_reported_weight_lbs"
+  names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft_component"
+  names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_inch_component"
+  names(household_data)[names(household_data) == "demo_self_report_weight"] <- "demo_parent2_reported_weight_lbs"
+
+
+  # combine parent2 feet and inch components into 1 height variable in meters
+  household_data$parent2_reported_height_m <- ((household_data$demo_parent2_reported_height_ft_component*12) + household_data$demo_parent2_reported_height_inch_component)*0.0254
+
+  # calculate parent2 BMI (kg/m2)
+  household_data$parent2_reported_bmi <- (household_data$demo_parent2_reported_weight_lbs*0.453592) / (household_data$parent2_reported_height_m**2)
 
   # subset demo_data
   demo_data <- demo_data_all[, c('participant_id', child_demo_vars)]
