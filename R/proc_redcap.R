@@ -243,8 +243,13 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
-  # stacked_puberty <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype) # will this be bids_phenotype/scored, add child response to this?
   # stacked_class <-  # will this be bids_phenotype/scored
+
+  stacked_puberty <- dplyr::bind_rows(
+    transform(parent_v1_data$puberty_data$bids_phenotype, visit = "1", session = "ses-1", responder = "parent"),
+    transform(parent_v5_data$puberty_data$bids_phenotype, visit = "5", session = "ses-2", responder = "parent"),
+    transform(child_v5_data$puberty_data$bids_phenotype, visit = "5", session = "ses-2", responder = "child"),
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2) %>% dplyr::relocate(responder, .after = 3)
 
 
   #### Export Phenotype Data ####
@@ -292,6 +297,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # write.csv(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), row.names = FALSE)
   write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
   # write.csv(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), row.names = FALSE)
+  write.csv(stacked_puberty, paste0(phenotype_wd, slash, 'puberty.tsv'), row.names = FALSE)
+
 
   # export double entry dexa data
   write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)

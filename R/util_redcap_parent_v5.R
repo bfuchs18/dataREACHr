@@ -77,6 +77,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
 
   ## Puberty Data ####
   puberty_data <-data[, grep("participant_id|^prs|tanner_", names(data))]
+  puberty_data <-puberty_data[, -grep("prs_missingcheck", names(puberty_data))]
   puberty_data_for_scoring <-util_format_puberty_data(puberty_data)
   puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "1", female = "0", id = 'participant_id')
 
