@@ -94,8 +94,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
 
   ## PSS Data  (percieved stress scale) ####
   pss_data <- data[, grepl('participant_id', names(data)) | grepl('pss', names(data))]
-  # need to develop score script
-  #pss_scored <-
+  pss_scored <- dataprepr::score_pss(pss_data, score_base = TRUE, id = "participant_id")
 
   ## LBC Data  ####
   lbc_data <- data[, grepl('participant_id', names(data)) | grepl('lbc', names(data))]
@@ -115,8 +114,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
       efcr_data = efcr_scored,
 #      chaos_data = chaos_scored, #score script to be developed
       chaos_data = chaos_data,
-#      pss_data = pss_scored, # score script to be developed
-      pss_data = pss_data,
+      pss_data = pss_scored,
       lbc_data = lbc_scored))
   }
 }

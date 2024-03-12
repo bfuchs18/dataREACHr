@@ -270,7 +270,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE) # cfq
   write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
   write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
-  # write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss -- will this be bids_phenotype
+  write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss
 
   # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE) #brief
   # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
