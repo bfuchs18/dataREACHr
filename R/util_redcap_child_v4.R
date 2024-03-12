@@ -49,18 +49,12 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   sic_data <-data[, grep("participant_id|^sic", names(data))]
   # score?
 
-  ## wasi ####
-  # get wasi scores through double-entry?
-  wasi_data <-data[, grep("participant_id|^wasi", names(data))]
-  wasi_data <- wasi_data[, !(names(wasi_data) %in% c('wasi_age_y', 'wasi_age_m','wasi_iq_scoring_form_complete'))]
-
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_info = meal_info,
                 loc_data = loc_data,
                 pptq_data = pptq_scored,
-                sic_data = sic_data,
-                wasi_data = wasi_data))
+                sic_data = sic_data))
   }
 }
 

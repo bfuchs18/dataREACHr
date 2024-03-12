@@ -4,10 +4,17 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study REACH REDCap}
 \usage{
-proc_redcap(visit_data_path, overwrite = FALSE, return_data = FALSE)
+proc_redcap(
+  visit_data_path,
+  data_de_path,
+  overwrite = FALSE,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{visit_data_path}{full path to the redcap visit data in bids/sourcedata/phenotype directory}
+
+\item{data_de_path}{full path to the redcap double entry data in bids/sourcedata/phenotype directory}
 
 \item{overwrite}{overwrite existing files (default = FALSE)}
 
@@ -33,6 +40,8 @@ This function:
 To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 }
 \examples{
+
+data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
 visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
 
 phenotype_data <- proc_redcap(visit_data_path, return = TRUE)

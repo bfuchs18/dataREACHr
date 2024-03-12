@@ -33,25 +33,6 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v1_post_check_notes', 'v1_date', 'child_assent', 'dxa_notes', 'rrv_task_notes')]
   names(visit_data_child)[names(visit_data_child) == "v1_post_check_notes"] <- "v1_notes"
 
-  # ## anthropometrics ####
-  anthro_data <- data[c('participant_id', 'child_height_1_cm', 'child_height_2_cm', 'child_weight_1_kg', 'child_weight_2_kg', 'child_height_average', 'child_average_weight', 'child_bmi_v1', 'child_bmi_percentile', 'child_bmi_screenout',
-                        'parent_height_sex', 'parent_height_1_cm', 'parent_height_2_cm', 'parent_weight_1_kg', 'parent_weight_2_kg', 'parent_height_average_cm', 'parent_weight_average_kg', 'parent_bmi_redcap_calc', 'parent_bmi_v1_self_report',
-                        'parent_bmi_screenout', 'heightweight_notes')]
-
-  # child bmi and percentile values were determined using the online form and entered into redcap -- recalculate?
-
-  names(anthro_data)[names(anthro_data) == "child_bmi_v1"] <- "child_bmi"
-  names(anthro_data)[names(anthro_data) == "parent_height_sex"] <- "parent1_sex"
-  names(anthro_data)[names(anthro_data) == "parent_height_1_cm"] <- "parent1_height_1_cm"
-  names(anthro_data)[names(anthro_data) == "parent_height_2_cm"] <- "parent1_height_2_cm"
-  names(anthro_data)[names(anthro_data) == "parent_weight_1_kg"] <- "parent1_weight_1_kg"
-  names(anthro_data)[names(anthro_data) == "parent_weight_2_kg"] <- "parent1_weight_2_kg"
-  names(anthro_data)[names(anthro_data) == "parent_height_average_cm"] <- "parent1_height_average_cm"
-  names(anthro_data)[names(anthro_data) == "parent_weight_average_kg"] <- "parent1_weight_average_kg"
-  names(anthro_data)[names(anthro_data) == "parent_bmi_redcap_calc"] <- "parent1_bmi_measured"
-  names(anthro_data)[names(anthro_data) == "parent_bmi_v1_self_report"] <- "parent2_bmi_partner_report"
-
-
   ## meal information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
   meal_info <- data[, grepl('vas', names(data)) |

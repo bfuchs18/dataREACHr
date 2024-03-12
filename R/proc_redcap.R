@@ -9,6 +9,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
 #' @param visit_data_path full path to the redcap visit data in bids/sourcedata/phenotype directory
+#' @param data_de_path full path to the redcap double entry data in bids/sourcedata/phenotype directory
 #' @param overwrite overwrite existing files (default = FALSE)
 #' @param return_data return phenotype to console (default = FLASE)
 #'
@@ -17,6 +18,8 @@
 #'  2) meta-data/.json inforamtion for each task
 #'
 #' @examples
+#'
+#' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
 #' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
 #'
 #' phenotype_data <- proc_redcap(visit_data_path, return = TRUE)
@@ -27,7 +30,7 @@
 #' @importFrom utils tail write.csv read.csv
 #' @export
 
-proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE) {
+proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return_data = FALSE) {
 
   # For testing
   # visit_data_path = "/Users/baf44/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
@@ -70,20 +73,20 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
     visit_data_file <- visit_data_path
   }
 
-  # if (!grep('.csv', data_de_path)) {
-  #   data_de_file <- paste0(data_de_path, '.csv')
-  # } else {
-  #   data_de_file <- data_de_path
-  # }
+  if (!grep('.csv', data_de_path)) {
+    data_de_file <- paste0(data_de_path, '.csv')
+  } else {
+    data_de_file <- data_de_path
+  }
 
   # check file existis
   if (!file.exists(visit_data_file)) {
     stop ('entered visit_data_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
   }
 
-  # if (!file.exists(data_de_file)) {
-  #   stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
-  # }
+  if (!file.exists(data_de_file)) {
+    stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
+  }
 
 
 
@@ -146,14 +149,11 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
   parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= v5_date_data)
 
-  # #### Load and organize double-entry data ####
-  # redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  #
-  # # all validated so can just take reviewer 1 data
-  # redcap_de_data <- redcap_de_data[grepl('--1', redcap_de_data[['record_id']]), ]
-  #
-  #
-  #
+  #### Load and organize double-entry data ####
+  redcap_de_data <- read.csv(data_de_path, header = TRUE)
+  # processed_de_data <- util_redcap_de(redcap_de_data)
+
+
   # # merge
   # participant_data <- merge(prepost_v1_data$prepost_data$data, prepost_v2_data$data, by = 'participant_id')
   # participant_data <- merge(participant_data, child_v1_data$child_visit1_data$data, by = 'participant_id')
@@ -164,11 +164,7 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   # participant_data$participant_id <- as.numeric(participant_data$participant_id)
   #
   # double_enter_data$bodpod_data$data$participant_id <- as.numeric(double_enter_data$bodpod_data$data$participant_id)
-  # #### Load and organize data double entry ####
-  # redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  #
-  # double_enter_data <- util_redcap_de(redcap_de_data)
-  # participant_data <- merge(participant_data, double_enter_data$bodpod_data$data, by = 'participant_id')
+  #  # participant_data <- merge(participant_data, double_enter_data$bodpod_data$data, by = 'participant_id')
   #
   #
   # #### Merge/stack visit data/notes ###
@@ -289,20 +285,22 @@ proc_redcap <- function(visit_data_path, overwrite = FALSE, return_data = FALSE)
   # export stacked dataframes
 
   # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
-  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
+  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE) # will this come from data_de?
   write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
   write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
   write.csv(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), row.names = FALSE) # should this be the participants.tsv?
+  write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
+  write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), row.names = FALSE)
 
-  # write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
-  # write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), row.names = FALSE)
   # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cshq.tsv'), row.names = FALSE)
   # write.csv(stacked_pstca, paste0(phenotype_wd, slash, 'pstca.tsv'), row.names = FALSE)
-  # write.csv(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), row.names = FALSE)
+  write.csv(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), row.names = FALSE)
   # write.csv(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), row.names = FALSE)
-  # write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
+  write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
   # write.csv(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), row.names = FALSE)
 
+  # export double entry dexa data
+  write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
 
   # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
 
