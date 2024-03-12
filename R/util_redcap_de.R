@@ -66,9 +66,9 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
   # stack anthro data
   stacked_anthro <- dplyr::bind_rows(
-    transform(anthro_v1_data, visit = "1"),
-    transform(anthro_v5_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(anthro_v1_data, visit = "1", session = "ses-1"),
+    transform(anthro_v5_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   ## DEXA data ####
@@ -87,9 +87,9 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
   # stack visit 1 and visit 5 data, add "visit" column, move "visit" to column 2
   stacked_dexa <- dplyr::bind_rows(
-    transform(dexa_v1_data, visit = "1"),
-    transform(dexa_v5_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(dexa_v1_data, visit = "1", session = "ses-1"),
+    transform(dexa_v5_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   ## meal data ####
@@ -122,11 +122,11 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
   # stack intake data
   stacked_intake <- dplyr::bind_rows(
-    transform(v1_intake_data, visit = "1"),
-    transform(v3_intake_data, visit = "3"),
-    transform(v4_intake_data, visit = "4"),
-    transform(v5_intake_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(v1_intake_data, visit = "1", session = "ses-1"),
+    transform(v3_intake_data, visit = "3", session = "ses-1"),
+    transform(v4_intake_data, visit = "4", session = "ses-1"),
+    transform(v5_intake_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   if (isTRUE(return_data)) {

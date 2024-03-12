@@ -161,9 +161,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # Merge double-entered anthro_data with parent-reported parent2 height and weight from household_data
 
   stacked_parent2_anthro <- dplyr::bind_rows(
-    transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1"),
-    transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1", session = "ses-1"),
+    transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(visit, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   anthro_data <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
 
@@ -177,75 +177,70 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Stack visit data collected on 2 visits ####
   # Note: double entry data collected on 2 visits is stacked by util_redcap_de()
 
-  # Dataframes will have a "visit" column added before stacking, "visit" column will be moved to column 2
-
-  stacked_anthro <- dplyr::bind_rows(
-    transform(child_v1_data$anthro_data, visit = "1"),
-    transform(child_v5_data$anthro_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+  # Dataframes will have a "visit" and "session" columns added before stacking, and these will be moved to columns 2 and 3
 
   stacked_stq <- dplyr::bind_rows(
-    transform(child_v1_data$stq_data, visit = "1"),
-    transform(child_v5_data$stq_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(child_v1_data$stq_data, visit = "1", session = "ses-1"),
+    transform(child_v5_data$stq_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_kbas <- dplyr::bind_rows(
-    transform(child_v1_data$kbas_data, visit = "1"),
-    transform(child_v5_data$kbas_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(child_v1_data$kbas_data, visit = "1", session = "ses-1"),
+    transform(child_v5_data$kbas_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # stacked_loc <- dplyr::bind_rows(
-  #   transform(child_v4_data$loc_data, visit = "4"),
-  #   transform(child_v5_data$loc_data, visit = "5")
-  # ) %>% dplyr::relocate(visit, .after = 1)
+  #   transform(child_v4_data$loc_data, visit = "4", session = "ses-1"),
+  #   transform(child_v5_data$loc_data, visit = "5"), session = "ses-2"
+  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_demo <- dplyr::bind_rows(
-    transform(parent_v1_data$demo_data, visit = "1"),
-    transform(parent_v5_data$demo_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v1_data$demo_data, visit = "1", session = "ses-1"),
+    transform(parent_v5_data$demo_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_household <- dplyr::bind_rows(
-    transform(parent_v1_data$household_data, visit = "1"),
-    transform(parent_v5_data$household_data, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v1_data$household_data, visit = "1", session = "ses-1"),
+    transform(parent_v5_data$household_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_cebq <- dplyr::bind_rows(
-    transform(parent_v1_data$cebq_data$bids_phenotype, visit = "1"),
-    transform(parent_v5_data$cebq_data$bids_phenotype, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v1_data$cebq_data$bids_phenotype, visit = "1", session = "ses-1"),
+    transform(parent_v5_data$cebq_data$bids_phenotype, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_cbq <- dplyr::bind_rows(
-    transform(parent_v2_data$cbq_data$bids_phenotype, visit = "2"),
-    transform(parent_v5_data$cbq_data$bids_phenotype, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v2_data$cbq_data$bids_phenotype, visit = "2", session = "ses-1"),
+    transform(parent_v5_data$cbq_data$bids_phenotype, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # not scored/in bids_phenotype yet
   # stacked_cshq <- dplyr::bind_rows(
-  #   transform(parent_v2_data$cshq_data$bids_phenotype, visit = "2"),
-  #   transform(parent_v5_data$cshq_data$bids_phenotype, visit = "5")
-  # ) %>% dplyr::relocate(visit, .after = 1)
+  #   transform(parent_v2_data$cshq_data$bids_phenotype, visit = "2", session = "ses-1"),
+  #   transform(parent_v5_data$cshq_data$bids_phenotype, visit = "5", session = "ses-2")
+  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # not scored/in bids_phenotype yet
   # stacked_pstca <- dplyr::bind_rows(
-  #   transform(parent_v3_data$pstca_data$bids_phenotype, visit = "3"),
-  #   transform(parent_v5_data$pstca_data$bids_phenotype, visit = "5")
-  # ) %>% dplyr::relocate(visit, .after = 1)
+  #   transform(parent_v3_data$pstca_data$bids_phenotype, visit = "3", session = "ses-1"),
+  #   transform(parent_v5_data$pstca_data$bids_phenotype, visit = "5", session = "ses-2")
+  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_audit <- dplyr::bind_rows(
-    transform(parent_v4_data$audit_data$bids_phenotype, visit = "4"),
-    transform(parent_v5_data$audit_data$bids_phenotype, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v4_data$audit_data$bids_phenotype, visit = "4", session = "ses-1"),
+    transform(parent_v5_data$audit_data$bids_phenotype, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # not scored/in bids_phenotype yet
   # stacked_pmum <- dplyr::bind_rows(
-  #   transform(parent_v4_data$pmum_data$bids_phenotype, visit = "4"),
-  #   transform(parent_v5_data$pmum_data$bids_phenotype, visit = "5")
-  # ) %>% dplyr::relocate(visit, .after = 1)
+  #   transform(parent_v4_data$pmum_data$bids_phenotype, visit = "4", session = "ses-1"),
+  #   transform(parent_v5_data$pmum_data$bids_phenotype, visit = "5", session = "ses-2")
+#  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_cfpq <- dplyr::bind_rows(
-    transform(parent_v4_data$cfpq_data$bids_phenotype, visit = "4"),
-    transform(parent_v5_data$cfpq_data$bids_phenotype, visit = "5")
-  ) %>% dplyr::relocate(visit, .after = 1)
+    transform(parent_v4_data$cfpq_data$bids_phenotype, visit = "4", session = "ses-1"),
+    transform(parent_v5_data$cfpq_data$bids_phenotype, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
   # stacked_puberty <- rbind(parent_v1_data$cebq_data$bids_phenotype, parent_v5_data$cebq_data$bids_phenotype) # will this be bids_phenotype/scored, add child response to this?
