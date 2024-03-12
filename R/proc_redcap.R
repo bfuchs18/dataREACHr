@@ -35,7 +35,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # For testing
   # visit_data_path = "/Users/baf44/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
 
-  #### 1. Set up/initial checks #####
+  #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
   data_arg <- methods::hasArg(visit_data_path)
@@ -49,6 +49,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   } else if (isFALSE(data_arg)) {
     stop("visit_data_path must be entered as a string")
   }
+
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -89,11 +90,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   }
 
 
-
-
   #### Load and organize visit data ####
   redcap_visit_data <- read.csv(visit_data_path, header = TRUE)
-
 
   # # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -107,7 +105,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     return(sub_dat)
   }
 
-  # process visit data ####
+  # Process visit data ####
   child_visit_1_arm_1 <- redcap_long_wide('child_visit_1_arm_1', redcap_visit_data)
   parent_visit_1_arm_1 <- redcap_long_wide('parent_visit_1_arm_1', redcap_visit_data)
   child_visit_2_arm_1 <- redcap_long_wide('child_visit_2_arm_1', redcap_visit_data)
@@ -151,34 +149,35 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Load and organize double-entry data ####
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  # processed_de_data <- util_redcap_de(redcap_de_data)
+  processed_de_data <- util_redcap_de(redcap_de_data)
 
 
-  # # merge
-  # participant_data <- merge(prepost_v1_data$prepost_data$data, prepost_v2_data$data, by = 'participant_id')
-  # participant_data <- merge(participant_data, child_v1_data$child_visit1_data$data, by = 'participant_id')
-  # participant_data <- merge(participant_data, child_v2_data$child_visit2_data$data, by = 'participant_id')
-  # participant_data <- merge(participant_data, child_v2_data$loc_data$data, by = 'participant_id')
-  # participant_data <- merge(participant_data, parent_v1_data$demo_data$data, by = 'participant_id')
-  #
-  # participant_data$participant_id <- as.numeric(participant_data$participant_id)
-  #
-  # double_enter_data$bodpod_data$data$participant_id <- as.numeric(double_enter_data$bodpod_data$data$participant_id)
-  #  # participant_data <- merge(participant_data, double_enter_data$bodpod_data$data, by = 'participant_id')
-  #
-  #
-  # #### Merge/stack visit data/notes ###
-
-    # merge demo data?? parent-reported parent2 height and weight are in household_data -- BMI not automatically calculated for parent2 v5 in child form
-    # merge dexa_notes with dexa_data? task notes with task data?
-
-  # merge intake data
+  #### Merge data  ####
 
   # merge notes/visit data?
 
-  # stack data collected on 2 visits
+  # Merge data that belongs in participant.tsv
 
-  # Combine the datasets with an additional "visit" column, move "visit" to column 2
+  # Merge double-entered anthro_data with parent-reported parent2 height and weight from household_data
+
+  stacked_parent2_anthro <- dplyr::bind_rows(
+    transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1"),
+    transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5")
+  ) %>% dplyr::relocate(visit, .after = 1)
+
+  anthro_data <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
+
+  # merge dexa_notes with dexa_data?
+
+  # merge MRI visit data ??
+
+  # merge intake_data from visits and double-entry
+
+
+  #### Stack visit data collected on 2 visits ####
+  # Note: double entry data collected on 2 visits is stacked by util_redcap_de()
+
+  # Dataframes will have a "visit" column added before stacking, "visit" column will be moved to column 2
 
   stacked_anthro <- dplyr::bind_rows(
     transform(child_v1_data$anthro_data, visit = "1"),
@@ -253,8 +252,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # stacked_class <-  # will this be bids_phenotype/scored
 
 
-  # #### Export Phenotype Data ####
-  #
+  #### Export Phenotype Data ####
+
+  # Update to only export if overwrite == TRUE
 
   # generate phenotype_wd if it doesnt exist
   if (!file.exists(phenotype_wd)){
@@ -262,7 +262,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   }
 
   # export forms collected at 1 visit only (i.e., not stacked data) -- can this be done using a list of lists and a loop?
-
   write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE) # cfq
   write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
   write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
@@ -302,6 +301,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # export double entry dexa data
   write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
 
+
   # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
 
   if (isTRUE(return_data)){
@@ -314,7 +314,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                  parent_v2_data = parent_v2_data,
                  parent_v3_data = parent_v3_data,
                  parent_v4_data = parent_v4_data,
-                 parent_v5_data = parent_v5_data
+                 parent_v5_data = parent_v5_data,
+                 processed_de_data = processed_de_data
                  ))
   }
 }
