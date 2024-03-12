@@ -48,18 +48,10 @@ util_redcap_de <- function(data, return_data = TRUE) {
   anthro_data <- data[, grep("participant_id|parent_height|child_height|parent_weight|child_weight|bmi", names(data))]
   anthro_data <- anthro_data[, -grep("complete|self_report", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
 
-  # child bmi and percentile values were determined using the online form and entered into redcap -- recalculate?
-
   colnames(anthro_data) <- gsub("child_bmi_v1", "child_bmi", colnames(anthro_data))
-  # names(anthro_data)[names(anthro_data) == "parent_height_sex"] <- "parent1_sex"
-  # names(anthro_data)[names(anthro_data) == "parent_height_1_cm"] <- "parent1_height_1_cm"
-  # names(anthro_data)[names(anthro_data) == "parent_height_2_cm"] <- "parent1_height_2_cm"
-  # names(anthro_data)[names(anthro_data) == "parent_weight_1_kg"] <- "parent1_weight_1_kg"
-  # names(anthro_data)[names(anthro_data) == "parent_weight_2_kg"] <- "parent1_weight_2_kg"
-  # names(anthro_data)[names(anthro_data) == "parent_height_average_cm"] <- "parent1_height_average_cm"
-  # names(anthro_data)[names(anthro_data) == "parent_weight_average_kg"] <- "parent1_weight_average_kg"
-  # names(anthro_data)[names(anthro_data) == "parent_bmi_redcap_calc"] <- "parent1_bmi_measured"
-  #
+  colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
+
+  # child bmi and percentile values were determined using the online form and entered into redcap -- recalculate?
 
   # separate visit data
   anthro_v1_data <- anthro_data[, grep("participant_id|v1", names(anthro_data))]
@@ -67,7 +59,6 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
   anthro_v5_data <- anthro_data[, grep("participant_id|v5", names(anthro_data))]
   colnames(anthro_v5_data) <- gsub("_v5", "", colnames(anthro_v5_data)) # Remove "v5_" from column names
-
 
   # make all vales numeric
   anthro_v1_data <- dplyr::mutate_all(anthro_v1_data, function(x) as.numeric(as.character(x)))
@@ -78,7 +69,6 @@ util_redcap_de <- function(data, return_data = TRUE) {
     transform(anthro_v1_data, visit = "1"),
     transform(anthro_v5_data, visit = "5")
   ) %>% dplyr::relocate(visit, .after = 1)
-
 
 
   ## DEXA data ####
