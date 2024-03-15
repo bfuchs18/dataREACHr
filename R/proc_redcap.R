@@ -105,7 +105,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     return(sub_dat)
   }
 
-  # Process visit data ####
+  # Extract visit data ####
   child_visit_1_arm_1 <- redcap_long_wide('child_visit_1_arm_1', redcap_visit_data)
   parent_visit_1_arm_1 <- redcap_long_wide('parent_visit_1_arm_1', redcap_visit_data)
   child_visit_2_arm_1 <- redcap_long_wide('child_visit_2_arm_1', redcap_visit_data)
@@ -117,39 +117,47 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   child_visit_5_arm_1 <- redcap_long_wide('child_visit_5_arm_1', redcap_visit_data)
   parent_visit_5_arm_1 <- redcap_long_wide('parent_visit_5_arm_1', redcap_visit_data)
 
-  # get visit 1 date data - needed for util_redcap_parent_v1()
-  v1_date_data <- child_visit_1_arm_1[, c("record_id", "v1_date")]
-  names(v1_date_data)[names(v1_date_data) == "record_id"] <- "participant_id"
+  # Make dataframe of visit dates and ages
+  date_data <- merge(child_visit_1_arm_1[, c("record_id", "v1_date")], child_visit_2_arm_1[, c("record_id", "v2_date")], by = "record_id", all = TRUE)
+  date_data <- merge(date_data, child_visit_3_arm_1[, c("record_id", "v3_date")], by = "record_id", all = TRUE)
+  date_data <- merge(date_data, child_visit_4_arm_1[, c("record_id", "v4_date")], by = "record_id", all = TRUE)
+  date_data <- merge(date_data, child_visit_5_arm_1[, c("record_id", "v5_date")], by = "record_id", all = TRUE)
 
-  # get age and sex data - needed for util_redcap_parent_v2()
-  agesex_data <- parent_visit_1_arm_1[, c("record_id", "prs_sex", "demo_child_birthdate")]
-  agesex_data <- merge(agesex_data, child_visit_2_arm_1[, c("record_id", "v2_date")], by = "record_id")
-  agesex_data[['demo_child_birthdate']] <- lubridate::as_date(agesex_data[['demo_child_birthdate']])
-  agesex_data[['v2_date']] <- lubridate::as_date(agesex_data[['v2_date']])
-  agesex_data[['v2_age']] <- lubridate::interval(agesex_data[['demo_child_birthdate']], agesex_data[['v2_date']])/lubridate::years(1)
-  agesex_data <- agesex_data[, c("record_id", "prs_sex", "v2_age")]
-  colnames(agesex_data) <- c("participant_id", "sex", "age")
+  # add child sex and dob to date_data
+  date_data <- merge(date_data, parent_visit_1_arm_1[, c("record_id", "prs_sex", "demo_child_birthdate")], by = "record_id", all = TRUE)
 
-  # get visit 5 date data - needed for util_redcap_parent_v5()
-  v5_date_data <- child_visit_5_arm_1[, c("record_id", "v5_date")]
-  v5_date_data <- merge(v5_date_data, parent_visit_1_arm_1[, c("record_id", "demo_child_birthdate")], by = "record_id")
-  names(v5_date_data)[names(v5_date_data) == "record_id"] <- "participant_id"
+  # add age at each visit to date_data
+  date_data[['v1_date']] <- lubridate::as_date(date_data[['v1_date']])
+  date_data[['v2_date']] <- lubridate::as_date(date_data[['v2_date']])
+  date_data[['v3_date']] <- lubridate::as_date(date_data[['v3_date']])
+  date_data[['v4_date']] <- lubridate::as_date(date_data[['v4_date']])
+  date_data[['v5_date']] <- lubridate::as_date(date_data[['v5_date']])
+  date_data[['demo_child_birthdate']] <- lubridate::as_date(date_data[['demo_child_birthdate']])
+  date_data[['v1_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v1_date']])/lubridate::years(1)
+  date_data[['v2_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v2_date']])/lubridate::years(1)
+  date_data[['v3_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v3_date']])/lubridate::years(1)
+  date_data[['v4_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v4_date']])/lubridate::years(1)
+  date_data[['v5_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v5_date']])/lubridate::years(1)
+
+  #update column names in date_data
+  names(date_data)[names(date_data) == "record_id"] <- "participant_id"
+  names(date_data)[names(date_data) == "prs_sex"] <- "sex"
 
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
-  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = v1_date_data)
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = date_data)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
-  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = agesex_data)
+  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
   child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
   parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
   parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
-  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= v5_date_data)
+  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= date_data)
 
   #### Load and organize double-entry data ####
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  processed_de_data <- util_redcap_de(redcap_de_data)
+  processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
 
 
   #### Merge data  ####
