@@ -93,41 +93,73 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
 
   ## meal data ####
+  meal_data <- data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|meal", names(data))]
+  meal_data <- meal_data[, -grep("water_eah|intake_notes", names(meal_data))]
 
-  # subset intake and freddies
-  intake_data <- data[, grep("participant_id|pre_w_o_plate|pre_w_plate|post_w_plate|consumed|freddy_v1|freddy_v3|freddy_v4|freddy_v5", names(data))]
-  intake_data <- intake_data[, -grep("eah.*v1$", names(intake_data))] # remove EAH v1 FFs -- there was no EAH on visit 1
+  # recalculate kcal consumed? this was calculated in redcap
+  ## at the very least, re-calculate grilled cheese based on the amounts of the raw ingredients
 
   # visit 1 data
-  v1_intake_data <- intake_data[, grep("participant_id|_v1$", names(intake_data))]
-  names(v1_intake_data) <- gsub('_v1', '', names(v1_intake_data))
+  v1_meal_data <- meal_data[, grep("participant_id|_v1$", names(meal_data))]
+  names(v1_meal_data) <- gsub('_v1', '', names(v1_meal_data))
 
   # visit 3 data
-  v3_intake_data <- intake_data[, grep("participant_id|_v3$", names(intake_data))]
-  names(v3_intake_data) <- gsub('_v3', '', names(v3_intake_data))
+  v3_meal_data <- meal_data[, grep("participant_id|_v3$", names(meal_data))]
+  names(v3_meal_data) <- gsub('_v3', '', names(v3_meal_data))
 
   # visit 4 data
-  v4_intake_data <- intake_data[, grep("participant_id|_v4$", names(intake_data))]
-  names(v4_intake_data) <- gsub('_v4', '', names(v4_intake_data))
+  v4_meal_data <- meal_data[, grep("participant_id|_v4$", names(meal_data))]
+  names(v4_meal_data) <- gsub('_v4', '', names(v4_meal_data))
 
   # visit 5 data
-  v5_intake_data <- intake_data[, grep("participant_id|_v5$", names(intake_data))]
-  names(v5_intake_data) <- gsub('_v5', '', names(v5_intake_data))
+  v5_meal_data <- meal_data[, grep("participant_id|_v5$", names(meal_data))]
+  names(v5_meal_data) <- gsub('_v5', '', names(v5_meal_data))
 
   # make all vales numeric
-  v1_intake_data <- dplyr::mutate_all(v1_intake_data, function(x) as.numeric(as.character(x)))
-  v3_intake_data <- dplyr::mutate_all(v3_intake_data, function(x) as.numeric(as.character(x)))
-  v4_intake_data <- dplyr::mutate_all(v4_intake_data, function(x) as.numeric(as.character(x)))
-  v5_intake_data <- dplyr::mutate_all(v5_intake_data, function(x) as.numeric(as.character(x)))
+  v1_meal_data <- dplyr::mutate_all(v1_meal_data, function(x) as.numeric(as.character(x)))
+  v3_meal_data <- dplyr::mutate_all(v3_meal_data, function(x) as.numeric(as.character(x)))
+  v4_meal_data <- dplyr::mutate_all(v4_meal_data, function(x) as.numeric(as.character(x)))
+  v5_meal_data <- dplyr::mutate_all(v5_meal_data, function(x) as.numeric(as.character(x)))
 
-  # stack intake data
-  stacked_intake <- dplyr::bind_rows(
-    transform(v1_intake_data, visit = "1", session = "ses-1"),
-    transform(v3_intake_data, visit = "3", session = "ses-1"),
-    transform(v4_intake_data, visit = "4", session = "ses-1"),
-    transform(v5_intake_data, visit = "5", session = "ses-2")
+  # stack meal data
+  stacked_meal <- dplyr::bind_rows(
+    transform(v1_meal_data, visit = "1", session = "ses-1"),
+    transform(v3_meal_data, visit = "3", session = "ses-1"),
+    transform(v4_meal_data, visit = "4", session = "ses-1"),
+    transform(v5_meal_data, visit = "5", session = "ses-2")
   ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
+  ## EAH data ####
+  eah_data <- data[, grep("participant_id|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
+  eah_data <- eah_data[, -grep("complete|notes|intake_eah_visit_number", names(eah_data))] # do we want ad condition (ad_cond_eah) from the de data?
+
+  # recalculate kcal consumed? this was calculated in redcap
+
+  # add pre-eah meal total intake (kcal, g) for use as covariates
+
+  # visit 3 data
+  v3_eah_data <- eah_data[, grep("participant_id|_v3$", names(eah_data))]
+  names(v3_eah_data) <- gsub('_v3', '', names(v3_eah_data))
+
+  # visit 4 data
+  v4_eah_data <- eah_data[, grep("participant_id|_v4$", names(eah_data))]
+  names(v4_eah_data) <- gsub('_v4', '', names(v4_eah_data))
+
+  # visit 5 data
+  v5_eah_data <- eah_data[, grep("participant_id|_v5$", names(eah_data))]
+  names(v5_eah_data) <- gsub('_v5', '', names(v5_eah_data))
+
+  # make all vales numeric
+  v3_eah_data <- dplyr::mutate_all(v3_eah_data, function(x) as.numeric(as.character(x)))
+  v4_eah_data <- dplyr::mutate_all(v4_eah_data, function(x) as.numeric(as.character(x)))
+  v5_eah_data <- dplyr::mutate_all(v5_eah_data, function(x) as.numeric(as.character(x)))
+
+  # stack EAH data
+  stacked_eah <- dplyr::bind_rows(
+    transform(v3_eah_data, visit = "3", session = "ses-1"),
+    transform(v4_eah_data, visit = "4", session = "ses-1"),
+    transform(v5_eah_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   if (isTRUE(return_data)) {
     return(
@@ -138,8 +170,10 @@ util_redcap_de <- function(data, return_data = TRUE) {
         dexa_data = stacked_dexa,
         anthro_data = list(anthro_long = stacked_anthro,
                            anthro_wide = anthro_data),
-        intake_data = list(intake_long = stacked_intake,
-                           intake_wide = intake_data)
+        intake_data = list(meal_long = stacked_meal,
+                           meal_wide = meal_data,
+                           eah_long = stacked_eah,
+                           eah_wide = eah_data)
       )
     )
   }
