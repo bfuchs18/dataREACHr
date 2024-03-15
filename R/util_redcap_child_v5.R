@@ -35,9 +35,9 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   ## meal information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
-  meal_info <- data[, grepl('vas', names(data)) |
-                      grepl('test_meal', names(data)) |
+  meal_info <- data[, grepl('vas|test_meal', names(data)) |
                       names(data) %in% c('participant_id', 'advertisement_condition', 'meal_intake_notes', 'test_meal_notes')]
+  meal_info <- meal_info[, !grepl('test_meal_protocol_complete', names(meal_info))]
 
   ## hrt ####
   hrt_data <- data[, grep("participant_id|hrt|food_|^q.*score", names(data))]
@@ -85,6 +85,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   ## loc ####
   loc_data <-data[, grep("participant_id|^loc", names(data))]
+  loc_data <-loc_data[, -grep("share_info_parent", names(loc_data))]
 
   ## kbas ####
   kbas_data <-data[, grep("participant_id|toy_|food_|^q.*score", names(data))]
@@ -99,7 +100,6 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
-                anthro_data = anthro_data,
                 meal_info = meal_info,
                 hrt_data = hrt_data,
                 puberty_data = puberty_scored,

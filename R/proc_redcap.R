@@ -163,19 +163,25 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   stacked_parent2_anthro <- dplyr::bind_rows(
     transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1", session = "ses-1"),
     transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(visit, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
-  anthro_data <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
+  stacked_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
 
   # merge dexa_notes with dexa_data?
 
   # merge MRI visit data ??
 
   # merge intake_data from visits and double-entry
+  stacked_visit_meal_data <- dplyr::bind_rows(
+    transform(child_v1_data$meal_info, visit = "1", session = "ses-1"),
+    transform(child_v3_data$meal_info, visit = "3", session = "ses-1"),
+    transform(child_v4_data$meal_info, visit = "4", session = "ses-1"),
+    transform(child_v5_data$meal_info, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   #### Stack visit data collected on 2 visits ####
-  # Note: double entry data collected on 2 visits is stacked by util_redcap_de()
+  # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
   # Dataframes will have a "visit" and "session" columns added before stacking, and these will be moved to columns 2 and 3
 
@@ -189,10 +195,10 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(child_v5_data$kbas_data, visit = "5", session = "ses-2")
   ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
-  # stacked_loc <- dplyr::bind_rows(
-  #   transform(child_v4_data$loc_data, visit = "4", session = "ses-1"),
-  #   transform(child_v5_data$loc_data, visit = "5"), session = "ses-2"
-  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  stacked_loc <- dplyr::bind_rows(
+    transform(child_v4_data$loc_data, visit = "4", session = "ses-1"),
+    transform(child_v5_data$loc_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_demo <- dplyr::bind_rows(
     transform(parent_v1_data$demo_data, visit = "1", session = "ses-1"),
@@ -245,6 +251,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
   # stacked_class <-  # will this be bids_phenotype/scored
 
+  # stack child (V5) and parent (V1, V5) puberty data
   stacked_puberty <- dplyr::bind_rows(
     transform(parent_v1_data$puberty_data$bids_phenotype, visit = "1", session = "ses-1", responder = "parent"),
     transform(parent_v5_data$puberty_data$bids_phenotype, visit = "5", session = "ses-2", responder = "parent"),
@@ -268,8 +275,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss
 
   # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE) #brief
-  # write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
-  # write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
+  write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
+  write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
   # write.csv(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE) #ffq -- will this be bids_phenotype
 
   write.csv(parent_v3_data$spsrq_data$bids_phenotype, paste0(phenotype_wd, slash, 'spsrq.tsv'), row.names = FALSE) # spsrq
@@ -284,7 +291,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # export stacked dataframes
 
   # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
-  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE) # will this come from data_de?
+  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
   write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
   write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
   write.csv(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), row.names = FALSE) # should this be the participants.tsv?
@@ -298,6 +305,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
   # write.csv(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), row.names = FALSE)
   write.csv(stacked_puberty, paste0(phenotype_wd, slash, 'puberty.tsv'), row.names = FALSE)
+  write.csv(stacked_loc, paste0(phenotype_wd, slash, 'loc.tsv'), row.names = FALSE)
 
 
   # export double entry dexa data

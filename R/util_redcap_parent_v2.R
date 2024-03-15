@@ -52,16 +52,17 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## CSHQ Data ####
   cshq_data <- data[, grepl('participant_id', names(data)) | grepl('cshq', names(data))]
   cshq_data <- cshq_data[, !(names(cshq_data) %in% c('cshq_missingcheck'))]
-  # colnames need to be modified: e.g., cshq_33_a
-  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, id = 'participant_id')
+
+  # update values for scoring (3 - Usually, 2 - Sometimes, 1 - Rarely)
+  cshq_data
+
+  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, reverse_score = FALSE, id = 'participant_id')
 
 
   ## BES Data ####
   bes_data <- data[, grepl('participant_id', names(data)) | grepl('bes', names(data))]
   bes_data <- bes_data[, !(names(bes_data) %in% c('bes_missingcheck'))]
-  # need to rescore 4 (don't want to answer) NA
-  #  bes_scored <- dataprepr::score_bes(bes_data, score_base = TRUE, id = 'participant_id')
-
+  bes_scored <- dataprepr::score_bes(bes_data, score_base = TRUE, pna = 4, id = 'participant_id')
 
   ## FFBS Data ####
   ffbs_data <- data[, grepl('participant_id', names(data)) | grepl('ffbs', names(data))]
@@ -81,8 +82,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
 #      brief_data = brief_scored,
       cshq_data = cshq_data,
 #      cshq_data = cshq_scored,
-      bes_data = bes_data,
-#      bes_data = bes_scored,
+      bes_data = bes_scored,
       ffbs_data = ffbs_scored,
 #     fsq_data = fsq_scored, #need to develop score script
       fsq_data = fsq_data

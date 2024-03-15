@@ -35,10 +35,12 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
 
   ## meal information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
-  meal_info <- data[, grep('participant_id|wanting|test_meal||advertisement_condition|test_meal_notes|meal_intake_notes|eah_notes|eah_intake_notes', names(data))]
+  meal_info <- data[, grep('participant_id|wanting|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes|eah_notes|eah_intake_notes', names(data))]
+  meal_info <- meal_info[, -grep("test_meal_protocol_complete|eah_wanting_questionnaire_complete|eah_wanting_questionnaire_timestamp", names(meal_info))]
 
   ## loc ####
   loc_data <-data[, grep("participant_id|^loc", names(data))]
+  loc_data <-loc_data[, -grep("share_info_parent", names(loc_data))]
 
   ## pptq ####
   pptq_data <-data[, grep("participant_id|^pptq", names(data))]
