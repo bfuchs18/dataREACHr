@@ -240,8 +240,17 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(parent_v5_data$cfpq_data$bids_phenotype, visit = "5", session = "ses-2")
   ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
-  # stacked_rank <- rbind(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) # will this bids_phenotype/scored?
-  # stacked_class <-  # will this be bids_phenotype/scored
+  # not scored/in bids_phenotype yet - will it be?
+  # stacked_rank <- dplyr::bind_rows(
+  #   transform(parent_v1_data$rank_data$bids_phenotype, visit = "3", session = "ses-1"),
+  #   transform(parent_v5_data$rank_data$bids_phenotype, visit = "5", session = "ses-2")
+  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+
+  # not scored/in bids_phenotype yet - will it be?
+  # stacked_class <- dplyr::bind_rows(
+  #   transform(parent_v3_data$class_data$bids_phenotype, visit = "3", session = "ses-1"),
+  #   transform(parent_v5_data$class_data$bids_phenotype, visit = "5", session = "ses-2")
+  # ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   # stack child (V5) and parent (V1, V5) puberty data
   stacked_puberty <- dplyr::bind_rows(
@@ -287,7 +296,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Merge visit data and double entry data ####
 
-  # Merge double-entered anthro_data with parent-reported parent2 height and weight from household_data
+  # Merge double-entered anthro_data with stacked_parent2_anthro (data from household_data)
   merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
 
 
@@ -349,7 +358,21 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
 
 
-  # Call function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
+  # Make function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
+  cebq_json <- json_cebq()
+  cbq_json <- json_cbq()
+  cfq_json <- json_cfq()
+  efcr_json <- json_efcr()
+  ffbs_json <- json_ffbs()
+  spsrq_json <- json_spsrq()
+  tfeq_json <- json_tfeq18()
+  bisbas_json <- json_bisbas()
+  debq_json <- json_debq()
+  scpf_json <- json_scpf()
+  hfssm_json <- json_hfssm()
+  audit_json <- json_audit()
+  rank_json <- json_rank()
+
 
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
