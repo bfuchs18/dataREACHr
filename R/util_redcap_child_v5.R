@@ -38,7 +38,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   ## meal data
   meal_data <- data[, grepl('participant_id|meal|advertisement_condition', names(data))]
-  meal_data <- meal_info[, !grepl('complete|freddy|consumed', names(meal_info))]
+  meal_data <- meal_data[, !grepl('complete|freddy|consumed|hrt', names(meal_data))]
   names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
 
   ## meal vas data
@@ -116,6 +116,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,
+                meal_vas_data = meal_vas_data,
                 eah_data = eah_data,
                 eah_vas_data = eah_vas_data,
                 hrt_data = hrt_data,

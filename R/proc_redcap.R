@@ -166,27 +166,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # Merge data that belongs in participant.tsv
 
-  # Merge double-entered anthro_data with parent-reported parent2 height and weight from household_data
-
-  stacked_parent2_anthro <- dplyr::bind_rows(
-    transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1", session = "ses-1"),
-    transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
-
-  stacked_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
-
   # merge dexa_notes with dexa_data?
 
   # merge MRI visit data ??
 
   # merge intake_data from visits and double-entry
-  stacked_visit_meal_data <- dplyr::bind_rows(
-    transform(child_v1_data$meal_info, visit = "1", session = "ses-1"),
-    transform(child_v3_data$meal_info, visit = "3", session = "ses-1"),
-    transform(child_v4_data$meal_info, visit = "4", session = "ses-1"),
-    transform(child_v5_data$meal_info, visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
-
 
   #### Stack visit data collected on 2 visits ####
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
@@ -266,6 +250,50 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(child_v5_data$puberty_data$bids_phenotype, visit = "5", session = "ses-2", responder = "child"),
   ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2) %>% dplyr::relocate(responder, .after = 3)
 
+  # note: visit column is vas_visit -- this data will merged with intake data by session only
+  stacked_meal_vas_data <- dplyr::bind_rows(
+    transform(child_v1_data$meal_vas_data, vas_visit = "1", session = "ses-1"),
+    transform(child_v5_data$meal_vas_data, vas_visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(vas_visit, .after = 2)
+
+  # note: visit column is vas_visit -- this data will merged with intake data by session only
+  stacked_eah_vas_data <- dplyr::bind_rows(
+    transform(child_v1_data$eah_vas_data, vas_visit = "1", session = "ses-1"),
+    transform(child_v5_data$eah_vas_data, vas_visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(vas_visit, .after = 2)
+
+  stacked_meal_data <- dplyr::bind_rows(
+    transform(child_v1_data$meal_data, visit = "1", session = "ses-1"),
+    transform(child_v3_data$meal_data, visit = "3", session = "ses-1"),
+    transform(child_v4_data$meal_data, visit = "4", session = "ses-1"),
+    transform(child_v5_data$meal_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+
+  stacked_eah_data <- dplyr::bind_rows(
+    transform(child_v3_data$eah_data, visit = "3", session = "ses-1"),
+    transform(child_v4_data$eah_data, visit = "4", session = "ses-1"),
+    transform(child_v5_data$eah_data, visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+
+  stacked_parent2_anthro <- dplyr::bind_rows(
+    transform(parent_v1_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "1", session = "ses-1"),
+    transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5", session = "ses-2")
+  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+
+  #### Merge visit intake (meal, EAH, vas) data ####
+  merged_vas_data <- merge(stacked_meal_vas_data, stacked_eah_vas_data, by=c("participant_id","session", "vas_visit"), all = TRUE)
+  merged_intake_data <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session", "advertisement_condition"), all = TRUE)
+  merged_intake_data <- merge(merged_intake_data, merged_vas_data, by=c("participant_id", "session"), all = TRUE)
+
+  #### Merge visit data and double entry data ####
+
+  # Merge double-entered anthro_data with parent-reported parent2 height and weight from household_data
+  merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
+
+
+  # merge intake data
+
+
 
   #### Export Phenotype Data ####
 
@@ -299,7 +327,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # export stacked dataframes
 
   # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
-  write.csv(stacked_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
+  write.csv(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
+
   write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
   write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
   write.csv(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), row.names = FALSE) # should this be the participants.tsv?
