@@ -1,0 +1,152 @@
+#' json_hfssm: Generates a json file for the U.S. Household Food Security Survey Module
+#'
+#' This function generates a json file for the scored U.S. Household Food Security Survey Module and raw participant responses.
+#' This function provides accurate json files ONLY if data is processed using score_debq function in dataprepr and is only accurate for data collected in Study REACH
+#'
+#' @return A json file documenting the raw inputs and scored values for the U.S. Household Food Security Survey Module
+#'
+#'
+#' @export
+
+json_hfssm <- function() {
+
+ hfssm_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'U.S. Household Food Security Survey Module',
+      Reference = '',
+      TermURL = 'https://www.ers.usda.gov/media/8271/hh2012.pdf'),
+    participant_id = list( Description = 'participant id number'),
+    hfssm_hh1 = list( Description = 'Which of these statements best describes the food eaten in your household in the last 12 months:',
+                      Levels = list ('0' = 'Enough of the kinds of food we want to eat',
+                                     '1' = 'Enough but not always the kinds of food we want',
+                                     '2' = 'Sometimes not enough to eat',
+                                     '3' = 'Often not enough to eat',
+                                     '4' = 'Don\'t know or Refuse')),
+    hfssm_hh2 = list( Description = 'We worried whether our food would run out before we got money to buy more.',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_hh3 = list( Description = 'The food that we bought just didn\'t last, and we didn\'t have money to get more',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_hh4 = list( Description = 'We couldn\'t afford to eat balanced meals.',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_ad1 = list( Description = 'In the last 12 months, did you or other adults in your household ever cut the size of your meals or skip meals because there wasn\'t enough money for food',
+                      Levels = list ('0' = 'No',
+                                     '1' = 'Yes')),
+    hfssm_ad1a = list( Description = 'How often did this happen?',
+                        Levels = list ('0' = 'Almost every month',
+                                       '1' = 'Some months but not every month',
+                                       '2' = 'Only 1 or 2 months',
+                                       '3' = 'Don\'t know')),
+    hfssm_ad2 = list( Description = 'In the last 12 months, did you ever eat less than you felt you should because there wasn\'t enough money for food?',
+                  Levels = list ('0' = 'Yes',
+                                 '1' = 'No',
+                                 '2' = 'Don\'t know or refuse')),
+    hfssm_ad3 = list( Description = 'In the last 12 months, were you every hungry but didn\'t eat because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know or refuse')),
+    hfssm_ad4 = list( Description = 'In the last 12 months, did you lose weight because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know or refuse')),
+    hfssm_ad5 = list( Description = 'In the last 12 months, did you or other adults in your household ever not eat for a whole day because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know or refuse')),
+    hfssm_ad5a = list( Description = 'How often did this happen?',
+                       Levels = list ('0' = 'Almost every month',
+                                      '1' = 'Some months but not every month',
+                                      '2' = 'Only 1 or 2 months',
+                                      '3' = 'Don\'t know')),
+    hfssm_ch1 = list( Description = 'We relied on only a few kinds of low-cost foods to feed our child/children because we were running out of money to buy food.',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_ch2 = list( Description = 'We couldn\'t feed our child a balanced meal, because we couldn\'t afford that.',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_ch3 = list( Description = 'My child was not eating enough because I just couldn\'t afford enough food',
+                      Levels = list ('0' = 'Often true',
+                                     '1' = 'Sometimes true',
+                                     '2' = 'Never true',
+                                     '3' = 'Don\'t know or Refuse')),
+    hfssm_ch4 = list( Description = 'In the last 12 months, did you ever cut the size of your child\'s meals because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know or refuse')),
+    hfssm_ch5 = list( Description = 'In the last 12 months, did any of your children ever skip meals because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know or refuse')),
+    hfssm_ch5a = list( Description = 'How often did this happen',
+                       Levels = list ('0' = 'Almost every month',
+                                      '1' = 'Some months but not every month',
+                                      '2' = 'Only 1 or 2 months',
+                                      '3' = 'Don\'t know')),
+    hfssm_ch6 = list( Description = 'In the last 12 months, was your child/children ever hungry but you just couldn\'t afford more food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know')),
+    hfssm_ch7 = list( Description = 'In the last 12 months, did your child/children ever not eat for a whole day because there wasn\'t enough money for food?',
+                      Levels = list ('0' = 'Yes',
+                                     '1' = 'No',
+                                     '2' = 'Don\'t know')),
+    hfssm_household_haschildren = list( Description = 'Participant responded to hfssm_ch1, indicating the presense of children in the household. -- this is used to determine whether hfssm_household_cat should use rawscore cutoffs for a household with or without children',
+                          Derivative = TRUE,
+                          Levels = list('TRUE' = 'responded to hfssm_ch1/has children',
+                                        'FALSE' = 'did not respond to hfssm_ch1/no children')),
+    hfssm_household_rawscore = list( Description = 'U.S. Household Food Security Scale raw score',
+                          Derivative = TRUE),
+    hfssm_household_cat = list( Description = 'U.S. Household Food Security Scale category',
+                                Derivative = TRUE,
+                                Levels = list('high' = 'High food security',
+                                              'marginal' = 'Marginal food security',
+                                              'low' = 'Low food security',
+                                              'very low' = 'Very low food security')),
+    hfssm_adult_rawscore = list( Description = 'U.S. Adult Food Security Scale raw score',
+                                     Derivative = TRUE),
+    hfssm_adult_cat = list( Description = 'U.S. Adult Food Security Scale category',
+                            Derivative = TRUE,
+                            Levels = list('high' = 'High food security among adults',
+                                          'marginal' = 'Marginal food security among adults',
+                                          'low' = 'Low food security among adults',
+                                          'very low' = 'Very low food security among adults')),
+    hfssm_short_rawscore = list( Description = 'Six-Item Food Security Scale raw score',
+                                     Derivative = TRUE),
+    hfssm_short_cat = list( Description = 'Six-Item Food Security Scale category',
+                            Derivative = TRUE,
+                            Levels = list('high/marginal' = 'High or marginal food security',
+                                          'low' = 'Low food security',
+                                          'very low' = 'Very low food security')),
+    hfssm_children_rawscore = list(Description = 'U.S. Children’s Food Security Scale raw score',
+                                     Derivative = TRUE),
+    hfssm_children_cat = list(Description = 'U.S. Children’s Food Security Scale category',
+                              Derivative = TRUE,
+                              Levels = list('high/marginal' = 'High or marginal food security among children',
+                                            'low' = 'Low food security among children',
+                                            'very low' = 'Very low food security among children'))
+  )
+
+
+  # convert formatting to JSON
+ hfssm_json <- RJSONIO::toJSON(debq_list, pretty = TRUE)
+
+  # double check
+  if (isFALSE(RJSONIO::isValidJSON(debq_json, asText = TRUE))){
+    print('debq JSON file may be invalid')
+  }
+
+  return(debq_json)
+
+}
