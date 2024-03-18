@@ -58,13 +58,13 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   # subset demo_data
   demo_data <- demo_data_all[, c('participant_id', child_demo_vars)]
 
-  # # add age to demo_data ??
-  demo_data <- merge(demo_data, v5_date_data, by = 'participant_id',  all=T)
-  demo_data[['v5_date']] <- lubridate::as_date(demo_data[['v5_date']])
-  demo_data[['age']] <- lubridate::interval(demo_data[['demo_child_birthdate']], demo_data[['v5_date']])/lubridate::years(1)
-
-  # # remove dob and v1 date from demo_data
-  demo_data <- demo_data[, !(names(demo_data) %in% c('demo_child_birthdate','v5_date'))]
+  # # # add age to demo_data ??
+  # demo_data <- merge(demo_data, v5_date_data, by = 'participant_id',  all=T)
+  # demo_data[['v5_date']] <- lubridate::as_date(demo_data[['v5_date']])
+  # demo_data[['age']] <- lubridate::interval(demo_data[['demo_child_birthdate']], demo_data[['v5_date']])/lubridate::years(1)
+#
+#   # # remove dob and v1 date from demo_data
+#   demo_data <- demo_data[, !(names(demo_data) %in% c('demo_child_birthdate','v5_date'))]
 
   # add sex to demo_data
   demo_data <- merge(demo_data, data[, c("participant_id", "prs_sex")], by="participant_id")
@@ -83,6 +83,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
 
   ## CEBQ Data ####
   cebq_data <- data[, grepl('participant_id', names(data)) | grepl('cebq', names(data))]
+  cebq_data <- cebq_data[, !(names(cebq_data) %in% c('cebq_missingcheck'))]
   cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id')
 
   ## CBQ Data ####
@@ -93,6 +94,8 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   ## CHSQ Data ####
   cshq_data <- data[, grepl('participant_id', names(data)) | grepl('cshq', names(data))]
   cshq_data <- cshq_data[, !(names(cshq_data) %in% c('cshq_missingcheck'))]
+  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, id = 'participant_id')
+
 
   ## CLASS Data ####
   class_data <- data[, grepl('participant_id', names(data)) | grepl('class', names(data))]

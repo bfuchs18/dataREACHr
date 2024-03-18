@@ -4,7 +4,7 @@
 \alias{util_redcap_de}
 \title{util_redcap_de: Organize double-entry data from REDCap (called within proc_redcap.R)}
 \usage{
-util_redcap_de(data, return_data = TRUE)
+util_redcap_de(data, agesex_data, return_data = TRUE)
 }
 \arguments{
 \item{data}{double-entry data}

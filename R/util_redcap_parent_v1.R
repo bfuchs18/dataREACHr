@@ -4,7 +4,7 @@
 #'
 #'
 #' @param data data from REDCap event parent_visit_1_arm_1
-#' @param v1_date_data dataframe with 2 columns: 'participant_id' and 'v1_date'
+#' @param v1_date_data dataframe with columns: 'participant_id' and 'v1_date' -- can have additional columns as long as these are in there
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
@@ -60,12 +60,12 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   demo_data <- demo_data_all[, c('participant_id', child_demo_vars)]
 
   # add age to demo_data
-  demo_data <- merge(demo_data, v1_date_data, by = 'participant_id')
-  demo_data[['v1_date']] <- lubridate::as_date(demo_data[['v1_date']])
-  demo_data[['age']] <- lubridate::interval(demo_data[['demo_child_birthdate']], demo_data[['v1_date']])/lubridate::years(1)
-
-  # remove dob and v1 date from demo_data
-  demo_data <- demo_data[, !(names(demo_data) %in% c('demo_child_birthdate','v1_date'))]
+  # demo_data <- merge(demo_data, v1_date_data, by = 'participant_id')
+  # demo_data[['v1_date']] <- lubridate::as_date(demo_data[['v1_date']])
+  # demo_data[['age']] <- lubridate::interval(demo_data[['demo_child_birthdate']], demo_data[['v1_date']])/lubridate::years(1)
+  #
+  # # remove dob and v1 date from demo_data
+  # demo_data <- demo_data[, !(names(demo_data) %in% c('demo_child_birthdate','v1_date'))]
 
   # add sex to demo_data
   demo_data <- merge(demo_data, data[, c("participant_id", "prs_sex")], by="participant_id")
@@ -106,6 +106,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   ## LBC Data  ####
   lbc_data <- data[, grepl('participant_id', names(data)) | grepl('lbc', names(data))]
   lbc_data <- lbc_data[, !(names(lbc_data) %in% c('lbc_missingcheck'))]
+  names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
   lbc_scored <- dataprepr::score_lbc(lbc_data, score_base = TRUE, id = 'participant_id')
 
 

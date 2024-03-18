@@ -9,7 +9,7 @@ util_redcap_parent_v1(data, v1_date_data, return_data = TRUE)
 \arguments{
 \item{data}{data from REDCap event parent_visit_1_arm_1}
 
-\item{v1_date_data}{dataframe with 2 columns: 'participant_id' and 'v1_date'}
+\item{v1_date_data}{dataframe with columns: 'participant_id' and 'v1_date' -- can have additional columns as long as these are in there}
 
 \item{return_data}{If return_data is set to TRUE, will return a list including:
 \enumerate{

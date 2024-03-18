@@ -4,7 +4,7 @@
 #'
 #'
 #' @param data data from REDCap event parent_visit_2_arm_1e'
-#' @param agesex_data a dataframe with child age and sex -- required for scoring the BRIEF2
+#' @param agesex_data dataframe with columns: 'participant_id', 'v2_age', 'sex' -- can have additional columns as long as these are in there; rerequired for scoring the BRIEF2
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
@@ -44,7 +44,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   brief_data <- data[, grepl('participant_id', names(data)) | grepl('brief', names(data))]
   brief_data <- brief_data[, !(names(brief_data) %in% c('brief_missing_check'))]
   # add age and sex to brief_data
-  brief_data <- merge(brief_data, agesex_data, by = "participant_id")
+  brief_data <- merge(brief_data, agesex_data[c("participant_id", "v2_age", "sex")], by = "participant_id")
 
   # brief_scored <- dataprepr::score_brief2(brief_data, age_var = "age", sex_var = "sex", score_base = TRUE, male = 1, female = 0, id = "participant_id") # need to debug
 
