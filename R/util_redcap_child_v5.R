@@ -33,11 +33,20 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v5_post_check_notes', 'v5_date', 'dxa_notes')]
   names(visit_data_child)[names(visit_data_child) == "v1_post_check_notes"] <- "v1_notes"
 
-  ## meal information ####
+  ## intake information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
-  meal_info <- data[, grepl('vas|test_meal', names(data)) |
-                      names(data) %in% c('participant_id', 'advertisement_condition', 'meal_intake_notes', 'test_meal_notes')]
-  meal_info <- meal_info[, !grepl('test_meal_protocol_complete', names(meal_info))]
+
+  ## meal data
+  meal_data <- data[, grepl('participant_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water|meal|advertisement_condition', names(data))]
+  meal_data <- meal_info[, !grepl('complete|freddy|consumed', names(meal_info))]
+
+  ## eah data
+  eah_data <- data[, grep("participant_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
+  eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
+
+  ## eah vas data
+  eah_vas_data <- data[, grepl('participant_id|vas_brownie|vas_corn_chip|vas_chocolate|vas_icecream|vas_cookie|vas_popcorn|vas_pretzel|vas_skittle|vas_starburst', names(data))]
+  names(eah_vas_data) <- gsub('cookie', 'oreo', names(eah_vas_data))
 
   ## hrt ####
   hrt_data <- data[, grep("participant_id|hrt|food_|^q.*score", names(data))]
@@ -100,7 +109,9 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
-                meal_info = meal_info,
+                meal_data = meal_data,
+                eah_data = eah_data,
+                eah_vas_data = eah_vas_data,
                 hrt_data = hrt_data,
                 puberty_data = puberty_scored,
                 loc_data = loc_data,

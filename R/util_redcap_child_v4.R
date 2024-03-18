@@ -33,10 +33,16 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v4_post_check_notes', 'v4_date', 'wasi_notes', 'pit_task_notes')]
   names(visit_data_child)[names(visit_data_child) == "v4_post_check_notes"] <- "v4_notes"
 
-  ## meal information ####
+  ## Intake information ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
-  meal_info <- data[, grep('participant_id|wanting|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes|eah_notes|eah_intake_notes', names(data))]
-  meal_info <- meal_info[, -grep("test_meal_protocol_complete|eah_wanting_questionnaire_complete|eah_wanting_questionnaire_timestamp", names(meal_info))]
+
+  ## meal data
+  meal_data <- data[, grep("participant_id|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes", names(data))]
+  meal_data <- meal_data[, -grep("complete", names(meal_data))]
+
+  ## EAH data
+  eah_data <- data[, grep("participant_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
+  eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
 
   ## loc ####
   loc_data <-data[, grep("participant_id|^loc", names(data))]
@@ -53,7 +59,8 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
 
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
-                meal_info = meal_info,
+                meal_data = meal_data,
+                eah_data = eah_data,
                 loc_data = loc_data,
                 pptq_data = pptq_scored,
                 sic_data = sic_data))
