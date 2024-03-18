@@ -16,10 +16,12 @@ Depends:
     R (>= 2.10)
 LazyData: true
 Imports: 
+    childsds,
     dataprepr,
     dplyr,
     lubridate,
     magrittr,
     methods,
+    RJSONIO,
     utils,
     varhandle
