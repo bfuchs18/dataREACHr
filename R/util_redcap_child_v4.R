@@ -39,10 +39,13 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   ## meal data
   meal_data <- data[, grep("participant_id|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes", names(data))]
   meal_data <- meal_data[, -grep("complete", names(meal_data))]
+  names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
 
   ## EAH data
   eah_data <- data[, grep("participant_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
   eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
+  names(eah_data) <- gsub('intake_notes', 'prep_notes', names(eah_data))
+  names(eah_data) <- gsub('eah_notes', 'eah_protocol_notes', names(eah_data))
 
   ## loc ####
   loc_data <-data[, grep("participant_id|^loc", names(data))]

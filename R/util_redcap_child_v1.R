@@ -37,8 +37,12 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
 
   ## meal data
-  meal_data <- data[, grepl('participant_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water|meal|advertisement_condition', names(data))]
+  meal_data <- data[, grepl('participant_id|meal|advertisement_condition', names(data))]
   meal_data <- meal_info[, !grepl('complete|freddy|consumed', names(meal_info))]
+  names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
+
+  ## meal vas data
+  meal_vas_data <- data[, grepl('participant_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water', names(data))]
 
   ## eah vas data
   eah_vas_data <- data[, grepl('participant_id|brownie|corn_chip|chocolate|icecream|cookie|popcorn|pretzel|skittle|starburst', names(data))]
