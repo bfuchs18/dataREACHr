@@ -52,6 +52,8 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## CSHQ Data ####
   cshq_data <- data[, grepl('participant_id', names(data)) | grepl('cshq', names(data))]
   cshq_data <- cshq_data[, !(names(cshq_data) %in% c('cshq_missingcheck'))]
+  names(cshq_data) <- gsub('_a', '_prob', names(cshq_data))
+
 
   # update values for scoring (3 - Usually, 2 - Sometimes, 1 - Rarely)
   cshq_data
@@ -62,7 +64,20 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## BES Data ####
   bes_data <- data[, grepl('participant_id', names(data)) | grepl('bes', names(data))]
   bes_data <- bes_data[, !(names(bes_data) %in% c('bes_missingcheck'))]
-  bes_scored <- dataprepr::score_bes(bes_data, score_base = TRUE, pna = 4, id = 'participant_id')
+
+  # change pna ('Don't want to answer') responses to 999
+  ## for bes_6 bes_13, bes_14, bes_15, and bes_16, 3 indicates pna; for all other variables, 4 indicates pna
+  bes_data_for_scoring <- bes_data %>%
+    dplyr::mutate_at(dplyr::vars(starts_with("bes_")), ~ ifelse(. %in% c(4), 999, .)) %>%
+    dplyr::mutate(
+      bes_6 = ifelse(bes_6 == 3, 999, bes_6),
+      bes_13 = ifelse(bes_13 == 3, 999, bes_13),
+      bes_14 = ifelse(bes_14 == 3, 999, bes_14),
+      bes_15 = ifelse(bes_15 == 3, 999, bes_15),
+      bes_16 = ifelse(bes_16 == 3, 999, bes_16)
+    )
+
+  bes_scored <- dataprepr::score_bes(bes_data_for_scoring, score_base = TRUE, pna = 999, id = 'participant_id')
 
   ## FFBS Data ####
   ffbs_data <- data[, grepl('participant_id', names(data)) | grepl('ffbs', names(data))]
