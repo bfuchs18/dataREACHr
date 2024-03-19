@@ -1,7 +1,7 @@
 #' json_cbq: Generates a json file for the Child Behavior Questionnaire
 #'
 #' This function generates a json file for the scored Child Behavior Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cbq function in dataprepr and is only accurate for data collected in Study BREAK
+#' This function provides accurate json files ONLY if data is processed using score_cbq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A json file documenting the raw inputs and scored values for the Child Behavior Questionnaire
 #'
