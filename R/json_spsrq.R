@@ -12,7 +12,7 @@ json_spsrq <- function() {
 
   spsrq_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Sensitivity to Punishment and Sensitivity to Reward Questionnaire.',
+      Description = 'Sensitivity to Punishment and Sensitivity to Reward Questionnaire. Participants were provided the following instructions: "How much do you agree or disagree with each statement as it describes your child in the last year? Use the following response options."',
       Reference = 'Colder CR, Trucco EM, Lopez HI, et al. Revised reinforcement sensitivity theory and laboratory assessment of BIS and BAS in children. Journal of Research in Personality. 2011;45(2):198-207. doi:10.1016/j.jrp.2011.01.005',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/21603055/'),
     participant_id = list( Description = 'participant id number'),

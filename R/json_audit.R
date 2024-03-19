@@ -12,7 +12,7 @@ json_audit <- function() {
 
   audit_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Alcohol Use Disorders Identification Test',
+      Description = 'Alcohol Use Disorders Identification Test. Participants were provided the following instructions: "Please check the answer that is correct for you"',
       Reference = 'Saunders JB, Aasland OG, Babor TF, De La Fuente JR, Grant M. Development of the Alcohol Use Disorders Identification Test (AUDIT): WHO Collaborative Project on Early Detection of Persons with Harmful Alcohol Consumption-II. Addiction. 1993;88(6):791-804. doi:10.1111/j.1360-0443.1993.tb02093.x',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/8329970/'),
     participant_id = list( Description = 'participant id number'),
