@@ -12,7 +12,7 @@ json_efcr <- function() {
 
   efcr_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'External Food Cue Responsiveness Scale.',
+      Description = 'External Food Cue Responsiveness Scale. Participants were provided the following instructions: "Please answer the following statements with "My Child..... Never, Rarely, Sometimes , Often or Always""',
       Reference = 'Masterson TD, Gilbert-Diamond D, Lansigan RK, Kim SJ, Schiffelbein JE, Emond JA. Measurement of external food cue responsiveness in preschool-age children: Preliminary evidence for the use of the external food cue responsiveness scale. Appetite. 2019;139:119-126. doi:10.1016/j.appet.2019.04.024',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/31047939/'),
     participant_id = list( Description = 'participant id number'),

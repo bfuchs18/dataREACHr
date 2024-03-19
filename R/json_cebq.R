@@ -12,7 +12,7 @@ json_cebq <- function() {
 
   cebq_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Children\'s Eating Behavior Questionnaire.',
+      Description = 'Children\'s Eating Behavior Questionnaire. Participants were provided the following instructions: "Please read the following statements and tick the boxes most appropriate to your child\'s eating behavior."',
       Reference = 'Wardle, J., Guthrie, C. A., Sanderson, S., & Rapoport, L. (2001). Development of the children’s eating behaviour questionnaire. Journal of Child Psychology and Psychiatry, 42, 963–970. https://doi.org/10.1017/S0021963001007727',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11693591/'),
     participant_id = list( Description = 'participant id number'),
