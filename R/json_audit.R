@@ -16,7 +16,7 @@ json_audit <- function() {
       Reference = 'Saunders JB, Aasland OG, Babor TF, De La Fuente JR, Grant M. Development of the Alcohol Use Disorders Identification Test (AUDIT): WHO Collaborative Project on Early Detection of Persons with Harmful Alcohol Consumption-II. Addiction. 1993;88(6):791-804. doi:10.1111/j.1360-0443.1993.tb02093.x',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/8329970/'),
     participant_id = list( Description = 'participant id number'),
-    session = list( Description = 'Session of data collection',
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
     visit = list( Description = 'REACH visit protocol for data collection'),

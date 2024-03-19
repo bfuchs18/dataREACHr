@@ -16,7 +16,7 @@ json_cebq <- function() {
       Reference = 'Wardle, J., Guthrie, C. A., Sanderson, S., & Rapoport, L. (2001). Development of the children’s eating behaviour questionnaire. Journal of Child Psychology and Psychiatry, 42, 963–970. https://doi.org/10.1017/S0021963001007727',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11693591/'),
     participant_id = list( Description = 'participant id number'),
-    session = list( Description = 'Session of data collection',
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
     visit = list( Description = 'REACH visit protocol for data collection'),

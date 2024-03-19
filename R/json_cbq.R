@@ -16,7 +16,7 @@ json_cbq <- function() {
       Reference = 'Putnam SP, Rothbart MK. Development of Short and Very Short Forms of the Children’s Behavior Questionnaire. Journal of Personality Assessment. 2006;87(1):102-112. doi:10.1207/s15327752jpa8701_09',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/16856791/'),
     participant_id = list( Description = 'participant id number'),
-    session = list( Description = 'Session of data collection',
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
     visit = list( Description = 'REACH visit protocol for data collection'),

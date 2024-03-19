@@ -16,7 +16,7 @@ json_rank <- function() {
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),
-    session = list( Description = 'Session of data collection',
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
     visit = list( Description = 'REACH visit protocol for data collection'),
