@@ -1,7 +1,7 @@
 #' json_hfssm: Generates a json file for the U.S. Household Food Security Survey Module
 #'
 #' This function generates a json file for the scored U.S. Household Food Security Survey Module and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_debq function in dataprepr and is only accurate for data collected in Study REACH
+#' This function provides accurate json files ONLY if data is processed using score_hfssm function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A json file documenting the raw inputs and scored values for the U.S. Household Food Security Survey Module
 #'
@@ -140,13 +140,13 @@ json_hfssm <- function() {
 
 
   # convert formatting to JSON
- hfssm_json <- RJSONIO::toJSON(debq_list, pretty = TRUE)
+ hfssm_json <- RJSONIO::toJSON(hfssm_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(debq_json, asText = TRUE))){
-    print('debq JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(hfssm_json, asText = TRUE))){
+    print('hfssm JSON file may be invalid')
   }
 
-  return(debq_json)
+  return(hfssm_json)
 
 }

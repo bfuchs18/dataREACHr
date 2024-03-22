@@ -11,5 +11,5 @@ A json file documenting the raw inputs and scored values for the U.S. Household 
 }
 \description{
 This function generates a json file for the scored U.S. Household Food Security Survey Module and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_debq function in dataprepr and is only accurate for data collected in Study REACH
+This function provides accurate json files ONLY if data is processed using score_hfssm function in dataprepr and is only accurate for data collected in Study REACH
 }
