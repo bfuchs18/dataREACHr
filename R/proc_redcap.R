@@ -326,7 +326,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # write.csv(parent_v1_data$chaos_data$bids_phenotype, paste0(phenotype_wd, slash, 'chaos.tsv'), row.names = FALSE) # chaos -- need to develop score script
 
 
-  # write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief.tsv'), row.names = FALSE) #brief
+  write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief2.tsv'), row.names = FALSE) #brief
   write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
   write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
   # write.csv(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE) #ffq -- will this be bids_phenotype

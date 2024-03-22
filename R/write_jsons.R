@@ -75,7 +75,9 @@ write_jsons <- function(export_dir, overwrite) {
 
   )
 
+  # Save meta-data into a list to return?
 
+  # Export meta-data
   for (func_name in names(json_functions)) {
     filename <- paste0(export_dir, json_functions[[func_name]])
 
