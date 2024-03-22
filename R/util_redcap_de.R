@@ -36,6 +36,10 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   mri_visit_data <- data[, grep("participant_id|cams_score|freddy_score_v2", names(data))]
   names(mri_visit_data)[names(mri_visit_data) == "pre_cams_score"] <- "cams_pre_mri"
   names(mri_visit_data)[names(mri_visit_data) == "post_cams_score"] <- "cams_post_mri"
+  names(mri_visit_data)[names(mri_visit_data) == "pre_snack_freddy_score_v2"] <- "freddy_pre_snack"
+  names(mri_visit_data)[names(mri_visit_data) == "post_snack_freddy_score_v2"] <- "freddy_post_snack"
+  names(mri_visit_data)[names(mri_visit_data) == "post_snack_2_freddy_score_v2"] <- "freddy_post_snack2"
+  names(mri_visit_data)[names(mri_visit_data) == "pre_mri_freddy_score_v2"] <- "freddy_pre_mri"
 
   ## TICTOC ####
   tictoc_data <- data[, grep("participant_id|tictoc_", names(data))]
@@ -97,9 +101,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack anthro data
   stacked_anthro <- dplyr::bind_rows(
-    transform(anthro_v1_data, visit = "1", session = "ses-1"),
-    transform(anthro_v5_data, visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+    transform(anthro_v1_data, visit = "1", session_id = "ses-1"),
+    transform(anthro_v5_data, visit = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   ## DEXA data ####
@@ -118,9 +122,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack visit 1 and visit 5 data, add "visit" column, move "visit" to column 2
   stacked_dexa <- dplyr::bind_rows(
-    transform(dexa_v1_data, visit = "1", session = "ses-1"),
-    transform(dexa_v5_data, visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+    transform(dexa_v1_data, visit = "1", session_id = "ses-1"),
+    transform(dexa_v5_data, visit = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
 
   ## meal data ####
@@ -154,11 +158,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack meal data
   stacked_meal <- dplyr::bind_rows(
-    transform(v1_meal_data, visit = "1", session = "ses-1"),
-    transform(v3_meal_data, visit = "3", session = "ses-1"),
-    transform(v4_meal_data, visit = "4", session = "ses-1"),
-    transform(v5_meal_data, visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+    transform(v1_meal_data, visit = "1", session_id = "ses-1"),
+    transform(v3_meal_data, visit = "3", session_id = "ses-1"),
+    transform(v4_meal_data, visit = "4", session_id = "ses-1"),
+    transform(v5_meal_data, visit = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   ## EAH data ####
   eah_data <- data[, grep("participant_id|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
@@ -187,10 +191,10 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack EAH data
   stacked_eah <- dplyr::bind_rows(
-    transform(v3_eah_data, visit = "3", session = "ses-1"),
-    transform(v4_eah_data, visit = "4", session = "ses-1"),
-    transform(v5_eah_data, visit = "5", session = "ses-2")
-  ) %>% dplyr::relocate(session, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+    transform(v3_eah_data, visit = "3", session_id = "ses-1"),
+    transform(v4_eah_data, visit = "4", session_id = "ses-1"),
+    transform(v5_eah_data, visit = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   if (isTRUE(return_data)) {
     return(
