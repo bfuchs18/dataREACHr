@@ -28,8 +28,8 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   #reduce columns and update names
 
   ## Visit Data ####
-  visit_data_parent <- data[, grepl('participant_id', names(data)) | grepl('update', names(data))]
-  visit_data_parent <- visit_data_parent[, !(names(visit_data_parent) %in% c('participant_update_form_timestamp', 'participant_update_form_complete', 'update_form_contact'))]
+  visit_data_parent <- data[, grep("participant_id|update", names(data))]
+  visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
   # notes: update_form_visit_number -- looks to be the session number attended, not protocol visit number
   # add column to specify v4 data?
 

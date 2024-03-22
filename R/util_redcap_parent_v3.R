@@ -28,8 +28,8 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   #reduce columns and update names
 
   ## V3 Data ####
-  v3_data <- data[, grepl('participant_id', names(data)) | grepl('update', names(data))]
-  v3_data <- v3_data[, !(names(v3_data) %in% c('participant_update_form_timestamp', 'participant_update_form_complete', 'update_form_contact'))]
+  visit_data_parent <- data[, grep("participant_id|update", names(data))]
+  visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
   # notes: update_form_visit_number -- looks to be the session number attended, not protocol visit number
   # add column to specify v3 data?
 
@@ -73,7 +73,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   ## compile and return data ####
   if (isTRUE(return_data)){
     return(list(
-      v3_data = v3_data,
+      visit_data_parent = visit_data_parent,
       spsrq_data = spsrq_scored,
       pwlb_data = pwlb_scored,
       tfeq_data = tfeq_scored,

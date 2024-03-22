@@ -29,6 +29,13 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
 
   #reduce columns and update names
 
+  ## Visit Data ####
+  visit_data_parent <- data[, grep("participant_id|update", names(data))]
+  visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
+  # notes: update_form_visit_number -- looks to be the session number attended, not protocol visit number
+  # add column to specify v5data?
+
+
   ## demographics data ####
   # this data will be split into 2 dataframes:
   # (1) demo_data: will include child demographic variables that will be include in participants.tsv
@@ -123,6 +130,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   ## compile and return data ####
   if (isTRUE(return_data)){
     return(list(
+      visit_data_parent = visit_data_parent,
       demo_data = demo_data,
       household_data = household_data,
       rank_data = rank_data,
