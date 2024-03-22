@@ -20,7 +20,7 @@
 #' @examples
 #'
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
+#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-03-22_1446.csv"
 #'
 #' phenotype_data <- proc_redcap(visit_data_path, return = TRUE)
 #'
@@ -122,22 +122,25 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   date_data <- merge(date_data, child_visit_3_arm_1[, c("record_id", "v3_date")], by = "record_id", all = TRUE)
   date_data <- merge(date_data, child_visit_4_arm_1[, c("record_id", "v4_date")], by = "record_id", all = TRUE)
   date_data <- merge(date_data, child_visit_5_arm_1[, c("record_id", "v5_date")], by = "record_id", all = TRUE)
+  date_data <- merge(date_data, parent_visit_2_arm_1[, c("record_id", "behavior_rating_inventory_of_executive_function_timestamp")], by = "record_id", all = TRUE)
 
   # add child sex and dob to date_data
   date_data <- merge(date_data, parent_visit_1_arm_1[, c("record_id", "prs_sex", "demo_child_birthdate")], by = "record_id", all = TRUE)
 
-  # add age at each visit to date_data
+  # add ages to date_data
   date_data[['v1_date']] <- lubridate::as_date(date_data[['v1_date']])
   date_data[['v2_date']] <- lubridate::as_date(date_data[['v2_date']])
   date_data[['v3_date']] <- lubridate::as_date(date_data[['v3_date']])
   date_data[['v4_date']] <- lubridate::as_date(date_data[['v4_date']])
   date_data[['v5_date']] <- lubridate::as_date(date_data[['v5_date']])
+  date_data[['brief_date']] <- lubridate::as_date(date_data[['behavior_rating_inventory_of_executive_function_timestamp']])
   date_data[['demo_child_birthdate']] <- lubridate::as_date(date_data[['demo_child_birthdate']])
   date_data[['v1_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v1_date']])/lubridate::years(1)
   date_data[['v2_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v2_date']])/lubridate::years(1)
   date_data[['v3_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v3_date']])/lubridate::years(1)
   date_data[['v4_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v4_date']])/lubridate::years(1)
   date_data[['v5_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v5_date']])/lubridate::years(1)
+  date_data[['brief_age']] <- lubridate::interval(date_data[['demo_child_birthdate']], date_data[['brief_date']])/lubridate::years(1)
 
   #update column names in date_data
   names(date_data)[names(date_data) == "record_id"] <- "participant_id"
@@ -299,8 +302,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # Merge data that belongs in participant.tsv
 
-  # merge dexa_notes with dexa_data? -- should dexa notes be exported?
-
   # merge MRI visit data double entry CAMS / MRI freddies
   merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
@@ -368,7 +369,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # make separate overwrite args -- 1 for dataframes and 1 for jsons?
   write_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
-
+  # return meta-data with this? if so, need to update write_jsons() to return meta-data
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
                  child_v2_data = child_v2_data,
@@ -381,6 +382,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                  parent_v4_data = parent_v4_data,
                  parent_v5_data = parent_v5_data,
                  processed_de_data = processed_de_data
+                 # meta_data = meta_data
                  ))
   }
 }

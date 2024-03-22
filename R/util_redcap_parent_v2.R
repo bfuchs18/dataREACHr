@@ -44,9 +44,9 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   brief_data <- data[, grepl('participant_id', names(data)) | grepl('brief', names(data))]
   brief_data <- brief_data[, !(names(brief_data) %in% c('brief_missing_check'))]
   # add age and sex to brief_data
-  brief_data <- merge(brief_data, agesex_data[c("participant_id", "v2_age", "sex")], by = "participant_id")
+  brief_data <- merge(brief_data, agesex_data[c("participant_id", "brief_age", "sex")], by = "participant_id")
 
-  # brief_scored <- dataprepr::score_brief2(brief_data, age_var = "age", sex_var = "sex", score_base = TRUE, male = 1, female = 0, id = "participant_id") # need to debug
+  # brief_scored <- dataprepr::score_brief2(brief_data, age_var = "brief_age", sex_var = "sex", score_base = TRUE, male = 1, female = 0, id = "participant_id") # need to debug
 
 
   ## CSHQ Data ####
