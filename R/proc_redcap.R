@@ -159,19 +159,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
   processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
 
-
-  #### Merge data  ####
-
-  # merge notes/visit data?
-
-  # Merge data that belongs in participant.tsv
-
-  # merge dexa_notes with dexa_data?
-
-  # merge MRI visit data ??
-
-  # merge intake_data from visits and double-entry
-
   #### Stack visit data collected on 2 visits ####
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
@@ -289,18 +276,35 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(parent_v5_data$household_data[, c("participant_id", "parent2_reported_bmi")], visit = "5", session_id = "ses-2")
   ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
+  stacked_updates <- dplyr::bind_rows(
+    transform(parent_v2_data$visit_data_parent, visit = "2", session_id = "ses-1"),
+    transform(parent_v3_data$visit_data_parent, visit = "3", session_id = "ses-1"),
+    transform(parent_v4_data$visit_data_parent, visit = "4", session_id = "ses-1"),
+    transform(parent_v5_data$visit_data_parent, visit = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+
   #### Merge visit intake (meal, EAH, vas) data ####
   merged_vas_data <- merge(stacked_meal_vas_data, stacked_eah_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
   merged_intake_data <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session_id", "advertisement_condition"), all = TRUE)
   merged_intake_data <- merge(merged_intake_data, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
 
-  #### Merge visit data and double entry data ####
+  #### Merge visit data and double entry (de) data ####
 
-  # Merge double-entered anthro_data with stacked_parent2_anthro (data from household_data)
-  merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit"), all = TRUE)
-
+  # de anthro_data with stacked_parent2_anthro (data from household_data)
+  merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit", "session_id"), all = TRUE)
 
   # merge intake data
+
+  # merge notes/visit data? update data?
+
+  # Merge data that belongs in participant.tsv
+
+  # merge dexa_notes with dexa_data? -- should dexa notes be exported?
+
+  # merge MRI visit data double entry CAMS / MRI freddies
+  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
+
+  # merge intake_data from visits and double-entry
 
 
 
@@ -360,27 +364,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
 
 
-  # Make function to export all jsons -- can add input arg that only outputs jsons if overwritejsons = TRUE
-  cebq_json <- json_cebq()
-  cbq_json <- json_cbq()
-  cfq_json <- json_cfq()
-  efcr_json <- json_efcr()
-  ffbs_json <- json_ffbs()
-  spsrq_json <- json_spsrq()
-  tfeq_json <- json_tfeq18()
-  bisbas_json <- json_bisbas()
-  debq_json <- json_debq()
-  scpf_json <- json_scpf()
-  hfssm_json <- json_hfssm()
-  audit_json <- json_audit()
-  rank_json <- json_rank()
-  puberty_json <- json_puberty()
-  chaos_json <- json_chaos()
-  pss_json <- json_pss()
-  lbs_json <- json_lbc()
-  brief_json <- json_brief2()
-  cshq_json <- json_cshq() ## will need modification if levels change in util_redcap_parent_v2.R
-  bes_json <- json_bes() ## will need modification if levels change in util_redcap_parent_v2.R
+  # Export meta-data
+  # make separate overwrite args -- 1 for dataframes and 1 for jsons?
+  write_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
 
   if (isTRUE(return_data)){
