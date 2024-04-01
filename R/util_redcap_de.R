@@ -130,7 +130,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   ## intake data ####
 
   intake_data <- data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
-  intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|kcal_consumed", names(intake_data))]
+  intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|kcal_consumed|ad_cond", names(intake_data))]
   colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
   colnames(intake_data) <- gsub("amount_consumed", "grams_consumed", colnames(intake_data)) # Replace "amount_consumed" with "grams_consumed" in colnames
 
@@ -164,27 +164,8 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
     transform(v5_intake_data, visit = "5", session_id = "ses-2")
   ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
-  # calculate grilled cheese energy content (pre_kcal) and energy density
-
-  ## calculate energy of individual components
-  ed_data <- util_gen_ed_data() #make dataframe with energy density data
-  stacked_intake$butter_pre_kcal <- (stacked_intake$butter_pre_w_o_plate + stacked_intake$butter_2_pre_w_o_plate)*(ed_data[ed_data$food == "butter", "ed"])
-  stacked_intake$bread_pre_kcal <- (stacked_intake$bread_pre_w_o_plate)*(ed_data[ed_data$food == "bread", "ed"])
-  stacked_intake$cheese_pre_kcal <- (stacked_intake$cheese_pre_w_o_plate)*(ed_data[ed_data$food == "cheese", "ed"])
-
-  ## calculate grilled cheese pre_kcal and energy density
-  stacked_intake$grilled_cheese_pre_kcal <- (stacked_intake$butter_pre_kcal + stacked_intake$bread_pre_kcal + stacked_intake$cheese_pre_kcal)
-  stacked_intake$grilled_cheese_ed <- stacked_intake$grilled_cheese_pre_kcal/stacked_intake$grilled_cheese_pre_w_o_plate
-
-  # calculate kcal consumed
-
-  ## grilled cheese
-  stacked_intake$grilled_cheese_kcal_consumed <- (stacked_intake$grilled_cheese_amount_consumed)*(stacked_intake$grilled_cheese_ed)
-
-
-
-  # recalculate kcal consumed? this was calculated in redcap
-
+  # compute intake variables
+  stacked_intake <- util_calc_intake(stacked_intake)
 
   if (isTRUE(return_data)) {
     return(
@@ -195,7 +176,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
         dexa_data = stacked_dexa,
         anthro_data = list(anthro_long = stacked_anthro,
                            anthro_wide = anthro_data),
-        intake_data = stacked_intake
+        stacked_intake = stacked_intake
       )
     )
   }
