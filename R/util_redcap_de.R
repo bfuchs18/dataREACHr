@@ -129,10 +129,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   ## intake data ####
 
-  intake_data <- data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
-  intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|kcal_consumed|ad_cond", names(intake_data))]
+  intake_data <- data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
+  intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|consumed|ad_cond", names(intake_data))]
   colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
-  colnames(intake_data) <- gsub("amount_consumed", "grams_consumed", colnames(intake_data)) # Replace "amount_consumed" with "grams_consumed" in colnames
 
   # visit 1 data
   v1_intake_data <- intake_data[, grep("participant_id|_v1$", names(intake_data))]
