@@ -29,6 +29,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   data <- data[grepl('--1', data[['participant_id']]), ]
   data$participant_id <- gsub("--1", "", data$participant_id)
 
+  # Make ID column bids compliant: add "sub_"
+  data$participant_id <- paste0("sub-", data$participant_id)
+
 
   #reduce columns and update names
 
@@ -95,9 +98,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   anthro_v5_data <- anthro_data[, grep("participant_id|v5", names(anthro_data))]
   colnames(anthro_v5_data) <- gsub("_v5|v5_", "", colnames(anthro_v5_data)) # Remove "v5_" or "_v5" from column names
 
-  # make all vales numeric
-  anthro_v1_data <- dplyr::mutate_all(anthro_v1_data, function(x) as.numeric(as.character(x)))
-  anthro_v5_data <- dplyr::mutate_all(anthro_v5_data, function(x) as.numeric(as.character(x)))
+  # make all values numeric except column 1 (participant_id)
+  anthro_v1_data <- dplyr::mutate_at(anthro_v1_data, -1, function(x) as.numeric(as.character(x)))
+  anthro_v5_data <- dplyr::mutate_at(anthro_v1_data, -1, function(x) as.numeric(as.character(x)))
 
   # stack anthro data
   stacked_anthro <- dplyr::bind_rows(
@@ -116,9 +119,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   dexa_v5_data <- data[, grep("participant_id|^v1.*v5$", names(data))] # Subset columns that start with "v1" and end with "v5"
   colnames(dexa_v5_data) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_data)) # Remove "v1_" and "_v5" from column names
 
-  # make all vales numeric
-  dexa_v1_data <- dplyr::mutate_all(dexa_v1_data, function(x) as.numeric(as.character(x)))
-  dexa_v5_data <- dplyr::mutate_all(dexa_v5_data, function(x) as.numeric(as.character(x)))
+  # make all values numeric except column 1 (participant_id)
+  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, -1, function(x) as.numeric(as.character(x)))
+  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, -1, function(x) as.numeric(as.character(x)))
 
   # stack visit 1 and visit 5 data, add "visit" column, move "visit" to column 2
   stacked_dexa <- dplyr::bind_rows(
@@ -149,11 +152,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   v5_intake_data <- intake_data[, grep("participant_id|_v5$", names(intake_data))]
   names(v5_intake_data) <- gsub('_v5', '', names(v5_intake_data))
 
-  # make all vales numeric
-  v1_intake_data <- dplyr::mutate_all(v1_intake_data, function(x) as.numeric(as.character(x)))
-  v3_intake_data <- dplyr::mutate_all(v3_intake_data, function(x) as.numeric(as.character(x)))
-  v4_intake_data <- dplyr::mutate_all(v4_intake_data, function(x) as.numeric(as.character(x)))
-  v5_intake_data <- dplyr::mutate_all(v5_intake_data, function(x) as.numeric(as.character(x)))
+  # make all values numeric except column 1 (participant_id)
+  v1_intake_data <- dplyr::mutate_at(v1_intake_data, -1, function(x) as.numeric(as.character(x)))
+  v3_intake_data <- dplyr::mutate_at(v3_intake_data, -1, function(x) as.numeric(as.character(x)))
+  v4_intake_data <- dplyr::mutate_at(v4_intake_data, -1, function(x) as.numeric(as.character(x)))
+  v5_intake_data <- dplyr::mutate_at(v5_intake_data, -1, function(x) as.numeric(as.character(x)))
 
   # stack intake data
   stacked_intake <- dplyr::bind_rows(

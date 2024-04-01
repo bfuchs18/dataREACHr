@@ -93,6 +93,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Load and organize visit data ####
   redcap_visit_data <- read.csv(visit_data_path, header = TRUE)
 
+  # Make ID column bids compliant: Convert record_id to strings padded with zeros and add "sub_"
+  redcap_visit_data$record_id <- sprintf("sub-%03d", redcap_visit_data$record_id)
+
   # # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
 
