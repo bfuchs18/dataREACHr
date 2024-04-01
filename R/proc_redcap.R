@@ -306,9 +306,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # merge MRI visit data double entry CAMS / MRI freddies
   merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
-  # merge intake_data from visits and double-entry
-
-
 
   #### Export Phenotype Data ####
 
@@ -319,7 +316,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dir.create(file.path(phenotype_wd))
   }
 
-  # export forms collected at 1 visit only (i.e., not stacked data) -- can this be done using a list of lists and a loop?
+  # export single-visit data (i.e. redcap visit data collected at 1 visit only)
+  ## can this be done using a list of lists and a loop?
   write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE) # cfq
   write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
   write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
@@ -341,10 +339,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   write.csv(child_v4_data$pptq_data$bids_phenotype, paste0(phenotype_wd, slash, 'pptq.tsv'), row.names = FALSE) # debq
 
-  # export stacked dataframes
+  # export stacked visit data
 
   # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
-  write.csv(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
 
   write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
   write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
@@ -362,15 +359,18 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   write.csv(stacked_loc, paste0(phenotype_wd, slash, 'loc.tsv'), row.names = FALSE)
 
 
+  # export merged data
+  write.csv(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
+  write.csv(merged_intake, paste0(phenotype_wd, slash, 'intake.tsv'), row.names = FALSE)
+
   # export double entry dexa data
   write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
 
 
   # Export meta-data
   # make separate overwrite args -- 1 for dataframes and 1 for jsons?
-  write_jsons(export_dir = phenotype_wd, overwrite = overwrite)
+  meta_data = write_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
-  # return meta-data with this? if so, need to update write_jsons() to return meta-data
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
                  child_v2_data = child_v2_data,
@@ -382,8 +382,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                  parent_v3_data = parent_v3_data,
                  parent_v4_data = parent_v4_data,
                  parent_v5_data = parent_v5_data,
-                 processed_de_data = processed_de_data
-                 # meta_data = meta_data
+                 processed_de_data = processed_de_data,
+                 meta_data = meta_data
                  ))
   }
 }

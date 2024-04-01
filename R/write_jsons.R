@@ -71,14 +71,28 @@ write_jsons <- function(export_dir, overwrite) {
 
     # non-questionnaire jsons
     json_mri_visit = "mri_visit.json",
-    json_anthro = "anthro.json"
+    json_anthro = "anthro.json",
+    json_intake = "intake.json"
+
 
   )
 
-  # Save meta-data into a list to return?
+  # Create an empty list to store JSON
+  json_list <- list()
 
-  # Export meta-data
+  # run json functions and export
   for (func_name in names(json_functions)) {
+
+    # Get the function by name
+    func <- get(func_name)
+
+    # Call the function
+    json <- func()
+
+    # Append JSON to a list
+    json_list[[func_name]] <- json
+
+    # define filename for export
     filename <- paste0(export_dir, json_functions[[func_name]])
 
     # If overwrite is false
@@ -86,18 +100,15 @@ write_jsons <- function(export_dir, overwrite) {
 
       # Write json if it doesn't exist
       if (!file.exists(filename)) {
-        func <- get(func_name)  # Get the function by name
-        json <- func()          # Call the function
         write(json, filename)   # Write json
       }
 
     } else {
-      func <- get(func_name)  # Get the function by name
-      json <- func()          # Call the function
       write(json, filename)
     }
   }
 
+  return(json_list)
 
 }
 
