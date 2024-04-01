@@ -287,7 +287,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   #### Merge visit intake (meal, EAH, vas) data ####
-  merged_vas_data <- merge(stacked_meal_vas_data, stacked_eah_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
+  merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
   merged_intake_data <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session_id", "advertisement_condition"), all = TRUE)
   merged_intake_data <- merge(merged_intake_data, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
 
@@ -297,6 +297,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id","visit", "session_id"), all = TRUE)
 
   # merge intake data
+  merged_intake_data <- merge(merged_intake_data, processed_de_data$stacked_intake, by=c("participant_id","visit", "session_id"), all = TRUE)
 
   # merge notes/visit data? update data?
 
