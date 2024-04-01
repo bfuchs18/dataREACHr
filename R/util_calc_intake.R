@@ -24,6 +24,9 @@ util_calc_intake <- function(stacked_intake) {
   # calculate grilled cheese ED
   stacked_intake$grilled_cheese_ed <- stacked_intake$grilled_cheese_pre_kcal/stacked_intake$grilled_cheese_pre_w_o_plate
 
+  #### TO DO ####
+  # deal with potential negative values (e.g., post amount was more than pre amount )
+
   #### calculate item amounts consumed ####
   foods <- ed_data$food[4:21]
 
