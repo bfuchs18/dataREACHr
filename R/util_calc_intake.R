@@ -25,7 +25,7 @@ util_calc_intake <- function(stacked_intake) {
   stacked_intake$grilled_cheese_ed <- stacked_intake$grilled_cheese_pre_kcal/stacked_intake$grilled_cheese_pre_w_o_plate
 
   #### calculate item amounts consumed ####
-  foods <- ed_data$food[4:20]
+  foods <- ed_data$food[4:21]
 
   for (food in foods) {
     pre_var <- paste(food, "_pre_w_plate", sep = "")
@@ -56,8 +56,8 @@ util_calc_intake <- function(stacked_intake) {
   ## meal
 
   # make lists of meal item consumption variables
-  meal_g_vars <- paste0(foods[1:7], "_grams_consumed")
-  meal_kcal_vars <- paste0(foods[1:7], "_kcal_consumed")
+  meal_g_vars <- paste0(foods[1:8], "_grams_consumed")
+  meal_kcal_vars <- paste0(foods[1:8], "_kcal_consumed")
 
   # sum across meal_g_vars columns
   stacked_intake$meal_grams_consumed <- stacked_intake %>%
@@ -72,8 +72,8 @@ util_calc_intake <- function(stacked_intake) {
   ## EAH
 
   # make lists of eah item consumption variables
-  eah_g_vars <- paste0(foods[8:17], "_grams_consumed")
-  eah_kcal_vars <- paste0(foods[8:17], "_kcal_consumed")
+  eah_g_vars <- paste0(foods[9:18], "_grams_consumed")
+  eah_kcal_vars <- paste0(foods[9:18], "_kcal_consumed")
 
   # sum across eah_g_vars columns
   stacked_intake$eah_grams_consumed <- stacked_intake %>%
