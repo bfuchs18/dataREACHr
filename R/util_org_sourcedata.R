@@ -58,12 +58,9 @@ util_org_sourcedata <- function(base_wd, overwrite = FALSE) {
       dir.create(sub_task_source_dir, recursive = TRUE)
     }
 
-    # copy file into sub_task_source_dir if it doesn't exist or overwrite = TRUE
-    if (!file.exists(sub_task_source_file) | isTRUE(overwrite)) {
+    # copy file into sub_task_source_dir
+    file.copy(from = file, to = sub_task_source_file, overwrite = overwrite)
 
-      file.copy(from = file, to = sub_task_source_file)
-      print("copying to sourcedata")
-    }
   }
 
   #### FoodView task ####
