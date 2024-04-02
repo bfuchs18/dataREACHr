@@ -79,6 +79,37 @@ util_org_sourcedata <- function(base_wd, overwrite = FALSE) {
   }
 
   #### Stop Signal Task ####
+  # to do: reduce reptitive code between sst and food view
+  sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
 
+  sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
+
+  for (file in sst_files) {
+
+    # extract file name
+    filename <- basename(file)
+
+    # extract subject from file name
+    temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
+    sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
+    sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+
+    # set sourcedata directory for task files
+    sub_task_source_dir <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, "ses-1", slash, "beh")
+
+    # set sourcedata file
+    sub_task_source_file <- paste0(sub_task_source_dir, slash, filename)
+
+    # create sub_task_source_dir if it doesnt exist
+    if (!dir.exists(sub_task_source_dir)) {
+      dir.create(sub_task_source_dir, recursive = TRUE)
+    }
+
+    # copy file into sub_task_source_dir if it doesn't exist or overwrite = TRUE
+    if (!file.exists(sub_task_source_file) | isTRUE(overwrite)) {
+
+      file.copy(from = file, to = sub_task_source_file)
+    }
+  }
 }
 
