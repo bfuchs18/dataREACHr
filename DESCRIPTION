@@ -25,3 +25,5 @@ Imports:
     RJSONIO,
     utils,
     varhandle
+Remotes:
+    alainapearce/dataprepr
