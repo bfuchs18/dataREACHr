@@ -1,6 +1,6 @@
-#' util_org_sourcedata: Move data from untouchedRaw into bids/sourcedata
+#' util_org_sourcedata: Move task data from untouchedRaw into bids/sourcedata
 #'
-#' This function moves data from untouchedRaw into bids/sourcedata
+#' This function moves task data (food view, sst) from untouchedRaw into bids/sourcedata
 #'
 #'
 #' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
@@ -8,8 +8,8 @@
 #'
 #' @examples
 #'
-#' # process task data for the Food View Task
-#' test <- util_org_sourcedata(data_path)
+#' # organize task data in untouchedRaw into sourcedata
+#' util_org_sourcedata(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
 #'
 #' \dontrun{
 #' }

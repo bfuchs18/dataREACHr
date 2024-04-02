@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_org_sourcedata.R
 \name{util_org_sourcedata}
 \alias{util_org_sourcedata}
-\title{util_org_sourcedata: Move data from untouchedRaw into bids/sourcedata}
+\title{util_org_sourcedata: Move task data from untouchedRaw into bids/sourcedata}
 \usage{
 util_org_sourcedata(base_wd, overwrite = FALSE)
 }
@@ -12,12 +12,12 @@ util_org_sourcedata(base_wd, overwrite = FALSE)
 \item{overwrite}{logical indicating if data should be overwritten in /sourcedata Default = FALSE}
 }
 \description{
-This function moves data from untouchedRaw into bids/sourcedata
+This function moves task data (food view, sst) from untouchedRaw into bids/sourcedata
 }
 \examples{
 
-# process task data for the Food View Task
-test <- util_org_sourcedata(data_path)
+# organize task data in untouchedRaw into sourcedata
+util_org_sourcedata(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
 
 \dontrun{
 }
