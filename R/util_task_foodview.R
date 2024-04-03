@@ -1,28 +1,28 @@
 #' util_task_foodview: Clean and organize Food View task data into BIDS rawdata
 #'
-#' This function processes foodview task sourcedata into BIDS and exports it into rawdata
+#' This function formats and organizes Food View task data from bids/sourcedata into bids/rawdata for a given subject
 #'
 #'
-#' @param sub subject label used in sub-<label>. Leading zeros not required
-#' @param ses session label used in ses-<label>
+#' @param sub subject label used in sub-label. Leading zeros not required
+#' @param ses session label used in ses-label. Default = 1
 #' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
 #' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
 #' @param return_data logical indicating if data should be returned. Default = FALSE
 #'
-#' @return If return_data is set to TRUE, will return a list including a clean raw dataset for each run
+#' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
 #'
 #' @examples
 #'
-#' # process task data for the Food View Task
-#' test <- util_task_foodview_orgraw(sub = 001, ses = 1, data_path, return = TRUE)
-#'
 #' \dontrun{
+#' # process task data for the Food View Task
+#' list_of_cleaned_data <- util_task_foodview_orgraw(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#'
 #' }
 #'
 #'
 #' @export
 
-util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = FALSE) {
+util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = FALSE) {
 
   # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
 
