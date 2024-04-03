@@ -46,7 +46,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     slash <- '/'
   } else {
     slash <- "\\"
-    print('util_task_foodview_orgraw.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    print('util_task_foodview.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   # Get subject number without leading zeros
@@ -64,8 +64,8 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   #### Organize Data #####
 
   # load data
-  onset_dat <- read.delim(onset_source_file)
-  resp_dat <- read.delim(resp_source_file)
+  onset_dat <- read.table(onset_source_file, header = TRUE, colClasses = c("commercial_condfood_cond"="character"))
+  resp_dat <- read.table(resp_source_file, header = TRUE, colClasses = c("commercial_cond"="character"))
 
   # update columns names
   names(resp_dat)[names(resp_dat) == "stimName"] <- "stim"
@@ -75,28 +75,12 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   dat <- merge(onset_dat, resp_dat, by=c("run", "set","food_cond","commercial_cond","stim"), all = TRUE)
   dat <- dat[order(dat$onset_time),] #order by onset_time
 
+  # re-label commercial_conditions as food/toy
+  dat$commercial_cond <- sub("T", "toy", dat$commercial_cond)
+  dat$commercial_cond <- sub("F", "food", dat$commercial_cond)
+
   # add subject column
   dat$sub <- sub_str
-
-  # transform onset_time to start at 0 and be in seconds
-  dat$onset <- (dat$onset_time - min(dat$onset_time))/1000
-  dat <- dat[,!(names(dat) %in% c("onset_time"))] # remove original onset_time column
-
-  # add duration column -- calculated based on onsets except for final fixation
-  for (row in 1:nrow(dat)) {
-    if (row < nrow(dat)) {
-      dat[row, "duration"] <- round(dat[row+1,"onset"] - dat[row,"onset"], 2)
-    } else if (row == nrow(dat) & dat[row, "stim"] == "fix") {
-      dat[row, "duration"] <- .5 #set to 0.5 seconds based on task program
-    }
-  }
-
-  # clean rt (response time) time column
-  ## convert rt from ms to sec
-  dat$rt <- dat$rt/1000
-
-  ## make rt = n/a when dat$resp = 0 (indicating no response)
-  dat$rt[dat$resp == 0] <- "n/a"
 
   # separate food_cond into 2 columns
   ## ED column
@@ -118,25 +102,47 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   # remove food_cond column
   dat <- dat[,!(names(dat) %in% c("food_cond"))]
 
-  # Replace all NA values with "n/a" for BIDS compliance
-  dat[is.na(dat)] <- "n/a"
-
   # update names
   names(dat)[names(dat) == "stim"] <- "stim_file"
   names(dat)[names(dat) == "rt"] <- "response_time"
+  names(dat)[names(dat) == "resp"] <- "response"
 
-  # re-order columns
-  dat <- dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'resp', 'response_time' , 'food_ed', 'food_taste')]
-
-  # split data by run and save into run_dfs
+  # split data by run, process onset and duration, save into run_dfs
   run_dfs <- list()
   unique_runs <- unique(dat$run)
   for (run in unique_runs) {
 
     run_label <- paste0("run", run)
+    run_dat <- dat[(dat$run == run),]
+
+    # transform onset_time to start at 0 and be in seconds
+    run_dat$onset <- (run_dat$onset_time - min(run_dat$onset_time))/1000
+    run_dat <- run_dat[,!(names(run_dat) %in% c("onset_time"))] # remove original onset_time column
+
+    # add duration column -- calculated based on onsets except for final fixation
+    for (row in 1:nrow(run_dat)) {
+      if (row < nrow(run_dat)) {
+        run_dat[row, "duration"] <- round(run_dat[row+1,"onset"] - run_dat[row,"onset"], 2)
+      } else if (row == nrow(run_dat) & run_dat[row, "stim_file"] == "fix") {
+        run_dat[row, "duration"] <- 10 #set to 10 seconds based on task program
+      }
+    }
+
+    # clean response_time column
+    ## convert response_time from ms to sec
+    run_dat$response_time <- run_dat$response_time/1000
+
+    ## make rt = n/a when dat$resp = 0 (indicating no response)
+    run_dat$response_time[run_dat$response == 0] <- "n/a"
+
+    # Replace all NA values with "n/a" for BIDS compliance
+    run_dat[is.na(run_dat)] <- "n/a"
+
+    # re-order columns
+    run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'response', 'response_time' , 'food_ed', 'food_taste')]
 
     # append to run_dfs
-    run_dfs[[run_label]] <- dat[(dat$run == run),]
+    run_dfs[[run_label]] <- run_dat
   }
 
 
