@@ -66,10 +66,10 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   fmri_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_fmri-', sub_num, '.txt')
 
   # load data
-  prac_dat <- read.delim(prac_source_file)
-  beh_dat <- read.delim(beh_source_file)
-  onset_dat <- read.delim(onset_source_file)
-  fmri_dat <- read.delim(fmri_source_file)
+  prac_dat <- read.table(prac_source_file, header = TRUE)
+  beh_dat <- read.table(beh_source_file, header = TRUE)
+  onset_dat <- read.table(onset_source_file, header = TRUE)
+  fmri_dat <- read.table(fmri_source_file, header = TRUE)
 
   # update columns names
   names(prac_dat)[names(prac_dat) == "stim"] <- "stim_file"

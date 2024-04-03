@@ -185,10 +185,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(child_v5_data$loc_data, visit = "5", session_id = "ses-2")
   ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
-  stacked_demo <- dplyr::bind_rows(
-    transform(parent_v1_data$demo_data, visit = "1", session_id = "ses-1"),
-    transform(parent_v5_data$demo_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  # demo should not be stacked? -- participants.tsv should have 1 row per participant
+  # stacked_demo <- dplyr::bind_rows(
+  #   transform(parent_v1_data$demo_data, visit = "1", session_id = "ses-1"),
+  #   transform(parent_v5_data$demo_data, visit = "5", session_id = "ses-2")
+  # ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
   stacked_household <- dplyr::bind_rows(
     transform(parent_v1_data$household_data, visit = "1", session_id = "ses-1"),
