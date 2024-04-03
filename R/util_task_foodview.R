@@ -126,7 +126,7 @@ util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data
   names(dat)[names(dat) == "rt"] <- "response_time"
 
   # re-order columns
-  dat <- dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'resp', 'response_time', 'stim_file' , 'food_ed', 'food_taste')]
+  dat <- dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'resp', 'response_time' , 'food_ed', 'food_taste')]
 
   # split data by run and save into run_dfs
   run_dfs <- list()
