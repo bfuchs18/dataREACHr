@@ -24,7 +24,9 @@
 
 util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = FALSE) {
 
-  #### 1. Set up/initial checks #####
+  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+
+  #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
   data_arg <- methods::hasArg(bids_wd)
@@ -56,16 +58,12 @@ util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data
 
   # get directory paths
   raw_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'func', slash)
-  onset_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'func', slash, 'foodview_onsets-', sub_num, '.txt')
-  resp_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'func', slash, 'foodview-', sub_num, '.txt')
+  onset_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'foodview_onsets-', sub_num, '.txt')
+  resp_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'foodview-', sub_num, '.txt')
 
   #### Organize Data #####
 
   # load data
-  ##### For development:
-  #### onset_dat <- read.delim("~/projects/Keller_Marketing/ParticipantData/untouchedRaw/foodview_task/foodview_onsets-1.txt")
-  #### resp_dat <- read.delim("~/projects/Keller_Marketing/ParticipantData/untouchedRaw/foodview_task/foodview-1.txt")
-
   onset_dat <- read.delim(onset_source_file)
   resp_dat <- read.delim(resp_source_file)
 
@@ -135,7 +133,7 @@ util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data
   unique_runs <- unique(dat$run)
   for (run in unique_runs) {
 
-    run_label <- paste0("run-", run)
+    run_label <- paste0("run", run)
 
     # append to run_dfs
     run_dfs[[run_label]] <- dat[(dat$run == run),]
@@ -144,33 +142,32 @@ util_task_foodview <- function(sub, ses, bids_wd, overwrite = FALSE, return_data
 
   #### Save in rawdata #####
 
+  # create bids/rawdata directory if it doesn't exist
   if (!dir.exists(raw_wd)) {
     dir.create(raw_wd, recursive = TRUE)
   }
 
   # for each run in run_dfs, export data
   for (runnum in 1:length(run_dfs)) {
-    run_label <- names(run_dfs)[runnum]
-    run_dat <- run_dfs[runnum]
 
-    file_name <- paste0(sub_str, '_ses-', ses, '_task-foodview_', run_label, '_events.tsv')
+    # extract data for run
+    run_dat <- run_dfs[[runnum]]
 
-      if (!file.exists(file_name) | isTRUE(overwrite)) {
-        write.table(run_dat, paste0(raw_wd, file_name), sep='\t', quote = FALSE, row.names = FALSE)
+    # format run_label for output file
+    run_label <- gsub('run', 'run-0', names(run_dfs)[runnum])
 
-        if (isTRUE(overwrite)){
-          return('overwrote with new version')
-        } else {
-          return('complete')
-        }
-      } else {
-        return('exists')
-      }
+    # define output file with path
+    outfile <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodview_', run_label, '_bold_events.tsv')
+
+    # export file if doesn't exist or overwrite = TRUE
+    if (!file.exists(outfile) | isTRUE(overwrite)) {
+      utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+    }
   }
 
-
-#   if (isTRUE(return_data)){
-#     return(list( foodview_dat = run_dfs)
-#   }
+  #### Return data #####
+  if (isTRUE(return_data)){
+    return(run_dfs)
+  }
 }
 
