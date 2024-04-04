@@ -1,4 +1,4 @@
-#' json_sst_events: Generates a json file for the SST fmri events (data in rawdata/func)
+#' json_sst_bold: Generates a json file for the SST fmri events (data in rawdata/func)
 #'
 #' This function generates a json file for cleaned stop signal data collected during fmri (onsets, responses)
 #'
@@ -7,7 +7,7 @@
 #'
 #' @export
 
-json_sst_events <- function() {
+json_sst_bold <- function() {
 
   sst_list <- list(
     'MeasurementToolMetadata' = list(
@@ -16,10 +16,10 @@ json_sst_events <- function() {
       TermURL = ''),
 
     onset = list( Description = '',
-                  Unit = seconds),
+                  Unit = "seconds"),
     duration = list( Description = 'stimulus duration. Calculated by subtracting the onset for the subsequent stimulus from the onset of the present stimulus',
                      Derivative = TRUE,
-                      Unit = seconds),
+                      Unit = "seconds"),
     run = list( Description = ''),
     set = list( Description = ''),
     run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',

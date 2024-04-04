@@ -1,11 +1,11 @@
-#' write_redcap_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
-#'#'
-#' This function exports json meta-data files for phenotype data
-#' @param export_dir string with absolute path to export directory (typically bids phenotype directory)
+#' write_task_jsons: Write meta-data for tasks created with json functions (called within proc_task.R)
+#'
+#' This function exports json meta-data files for task data
+#' @param export_dir string with absolute path to export directory (typically bids rawdata directory)
 #' @param overwrite logical (TRUE/FALSE) to indicate if json files should be overwritten
 
 
-write_redcap_jsons <- function(export_dir, overwrite) {
+write_task_jsons <- function(export_dir, overwrite) {
 
   #### Set up/initial checks #####
 
@@ -43,37 +43,9 @@ write_redcap_jsons <- function(export_dir, overwrite) {
   # List of json functions and corresponding filenames
   json_functions <- list(
 
-    # questionnaire jsons
-    json_cebq = "cebq.json",
-    json_cbq = "cbq.json",
-    json_cfq = "cfq.json",
-    json_efcr = "efcr.json",
-    json_ffbs = "ffbs.json",
-    json_spsrq = "spsrq.json",
-    json_debq = "debq.json",
-    json_tfeq18 = "tfeq.json",
-    json_bisbas = "bisbas.json",
-    json_scpf = "scpf.json",
-    json_hfssm = "hfssm.json",
-    json_audit = "audit.json",
-    json_rank = "rank.json",
-    json_puberty = "puberty.json",
-    json_chaos = "chaos.json",
-    json_pss = "pss.json",
-    json_lbc = "lbc.json",
-    json_brief2 = "brief2.json",
-    json_cshq = "cshq.json",
-    json_bes = "bes.json",
-    json_fsq = "fsq.json",
-    json_pwlb = "pwlb.json",
-    json_pptq = "pptq.json",
-    json_sic = "sic.json",
-
-    # non-questionnaire jsons
-    json_mri_visit = "mri_visit.json",
-    json_anthro = "anthro.json",
-    json_intake = "intake.json"
-
+    json_sst_beh = "task-sst_beh.json",
+    json_sst_bold = "task-sst_bold.json",
+    json_foodview = "task-foodview_bold.json"
 
   )
 
