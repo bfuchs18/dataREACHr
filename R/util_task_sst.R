@@ -65,10 +65,23 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   fmri_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_fmri-', sub_num, '.txt')
 
   # load data
-  prac_dat <- read.table(prac_source_file, header = TRUE)
-  beh_dat <- read.table(beh_source_file, header = TRUE)
-
+  ## all subs should have prac_source_file and beh_source_file
   ## subjects that did not do sst in scanner will not have onset_source_file or fmri_source_file
+
+  if (file.exists(prac_source_file)) {
+    prac_dat <- read.table(prac_source_file, header = TRUE)
+  } else {
+    print(paste(sub_str, "has no sst practice data. Aborting task processing for this sub."))
+    return()
+  }
+
+  if (file.exists(beh_source_file)) {
+    beh_dat <- read.table(beh_source_file, header = TRUE)
+  } else {
+    print(paste(sub_str, "has no sst beh data. Aborting task processing for this sub."))
+    return()
+  }
+
   if (file.exists(onset_source_file)) {
     onset_dat <- read.table(onset_source_file, header = TRUE)
     have_onset_dat = 1

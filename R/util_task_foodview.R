@@ -63,9 +63,21 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
 
   #### Organize Data #####
 
-  # load data
-  onset_dat <- read.table(onset_source_file, header = TRUE, colClasses = c("commercial_condfood_cond"="character"))
-  resp_dat <- read.table(resp_source_file, header = TRUE, colClasses = c("commercial_cond"="character"))
+  # load data, abort processing if file does not exist
+
+  if (file.exists(onset_source_file)) {
+    onset_dat <- read.table(onset_source_file, header = TRUE, colClasses = c("commercial_condfood_cond"="character"))
+  } else {
+    print(paste(sub_str, "has no Food View task onset data. Aborting task processing for this sub."))
+    return()
+  }
+
+  if (file.exists(resp_source_file)) {
+    resp_dat <- read.table(resp_source_file, header = TRUE, colClasses = c("commercial_cond"="character"))
+  } else {
+    print(paste(sub_str, "has no Food View task response data. Aborting task processing for this sub."))
+    return()
+  }
 
   # update columns names
   names(resp_dat)[names(resp_dat) == "stimName"] <- "stim"
