@@ -4,7 +4,7 @@
 \alias{util_task_sst}
 \title{util_task_sst: Clean and organize Stop Signal Task data into BIDS rawdata}
 \usage{
-util_task_sst(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = FALSE)
+util_task_sst(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE)
 }
 \arguments{
 \item{sub}{subject label used in sub-label. Leading zeros not required}
@@ -15,14 +15,14 @@ util_task_sst(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = FALSE)
 
 \item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
 
-\item{return_data}{logical indicating if data should be returned. Default = FALSE}
+\item{return_data}{logical indicating if data should be returned. Default = TRUE}
 }
 \value{
 If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
 }
 \description{
 This function formats and organizes Stop Signal Task data from bids/sourcedata into bids/rawdata for a given subject
-Data from practice and behavioral runs will be organized into bids/rawdata/beh, while data from fmri runs will be organized into bids/rawdata/func.
+Data from practice and behavioral runs will be organized into bids/rawdata/sub-label/beh, while data from fmri runs will be organized into bids/rawdata/sub-label/func.
 }
 \examples{
 
