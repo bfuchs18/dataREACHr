@@ -22,7 +22,7 @@
 #'
 #' @export
 
-util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = FALSE) {
+util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
 
   # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
 
