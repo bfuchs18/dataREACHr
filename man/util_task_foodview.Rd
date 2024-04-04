@@ -9,7 +9,7 @@ util_task_foodview(
   ses = 1,
   bids_wd,
   overwrite = FALSE,
-  return_data = FALSE
+  return_data = TRUE
 )
 }
 \arguments{

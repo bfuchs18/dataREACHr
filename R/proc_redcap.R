@@ -373,7 +373,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # Export meta-data
   # make separate overwrite args -- 1 for dataframes and 1 for jsons?
-  meta_data = write_jsons(export_dir = phenotype_wd, overwrite = overwrite)
+  meta_data = write_redcap_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,

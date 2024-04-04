@@ -51,8 +51,9 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
     print('The task_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
-  bids_wd <- paste0(base_wd, slash, "bids")
-  sourcedata_wd <- paste0(base_wd, slash, "bids", slash, "sourcedata")
+  bids_wd <- paste0(base_wd, slash, "bids", slash)
+  sourcedata_wd <- paste0(base_wd, slash, "bids", slash, "sourcedata", slash)
+  raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
 
   ####Copy data into to sourcedata ####
 
@@ -74,13 +75,13 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   foodview_data <- list()
 
   # process foodview task data and organize into bids/rawdata for each subject
-  for (sub in foodview_subs) {
+  for (sub_str in foodview_subs) {
 
     # get sub num
-    sub_sum <- as.numeric(gsub("sub-","", sub))
+    sub <- as.numeric(gsub("sub-","", sub_str))
 
     # process
-    sub_foodview_data <- util_task_foodview(sub = sub_sum, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
+    sub_foodview_data <- util_task_foodview(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
 
     # append sub_foodview_data to foodview_data
     sub_label <- paste0("sub-", sub)
@@ -100,17 +101,16 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   sst_data <- list()
 
   # process sst task data and organize into bids/rawdata for each subject
-  for (sub in sst_subs) {
+  for (sub_str in sst_subs) {
 
-    # get sub num
-    sub_sum <- as.numeric(gsub("sub-","", sub))
+    # get sub number from sub_str
+    sub <- as.numeric(gsub("sub-","", sub_str))
 
     # process
-    sub_sst_data <- util_task_sst(sub = sub_sum, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
+    sub_sst_data <- util_task_sst(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
 
     # append sub_sst_data to sst_data
-    sub_label <- paste0(sub)
-    sst_data[[sub_label]] <- sub_sst_data
+    sst_data[[sub_str]] <- sub_sst_data
 
   }
 
@@ -120,12 +120,15 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   #### Process NIH data ####
 
 
-  #### Process other data ... ####
+  # Export meta-data
+  # make separate overwrite args -- 1 for dataframes and 1 for jsons?
+  meta_data = write_task_jsons(export_dir = raw_wd, overwrite = overwrite)
 
   #### Return data ####
   if (isTRUE(return_data)){
     return(list(foodview_data = foodview_data,
                 sst_data = sst_data,
+                meta_data = meta_data
     ))
   }
 }
