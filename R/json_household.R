@@ -48,7 +48,9 @@ json_household <- function() {
                                           '4' = '4th grade',
                                           '5' = '5th grade',
                                           '6' = '6th grade')),
-    demo_parent_birthdate = list( Description = 'What is your date of birth?'),
+    demo_parent_age = list( Description = 'Age of parent calculated from self-reported parent date of birth (data not shared) and date of form completion (data not shared)',
+                            Unit = "years",
+                            Derivative = TRUE),
     demo_parent_ethnicity = list( Description = 'What is your ethnicity?',
                                   Levels = list ('0' = 'Hispanic or Latino',
                                                  '1' = 'Not Hispanic or Latino')),
@@ -274,6 +276,10 @@ json_household <- function() {
                                  Levels = list ('0' = 'Less than $1 a week',
                                                 '1' = '$1 - $5 a week',
                                                 '2' = 'More than $5 a week')))
+
+  # variables to add:
+  # parent2_reported_height_m -- derivative computed from reported feet and inches
+  # parent2_reported_bmi -- derivative. will this be included? or just report in anthro form?
 
   # convert formatting to JSON
   household_json <- RJSONIO::toJSON(household_list, pretty = TRUE)
