@@ -41,16 +41,13 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   # (1) demo_data: will include child demographic variables that will be include in participants.tsv
   # (2) household_data: will include variables related to the family and household environemnt
 
-  child_demo_vars <- c('demo_income', 'demo_education_mom')
-
   demo_data_all <- data[, grepl('participant_id', names(data)) | grepl('demo', names(data))]
   household_data <- demo_data_all[, !(names(demo_data_all) %in% c('visit_1_demographics_timestamp',
                                                                   'demo_v1_missingcheck',
                                                                   'visit_1_demographics_complete',
                                                                   'parent_household_demographics_questionnaire_timestamp',
                                                                   'demo_missingcheck', 'demo_missingcheck_2', 'demo_missingcheck_3',
-                                                                  'parent_household_demographics_questionnaire_complete',
-                                                                  child_demo_vars))]
+                                                                  'parent_household_demographics_questionnaire_complete'))]
 
   names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft_component"
   names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_inch_component"
@@ -61,21 +58,6 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
 
   # calculate parent2 BMI (kg/m2)
   household_data$parent2_reported_bmi <- (household_data$demo_parent2_reported_weight_lbs*0.453592) / (household_data$parent2_reported_height_m**2)
-
-  # subset demo_data
-  demo_data <- demo_data_all[, c('participant_id', child_demo_vars)]
-
-  # # # add age to demo_data ??
-  # demo_data <- merge(demo_data, v5_date_data, by = 'participant_id',  all=T)
-  # demo_data[['v5_date']] <- lubridate::as_date(demo_data[['v5_date']])
-  # demo_data[['age']] <- lubridate::interval(demo_data[['demo_child_birthdate']], demo_data[['v5_date']])/lubridate::years(1)
-#
-#   # # remove dob and v1 date from demo_data
-#   demo_data <- demo_data[, !(names(demo_data) %in% c('demo_child_birthdate','v5_date'))]
-
-  # add sex to demo_data
-  demo_data <- merge(demo_data, data[, c("participant_id", "prs_sex")], by="participant_id")
-  names(demo_data)[names(demo_data) == "prs_sex"] <- "sex"
 
   ## RANK Data (ranking food item questionnaire) ####
   rank_data <- data[, grepl('participant_id', names(data)) | grepl('rank', names(data))]
@@ -131,7 +113,6 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(
       visit_data_parent = visit_data_parent,
-      demo_data = demo_data,
       household_data = household_data,
       rank_data = rank_data,
       puberty_data = puberty_scored,

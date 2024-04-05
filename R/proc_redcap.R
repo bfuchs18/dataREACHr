@@ -290,6 +290,28 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(parent_v5_data$visit_data_parent, visit = "5", session_id = "ses-2")
   ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
 
+  #### Merge data into participants.tsv ####
+
+  # add demo_data and sex
+  participants_data <- merge(parent_v1_data$demo_data, parent_v1_data$puberty_data$bids_phenotype[, c("participant_id", "sex")], by = "participant_id", all = TRUE)
+
+  # add maternal edu and income from visit 1 and append "v1" to variable names
+  participants_data <- merge(participants_data,
+                             parent_v1_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
+                             by = "participant_id",
+                             all = TRUE) %>% dplyr::rename(demo_education_mom_v1 = demo_education_mom, demo_income_v1 = demo_income)
+
+  # add maternal edu and income from visit 5 and append "v5" to variable names
+  participants_data <- merge(participants_data,
+                             parent_v5_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
+                             by = "participant_id",
+                             all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = demo_education_mom, demo_income_v5 = demo_income)
+
+  # add risk status
+  ## age at each visit
+  ## date of each visit (month / year)
+  ## bmi and bmi-z
+
   #### Merge visit intake (meal, EAH, vas) data ####
   merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
   merged_intake_data <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session_id", "advertisement_condition"), all = TRUE)
@@ -304,8 +326,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_intake_data <- merge(merged_intake_data, processed_de_data$stacked_intake, by=c("participant_id","visit", "session_id"), all = TRUE)
 
   # merge notes/visit data? update data?
-
-  # Merge data that belongs in participant.tsv
 
   # merge MRI visit data double entry CAMS / MRI freddies
   merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
