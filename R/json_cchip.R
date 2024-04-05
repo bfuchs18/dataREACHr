@@ -67,7 +67,11 @@ json_cchip <- function() {
     cchip_total = list( Description = 'Food Insecurity Score',
                        Derivative = TRUE),
     cchip_category = list( Description = 'Food Insecurity Category',
-                        Derivative = TRUE))
+                           Levels = list (
+                             'Hungry' = 'Hungry',
+                             'At Risk for Hunger' = 't Risk for Hunger',
+                             'Not Hungry' = 'Not Hungry'),
+                           Derivative = TRUE))
 
   # convert formatting to JSON
   cchip_json <- RJSONIO::toJSON(cchip_list, pretty = TRUE)
