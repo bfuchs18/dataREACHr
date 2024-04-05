@@ -68,11 +68,17 @@ write_redcap_jsons <- function(export_dir, overwrite) {
     json_pwlb = "pwlb.json",
     json_pptq = "pptq.json",
     json_sic = "sic.json",
+    json_loc = "loc.json",
+    json_pmum = "pmum.json",
+    json_class = "class.json",
+    json_stq = "stq.json",
+    json_scpf = "scpf.json",
 
     # non-questionnaire jsons
     json_mri_visit = "mri_visit.json",
     json_anthro = "anthro.json",
-    json_intake = "intake.json"
+    json_intake = "intake.json",
+    json_household = "household.json"
 
 
   )
