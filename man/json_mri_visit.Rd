@@ -7,7 +7,7 @@
 json_mri_visit()
 }
 \value{
-A json file documenting the MRI visit data
+A string with data stored in JSON format containing meta-data for the MRI visit data
 }
 \description{
 This function generates a json file for MRI visit data (notes, CAMS, freddy fullness scores)

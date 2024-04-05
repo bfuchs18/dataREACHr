@@ -7,7 +7,7 @@
 json_audit()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Alcohol Use Disorders Identification Test
+A string with data stored in JSON format containing meta-data the Alcohol Use Disorders Identification Test
 }
 \description{
 This function generates a json file for the scored Alcohol Use Disorders Identification Test and raw participant responses.

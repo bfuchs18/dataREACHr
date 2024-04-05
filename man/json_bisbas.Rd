@@ -7,7 +7,7 @@
 json_bisbas()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Behavioral Inhibition System/Behavioral Activation System Scale
+A string with data stored in JSON format containing meta-data for the Behavioral Inhibition System/Behavioral Activation System Scale
 }
 \description{
 This function generates a json file for the scored Behavioral Inhibition System/Behavioral Activation System Scale and raw participant responses.

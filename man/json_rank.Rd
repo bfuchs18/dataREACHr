@@ -7,7 +7,7 @@
 json_rank()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Ranking Food Item Questionnaire
+A string with data stored in JSON format containing meta-data for the Ranking Food Item Questionnaire
 }
 \description{
 This function generates a json file for the (scored?) Ranking Food Item Questionnaire and raw participant responses.

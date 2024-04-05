@@ -2,7 +2,7 @@
 #'
 #' This function generates a json file for MRI visit data (notes, CAMS, freddy fullness scores)
 #'
-#' @return A json file documenting the MRI visit data
+#' @return A string with data stored in JSON format containing meta-data for the MRI visit data
 #'
 #'
 #' @export

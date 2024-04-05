@@ -7,7 +7,7 @@
 json_tfeq18()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Three-Factor Eating Questionnaire-R18
+A string with data stored in JSON format containing meta-data for the Three-Factor Eating Questionnaire-R18
 }
 \description{
 This function generates a json file for the scored Three-Factor Eating Questionnaire-R18 and raw participant responses.

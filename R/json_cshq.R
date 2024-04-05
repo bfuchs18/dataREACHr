@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored Children's Sleep Habits Questionnaire and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_cshq function in dataprepr and is only accurate for data collected in Study REACH.
 #'
-#' @return A json file documenting the raw inputs and scored values for the Children's Sleep Habits Questionnaire
+#' @return A string with data stored in JSON format containing meta-data for the Children's Sleep Habits Questionnaire
 #'
 #'
 #' @export

@@ -7,7 +7,7 @@
 json_anthro()
 }
 \value{
-A json file documenting anthropometric data
+A string with data stored in JSON format containing meta-data anthropometric data
 }
 \description{
 This function generates a json file for anthropometric data

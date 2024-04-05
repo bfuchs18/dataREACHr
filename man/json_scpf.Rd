@@ -7,7 +7,7 @@
 json_scpf()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Structure and Control in Parent Feeding questionnaire
+A string with data stored in JSON format containing meta-data for the Structure and Control in Parent Feeding questionnaire
 }
 \description{
 This function generates a json file for the scored Structure and Control in Parent Feeding questionnaire and raw participant responses.

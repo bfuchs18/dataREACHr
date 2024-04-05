@@ -7,7 +7,7 @@
 json_pwlb()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Parent Weight Loss Behavior Questionnaire
+A string with data stored in JSON format containing meta-data for the Parent Weight Loss Behavior Questionnaire
 }
 \description{
 This function generates a json file for the scored Parent Weight Loss Behavior Questionnaire and raw participant responses.

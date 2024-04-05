@@ -7,7 +7,7 @@
 json_fsq()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Feeding Strategies Questionnaire
+A string with data stored in JSON format containing meta-data for the Feeding Strategies Questionnaire
 }
 \description{
 This function generates a json file for the Feeding Strategies Questionnaire

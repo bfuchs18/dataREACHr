@@ -7,7 +7,7 @@
 json_chaos()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Confusion, Hubbub, and Order Scale
+A string with data stored in JSON format containing meta-data for the Confusion, Hubbub, and Order Scale
 }
 \description{
 This function generates a json file for the scored Confusion, Hubbub, and Order Scale and raw participant responses.

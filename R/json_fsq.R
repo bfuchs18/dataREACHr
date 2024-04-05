@@ -3,7 +3,7 @@
 #' This function generates a json file for the Feeding Strategies Questionnaire
 #' This function is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the Feeding Strategies Questionnaire
+#' @return A string with data stored in JSON format containing meta-data for the Feeding Strategies Questionnaire
 #'
 #'
 #' @export

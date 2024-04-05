@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored Behavioral Rating Inventory of Executive Function-2 and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_brief2 function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the Behavioral Rating Inventory of Executive Function-2
+#' @return A string with data stored in JSON format containing meta-data for the Behavioral Rating Inventory of Executive Function-2
 #'
 #'
 #' @export

@@ -7,7 +7,7 @@
 json_class()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Children's Leisure Activities Study Survey
+A string with data stored in JSON format containing meta-data for the Children's Leisure Activities Study Survey
 }
 \description{
 This function generates a json file for the scored? Children's Leisure Activities Study Survey and raw participant responses.

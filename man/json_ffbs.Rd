@@ -7,7 +7,7 @@
 json_ffbs()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Family Food Behavior Survey
+A string with data stored in JSON format containing meta-data for the Family Food Behavior Survey
 }
 \description{
 This function generates a json file for the scored Family Food Behavior Survey and raw participant responses.

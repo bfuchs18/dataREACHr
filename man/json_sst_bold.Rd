@@ -7,7 +7,7 @@
 json_sst_bold()
 }
 \value{
-A json file documenting the XXX
+A string with data stored in JSON format containing meta-data for the XXX
 }
 \description{
 This function generates a json file for cleaned stop signal data collected during fmri (onsets, responses)

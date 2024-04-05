@@ -7,7 +7,7 @@
 json_cbq()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Child Behavior Questionnaire
+A string with data stored in JSON format containing meta-data for the Child Behavior Questionnaire
 }
 \description{
 This function generates a json file for the scored Child Behavior Questionnaire and raw participant responses.

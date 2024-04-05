@@ -2,7 +2,7 @@
 #'
 #' This function generates a json file for anthropometric data
 #'
-#' @return A json file documenting anthropometric data
+#' @return A string with data stored in JSON format containing meta-data anthropometric data
 #'
 #'
 #' @export
@@ -12,7 +12,7 @@ json_anthro <- function() {
   anthro_list <- list(
     participant_id = list( Description = 'participant id number'),
     visit = list( Description = 'participant id number'),
-    session_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'session description'),
     child_height_1_cm = list( Description = 'child height measurement 1',
                               Unit = "cm"),
     child_height_2_cm = list( Description = 'child height measurement 2',

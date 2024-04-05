@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored U.S. Household Food Security Survey Module and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_hfssm function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the U.S. Household Food Security Survey Module
+#' @return A string with data stored in JSON format containing meta-data for the U.S. Household Food Security Survey Module
 #'
 #'
 #' @export

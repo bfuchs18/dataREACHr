@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored External Food Cue Responsiveness Scale and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_efcr function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the External Food Cue Responsiveness Scale
+#' @return A string with data stored in JSON format containing meta-data for the External Food Cue Responsiveness Scale
 #'
 #'
 #' @export

@@ -7,7 +7,7 @@
 json_intake()
 }
 \value{
-A json file documenting intake data
+A string with data stored in JSON format containing meta-data for intake data
 }
 \description{
 This function generates a json file for intake data

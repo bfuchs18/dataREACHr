@@ -7,7 +7,7 @@
 json_puberty()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Pubertal Development Score.
+A string with data stored in JSON format containing meta-data for the Pubertal Development Score.
 }
 \description{
 This function generates a json file for the scored Pubertal Development Scale and and raw participant responses.

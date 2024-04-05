@@ -7,7 +7,7 @@
 json_pptq()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Pictorial Personality Traits Questionnaire for Children
+A string with data stored in JSON format containing meta-data for the Pictorial Personality Traits Questionnaire for Children
 }
 \description{
 This function generates a json file for the scored Pictorial Personality Traits Questionnaire for Children  and raw participant responses.

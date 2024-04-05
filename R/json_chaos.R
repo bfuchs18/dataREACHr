@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored Confusion, Hubbub, and Order Scale and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_chaos function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the Confusion, Hubbub, and Order Scale
+#' @return A string with data stored in JSON format containing meta-data for the Confusion, Hubbub, and Order Scale
 #'
 #'
 #' @export

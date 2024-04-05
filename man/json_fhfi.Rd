@@ -7,7 +7,7 @@
 json_fhfi()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Fulkerson Home Food Inventory
+A string with data stored in JSON format containing meta-data for the Fulkerson Home Food Inventory
 }
 \description{
 This function generates a json file for the scored Fulkerson Home Food Inventory and raw participant responses. This function provides accurate json files ONLY if data is processed using score_hfi function in dataprepr and is only accurate for data collected in Study BRAKE.

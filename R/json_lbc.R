@@ -2,7 +2,7 @@
 #'
 #' This function generates a json file for the scored Lifestyle Behavior Checklist and raw participant responses. This function provides accurate json files ONLY if data is processed using score_lbc function in dataprepr and is only accurate for data collected in Study BRAKE.
 #'
-#' @return A json file documenting the raw inputs and scored values for the Lifestyle Behavior Checklist
+#' @return A string with data stored in JSON format containing meta-data for the Lifestyle Behavior Checklist
 #'
 #'
 #' @export

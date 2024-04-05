@@ -3,7 +3,7 @@
 #' This function generates a json file for the scored? Children's Leisure Activities Study Survey and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_class function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A json file documenting the raw inputs and scored values for the Children's Leisure Activities Study Survey
+#' @return A string with data stored in JSON format containing meta-data for the Children's Leisure Activities Study Survey
 #'
 #'
 #' @export
@@ -369,7 +369,7 @@ json_class <- function() {
     )
 
   # convert formatting to JSON
-  class_json <- RJSONIO::toJSON(class__list, pretty = TRUE)
+  class_json <- RJSONIO::toJSON(class_list, pretty = TRUE)
 
   # double check
   if (isFALSE(RJSONIO::isValidJSON(class_json, asText = TRUE))){

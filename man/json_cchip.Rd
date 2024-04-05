@@ -7,7 +7,7 @@
 json_cchip()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Community Childhood Hunger Identification Project
+A string with data stored in JSON format containing meta-data for the Community Childhood Hunger Identification Project
 }
 \description{
 This function generates a json file for the scored Community Childhood Hunger Identification Project and raw participant responses.

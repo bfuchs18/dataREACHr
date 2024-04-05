@@ -7,7 +7,7 @@
 json_debq()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Dutch Eating Behavior Questionnaire
+A string with data stored in JSON format containing meta-data for the Dutch Eating Behavior Questionnaire
 }
 \description{
 This function generates a json file for the scored Dutch Eating Behavior Questionnaire and raw participant responses.

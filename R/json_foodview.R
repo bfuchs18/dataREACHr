@@ -2,7 +2,7 @@
 #'
 #' This function generates a json file for cleaned food view task data collected during fmri (onsets, responses)
 #'
-#' @return A json file documenting the XXX
+#' @return A string with data stored in JSON format containing meta-data for the XXx
 #'
 #'
 #' @export

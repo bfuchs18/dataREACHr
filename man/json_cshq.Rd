@@ -7,7 +7,7 @@
 json_cshq()
 }
 \value{
-A json file documenting the raw inputs and scored values for the Children's Sleep Habits Questionnaire
+A string with data stored in JSON format containing meta-data for the Children's Sleep Habits Questionnaire
 }
 \description{
 This function generates a json file for the scored Children's Sleep Habits Questionnaire and raw participant responses.
