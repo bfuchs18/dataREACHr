@@ -2,8 +2,9 @@
 #'
 #' This function organizes REDCap double entry data data
 #'
-#'
+#' @importFrom rlang .data
 #' @param data double-entry data
+#' @param agesex_data dataframe with participant_id, v1_age (visit 1 age) and v5_age (visit 5 age), sex
 #' @param return_data If return_data is set to TRUE, will return a list including: mri_visit_data, tictoc_data, wasi_data, dexa_data, anthro_data (wide and long), intake_data (wide and long)
 #'
 
@@ -106,7 +107,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   stacked_anthro <- dplyr::bind_rows(
     transform(anthro_v1_data, visit = "1", session_id = "ses-1"),
     transform(anthro_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
 
 
   ## DEXA data ####
@@ -127,7 +128,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   stacked_dexa <- dplyr::bind_rows(
     transform(dexa_v1_data, visit = "1", session_id = "ses-1"),
     transform(dexa_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
 
 
   ## intake data ####
@@ -164,7 +165,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
     transform(v3_intake_data, visit = "3", session_id = "ses-1"),
     transform(v4_intake_data, visit = "4", session_id = "ses-1"),
     transform(v5_intake_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(session_id, .after = 1) %>% dplyr::relocate(visit, .after = 2)
+  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
 
   # compute intake variables
   stacked_intake <- util_calc_intake(stacked_intake)

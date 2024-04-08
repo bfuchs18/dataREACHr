@@ -18,8 +18,8 @@
 #' list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
 #'
 #' }
-#'
-#'
+#' @importFrom utils read.table
+#' @importFrom rlang .data
 #' @export
 
 util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
@@ -184,8 +184,8 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
     fmri_dat$trial_num <- seq.int(nrow(fmri_dat))
     onset_dat <- onset_dat %>%
-      dplyr::mutate(trial_num = ifelse(grepl(".jpeg", stim_file),
-                                       cumsum(grepl(".jpeg", stim_file)),
+      dplyr::mutate(trial_num = ifelse(grepl(".jpeg", .data$stim_file),
+                                       cumsum(grepl(".jpeg", .data$stim_file)),
                                        NA))
 
     # combine onset_dat (onset data) and fmri_dat (response data) into func_dat

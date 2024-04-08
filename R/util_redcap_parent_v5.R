@@ -4,7 +4,7 @@
 #'
 #'
 #' @param data data from REDCap event parent_visit_5_arm_1
-#' @param v1_date_data dataframe with 2 columns: 'participant_id' and 'v5_date'
+#' @param v5_date_data dataframe with 2 columns: 'participant_id' and 'v5_date'
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset

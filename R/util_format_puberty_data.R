@@ -4,7 +4,7 @@
 #'
 #'
 #' @param puberty_data Puberty data (parental_rating_scale_for_pubertal_development, Tanner) extracted from data from REDCap events parent_visit_1_arm_1 and parent_visit_5_arm_1'
-#'
+#' @importFrom rlang .data
 util_format_puberty_data <- function(puberty_data) {
 
   names(puberty_data) <- gsub('prs_sex', 'sex', names(puberty_data))
@@ -23,29 +23,29 @@ util_format_puberty_data <- function(puberty_data) {
   puberty_data[, "prs_girls_5"] <- ifelse(puberty_data[, "prs_girls_5"] == 4, value_mapping_g5[as.character(4)], puberty_data[, "prs_girls_5"])
 
   # subset and rename girls variables
-  puberty_data_girls <- subset(puberty_data, sex == 0)
+  puberty_data_girls <- subset(puberty_data, puberty_data$sex == 0)
   puberty_data_girls <- puberty_data_girls[, -grep("boys|tanner_male_choice", names(puberty_data_girls))]
   puberty_data_girls <- puberty_data_girls %>% dplyr::rename(
-    pds_1 = prs_girls_1,
-    pds_2 = prs_girls_2,
-    pds_3 = prs_girls_3,
-    pds_4f = prs_girls_4,
-    pds_5fa = prs_girls_5,
-    pds_6 = prs_girls_6,
-    tanner_choice = tanner_female_choice
+    pds_1 = .data$prs_girls_1,
+    pds_2 = .data$prs_girls_2,
+    pds_3 = .data$prs_girls_3,
+    pds_4f = .data$prs_girls_4,
+    pds_5fa = .data$prs_girls_5,
+    pds_6 = .data$prs_girls_6,
+    tanner_choice = .data$tanner_female_choice
   )
 
   # subset and rename boys variables
-  puberty_data_boys <- subset(puberty_data, sex == 1)
+  puberty_data_boys <- subset(puberty_data, puberty_data$sex == 1)
   puberty_data_boys <- puberty_data_boys[, -grep("girls|tanner_female_choice", names(puberty_data_boys))]
   puberty_data_boys <- puberty_data_boys %>% dplyr::rename(
-    pds_1 = prs_boys_1,
-    pds_2 = prs_boys_2,
-    pds_3 = prs_boys_3,
-    pds_4m = prs_boys_4,
-    pds_5m = prs_boys_5,
-    pds_6 = prs_boys_6,
-    tanner_choice = tanner_male_choice
+    pds_1 = .data$prs_boys_1,
+    pds_2 = .data$prs_boys_2,
+    pds_3 = .data$prs_boys_3,
+    pds_4m = .data$prs_boys_4,
+    pds_5m = .data$prs_boys_5,
+    pds_6 = .data$prs_boys_6,
+    tanner_choice = .data$tanner_male_choice
   )
   # bind girls and boys dfs -- dplyr::bind_rows fills missing values with NA where columns don't match.
   puberty_data_for_scoring <- dplyr::bind_rows(puberty_data_girls, puberty_data_boys)

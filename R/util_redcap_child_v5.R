@@ -7,7 +7,7 @@
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw child visit 1 datasets
 #'  2) meta-data/.json for each dataset
-#'
+#' @importFrom rlang .data
 
 util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
@@ -67,29 +67,29 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   # is p6 part of scoring for children? -- not in Table1 A Self-Administered sting Scale for Development Carskadon and Acebo
 
   # subset and rename girls variables
-  puberty_data_girls <- subset(puberty_data, sex == 0)
+  puberty_data_girls <- subset(puberty_data, puberty_data$sex == 0)
   puberty_data_girls <- puberty_data_girls[, -grep("puberty_voice|puberty_facialhair|boycomp|tanner_male", names(puberty_data_girls))]
   puberty_data_girls <- puberty_data_girls %>% dplyr::rename(
-    pds_1 = childreport_puberty_height,
-    pds_2 = childreport_puberty_hair,
-    pds_3 = childreport_puberty_acne,
-    pds_4f = childrep_puberty_breast,
-    pds_5fa = childrep_puberty_menses,
-    pds_6 = childrep_puberty_girlcomp,
-    tanner_choice = tanner_female_choice_v5
+    pds_1 = .data$childreport_puberty_height,
+    pds_2 = .data$childreport_puberty_hair,
+    pds_3 = .data$childreport_puberty_acne,
+    pds_4f = .data$childrep_puberty_breast,
+    pds_5fa = .data$childrep_puberty_menses,
+    pds_6 = .data$childrep_puberty_girlcomp,
+    tanner_choice = .data$tanner_female_choice_v5
   )
 
   # subset and rename boys variables
-  puberty_data_boys <- subset(puberty_data, sex == 1)
+  puberty_data_boys <- subset(puberty_data, puberty_data$sex == 1)
   puberty_data_boys <- puberty_data_boys[, -grep("puberty_breast|puberty_menses|tanner_female|girlcomp", names(puberty_data_boys))]
   puberty_data_boys <- puberty_data_boys %>% dplyr::rename(
-    pds_1 = childreport_puberty_height,
-    pds_2 = childreport_puberty_hair,
-    pds_3 = childreport_puberty_acne,
-    pds_4m = childreport_puberty_voice,
-    pds_5m = childreport_puberty_facialhair,
-    pds_6 = childrep_puberty_boycomp,
-    tanner_choice = tanner_male_choice_v5
+    pds_1 = .data$childreport_puberty_height,
+    pds_2 = .data$childreport_puberty_hair,
+    pds_3 = .data$childreport_puberty_acne,
+    pds_4m = .data$childreport_puberty_voice,
+    pds_5m = .data$childreport_puberty_facialhair,
+    pds_6 = .data$childrep_puberty_boycomp,
+    tanner_choice = .data$tanner_male_choice_v5
   )
 
   # bind girls and boys dfs -- dplyr::bind_rows fills missing values with NA where columns don't match.

@@ -23,6 +23,7 @@ Imports:
     magrittr,
     methods,
     RJSONIO,
+    rlang,
     utils,
     varhandle
 Remotes:

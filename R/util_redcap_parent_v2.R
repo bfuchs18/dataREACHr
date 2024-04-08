@@ -8,7 +8,7 @@
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
-#'
+#' @importFrom rlang .data
 util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
 
   #### 1. Set up/initial checks #####
@@ -66,13 +66,13 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   # change pna ('Don't want to answer') responses to 999
   ## for bes_6 bes_13, bes_14, bes_15, and bes_16, 3 indicates pna; for all other variables, 4 indicates pna
   bes_data_for_scoring <- bes_data %>%
-    dplyr::mutate_at(dplyr::vars(starts_with("bes_")), ~ ifelse(. %in% c(4), 999, .)) %>%
+    dplyr::mutate_at(dplyr::vars(dplyr::starts_with("bes_")), ~ ifelse(. %in% c(4), 999, .)) %>%
     dplyr::mutate(
-      bes_6 = ifelse(bes_6 == 3, 999, bes_6),
-      bes_13 = ifelse(bes_13 == 3, 999, bes_13),
-      bes_14 = ifelse(bes_14 == 3, 999, bes_14),
-      bes_15 = ifelse(bes_15 == 3, 999, bes_15),
-      bes_16 = ifelse(bes_16 == 3, 999, bes_16)
+      bes_6 = ifelse(.data$bes_6 == 3, 999, .data$bes_6),
+      bes_13 = ifelse(.data$bes_13 == 3, 999, .data$bes_13),
+      bes_14 = ifelse(.data$bes_14 == 3, 999, .data$bes_14),
+      bes_15 = ifelse(.data$bes_15 == 3, 999, .data$bes_15),
+      bes_16 = ifelse(.data$bes_16 == 3, 999, .data$bes_16)
     )
 
   bes_scored <- dataprepr::score_bes(bes_data_for_scoring, score_base = TRUE, pna = 999, id = 'participant_id')

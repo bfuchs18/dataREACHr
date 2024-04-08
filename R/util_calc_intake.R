@@ -64,12 +64,12 @@ util_calc_intake <- function(stacked_intake) {
 
   # sum across meal_g_vars columns
   stacked_intake$meal_grams_consumed <- stacked_intake %>%
-    dplyr::select(all_of(meal_g_vars)) %>%
+    dplyr::select(dplyr::all_of(meal_g_vars)) %>%
     rowSums(na.rm = FALSE)
 
   # sum across meal_kcal_vars columns
   stacked_intake$meal_kcal_consumed <- stacked_intake %>%
-    dplyr::select(all_of(meal_kcal_vars)) %>%
+    dplyr::select(dplyr::all_of(meal_kcal_vars)) %>%
     rowSums(na.rm = FALSE)
 
   ## EAH
@@ -80,12 +80,12 @@ util_calc_intake <- function(stacked_intake) {
 
   # sum across eah_g_vars columns
   stacked_intake$eah_grams_consumed <- stacked_intake %>%
-    dplyr::select(all_of(eah_g_vars)) %>%
+    dplyr::select(dplyr::all_of(eah_g_vars)) %>%
     rowSums(na.rm = FALSE)
 
   # sum across eah_kcal_vars columns
   stacked_intake$eah_kcal_consumed <- stacked_intake %>%
-    dplyr::select(all_of(eah_kcal_vars)) %>%
+    dplyr::select(dplyr::all_of(eah_kcal_vars)) %>%
     rowSums(na.rm = FALSE)
 
   ## total (meal + eah)
