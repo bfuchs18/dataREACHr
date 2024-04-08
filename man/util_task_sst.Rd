@@ -31,6 +31,4 @@ Data from practice and behavioral runs will be organized into bids/rawdata/sub-l
 list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
 
 }
-
-
 }
