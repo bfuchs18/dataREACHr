@@ -38,7 +38,7 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
     } else if (!file.exists(base_wd)) {
       stop("base_wd entered, but path does not exist. Check base_wd string.")
     }
-  } else if (isFALSE(data_arg)) {
+  } else if (isFALSE(path_arg)) {
     stop("base_wd must be entered as a string")
   }
 
