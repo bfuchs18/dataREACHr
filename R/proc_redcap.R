@@ -19,21 +19,19 @@
 #'
 #' @examples
 #'
+#' \dontrun{
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
 #' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-03-22_1446.csv"
 #'
-#' phenotype_data <- proc_redcap(visit_data_path, return = TRUE)
+#' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
-#' \dontrun{
 #' }
 #'
 #' @importFrom utils tail write.csv read.csv
+#' @importFrom rlang .data
 #' @export
 
 proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return_data = FALSE) {
-
-  # For testing
-  # visit_data_path = "/Users/baf44/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-02-16_1544.csv"
 
   #### Set up/initial checks #####
 
