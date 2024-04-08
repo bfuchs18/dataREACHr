@@ -13,7 +13,7 @@ json_bes <- function() {
   bes_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Binge Eating Scale. Participants were provided the following instructions: "Below are groups of statements. Read all of the statements in each group and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior."',
-      Reference = 'Gormally, J., Black, S., Daston, S., & Rardin, D. (1982). The assessment of binge eating severity among obese persons. Addictive Behaviors, 7(1), 47–55. https://doi.org/10.1016/0306-4603(82)90024-7',
+      Reference = 'Gormally, J., Black, S., Daston, S., & Rardin, D. (1982). The assessment of binge eating severity among obese persons. Addictive Behaviors, 7(1). https://doi.org/10.1016/0306-4603(82)90024-7',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/7080884/'),
     participant_id = list( Description = 'participant id number'),
     bes1 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',

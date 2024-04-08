@@ -13,7 +13,7 @@ json_bisbas <- function() {
   bisbas_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Behavioral Inhibition System/Behavioral Activation System. Participants were provided the following instructions: "Each item of this questionnaire is a statement that a person may either agree with or disagree with. For each item, indicate how much you agree or disagree with what the item says. Please respond to all the items; do not leave any blank. Choose only one response to each statement. Please be as accurate and honest as you can be. Respond to each item as if it were the only item. That is, don\'t worry about being "consistent" in your responses. These answers are about your child. Choose from the following four response options: 1 = very true for me; 2 = somewhat true for me; 3 = somewhat false for me; 4 = very false for me"',
-      Reference = 'Carver, C. S., & White, T. L. (1994). Behavioral inhibition, behavioral activation, and affective responses to impending reward and punishment: The BIS/BAS Scales. Journal of Personality and Social Psychology, 67(2), 319–333. https://doi.org/10.1037/0022-3514.67.2.319',
+      Reference = 'Carver, C. S., & White, T. L. (1994). Behavioral inhibition, behavioral activation, and affective responses to impending reward and punishment: The BIS/BAS Scales. Journal of Personality and Social Psychology, 67(2). https://doi.org/10.1037/0022-3514.67.2.319',
       TermURL = 'https://psycnet.apa.org/record/1995-00067-001'),
     participant_id = list( Description = 'participant id number'),
     bisbas1 = list( Description = 'My child thinks family is the most important thing in life.',

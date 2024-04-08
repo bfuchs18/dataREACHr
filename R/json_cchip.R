@@ -13,7 +13,7 @@ json_cchip <- function() {
   cchip_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Community Childhood Hunger Identification Project',
-      Reference = 'Wehler CA, Scott RI, Anderson JJ. The community childhood hunger identification project: A model of domestic hunger—Demonstration project in Seattle, Washington. Journal of Nutrition Education. 1992;24(1):29S-35S. doi:10.1016/S0022-3182(12)80135-X',
+      Reference = 'Wehler CA, Scott RI, Anderson JJ. The community childhood hunger identification project: A model of domestic hunger—Demonstration project in Seattle, Washington. Journal of Nutrition Education. 1992;24(1). doi:10.1016/S0022-3182(12)80135-X',
       TermURL = 'https://www.sciencedirect.com/science/article/abs/pii/S002231821280135X'),
     participant_id = list( Description = 'participant id number'),
     cchip1 = list( Description = 'Thinking about the past 12 months, did your household ever run out of money to buy food to make a meal?',
