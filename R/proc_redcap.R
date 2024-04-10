@@ -329,70 +329,14 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
 
-  #### Export Phenotype Data ####
-
-  # Update to only export if overwrite == TRUE
-
-  # generate phenotype_wd if it doesnt exist
-  if (!file.exists(phenotype_wd)){
-    dir.create(file.path(phenotype_wd))
-  }
-
-  # export participants.tsv to bids/
-  # write.table(participants_data, paste0(bids_wd, slash, 'participants.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-
-  # export single-visit data (i.e. redcap visit data collected at 1 visit only)
-  ## can this be done using a list of lists and a loop?
-
-  write.table(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # cfq
-  write.table(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #efcr
-  write.table(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #lbc
-  write.table(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # pss
-  # write.table(parent_v1_data$chaos_data$bids_phenotype, paste0(phenotype_wd, slash, 'chaos.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # chaos -- need to develop score script
-
-
-  write.table(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief2.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #brief
-  write.table(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #bes
-  write.table(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #ffbs
-  # write.table(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv', quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #ffq -- will this be bids_phenotype
-
-  write.table(parent_v3_data$spsrq_data$bids_phenotype, paste0(phenotype_wd, slash, 'spsrq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # spsrq
-  write.table(parent_v3_data$pwlb_data$bids_phenotype, paste0(phenotype_wd, slash, 'pwlb.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # pwlb
-  write.table(parent_v3_data$tfeq_data$bids_phenotype, paste0(phenotype_wd, slash, 'tfeq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # tfeq
-  write.table(parent_v3_data$bisbas_data$bids_phenotype, paste0(phenotype_wd, slash, 'bisbas.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # bisbas
-  write.table(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # debq
-  write.table(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'scpf.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # scpf
-
-  write.table(child_v4_data$pptq_data$bids_phenotype, paste0(phenotype_wd, slash, 'pptq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # debq
-
-  # export stacked visit data
-  write.table(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # should this be the participants.tsv?
-  write.table(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-
-  # write.table(stacked_cshq, paste0(phenotype_wd, slash, 'cshq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  # write.table(stacked_pstca, paste0(phenotype_wd, slash, 'pstca.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  # write.table(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  # write.table(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_puberty, paste0(phenotype_wd, slash, 'puberty.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(stacked_loc, paste0(phenotype_wd, slash, 'loc.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-
-
-  # export merged data
-  write.table(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-  write.table(merged_intake, paste0(phenotype_wd, slash, 'intake.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-
-  # export double entry dexa data
-  write.table(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
-
-
-  # Export meta-data
+  #### Export Data ####
   # make separate overwrite args -- 1 for dataframes and 1 for jsons?
-  meta_data = write_redcap_jsons(export_dir = phenotype_wd, overwrite = overwrite)
+
+  # participant data (participant.tsv)
+
+  # phenotype data and jsons
+  write_phenotype_data(export_dir = phenotype_wd, overwrite = overwrite)
+  meta_data = write_phenotype_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
