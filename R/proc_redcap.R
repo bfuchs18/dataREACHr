@@ -27,7 +27,7 @@
 #'
 #' }
 #'
-#' @importFrom utils tail write.csv read.csv
+#' @importFrom utils tail write.table read.csv
 #' @importFrom rlang .data
 #' @export
 
@@ -338,55 +338,56 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dir.create(file.path(phenotype_wd))
   }
 
+  # export participants.tsv to bids/
+  # write.table(participants_data, paste0(bids_wd, slash, 'participants.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+
   # export single-visit data (i.e. redcap visit data collected at 1 visit only)
   ## can this be done using a list of lists and a loop?
-  write.csv(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), row.names = FALSE) # cfq
-  write.csv(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), row.names = FALSE) #efcr
-  write.csv(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), row.names = FALSE) #lbc
-  write.csv(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), row.names = FALSE) # pss
-  # write.csv(parent_v1_data$chaos_data$bids_phenotype, paste0(phenotype_wd, slash, 'chaos.tsv'), row.names = FALSE) # chaos -- need to develop score script
+
+  write.table(parent_v1_data$cfq_data$bids_phenotype, paste0(phenotype_wd, slash, 'cfq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # cfq
+  write.table(parent_v1_data$efcr_data$bids_phenotype, paste0(phenotype_wd, slash, 'efcr.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #efcr
+  write.table(parent_v1_data$lbc_data$bids_phenotype, paste0(phenotype_wd, slash, 'lbc.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #lbc
+  write.table(parent_v1_data$pss_data$bids_phenotype, paste0(phenotype_wd, slash, 'pss.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # pss
+  # write.table(parent_v1_data$chaos_data$bids_phenotype, paste0(phenotype_wd, slash, 'chaos.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # chaos -- need to develop score script
 
 
-  write.csv(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief2.tsv'), row.names = FALSE) #brief
-  write.csv(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), row.names = FALSE) #bes
-  write.csv(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), row.names = FALSE) #ffbs
-  # write.csv(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv'), row.names = FALSE) #ffq -- will this be bids_phenotype
+  write.table(parent_v2_data$brief_data$bids_phenotype, paste0(phenotype_wd, slash, 'brief2.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #brief
+  write.table(parent_v2_data$bes_data$bids_phenotype, paste0(phenotype_wd, slash, 'bes.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #bes
+  write.table(parent_v2_data$ffbs_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffbs.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #ffbs
+  # write.table(parent_v2_data$ffq_data$bids_phenotype, paste0(phenotype_wd, slash, 'ffq.tsv', quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) #ffq -- will this be bids_phenotype
 
-  write.csv(parent_v3_data$spsrq_data$bids_phenotype, paste0(phenotype_wd, slash, 'spsrq.tsv'), row.names = FALSE) # spsrq
-  write.csv(parent_v3_data$pwlb_data$bids_phenotype, paste0(phenotype_wd, slash, 'pwlb.tsv'), row.names = FALSE) # pwlb
-  write.csv(parent_v3_data$tfeq_data$bids_phenotype, paste0(phenotype_wd, slash, 'tfeq.tsv'), row.names = FALSE) # tfeq
-  write.csv(parent_v3_data$bisbas_data$bids_phenotype, paste0(phenotype_wd, slash, 'bisbas.tsv'), row.names = FALSE) # bisbas
-  write.csv(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), row.names = FALSE) # debq
-  # write.csv(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'scpf.tsv'), row.names = FALSE) # scpf -- will this be bids_phenotype
+  write.table(parent_v3_data$spsrq_data$bids_phenotype, paste0(phenotype_wd, slash, 'spsrq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # spsrq
+  write.table(parent_v3_data$pwlb_data$bids_phenotype, paste0(phenotype_wd, slash, 'pwlb.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # pwlb
+  write.table(parent_v3_data$tfeq_data$bids_phenotype, paste0(phenotype_wd, slash, 'tfeq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # tfeq
+  write.table(parent_v3_data$bisbas_data$bids_phenotype, paste0(phenotype_wd, slash, 'bisbas.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # bisbas
+  write.table(parent_v3_data$debq_data$bids_phenotype, paste0(phenotype_wd, slash, 'debq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # debq
+  write.table(parent_v3_data$scpf_data$bids_phenotype, paste0(phenotype_wd, slash, 'scpf.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # scpf
 
-  write.csv(child_v4_data$pptq_data$bids_phenotype, paste0(phenotype_wd, slash, 'pptq.tsv'), row.names = FALSE) # debq
+  write.table(child_v4_data$pptq_data$bids_phenotype, paste0(phenotype_wd, slash, 'pptq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # debq
 
   # export stacked visit data
+  write.table(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE) # should this be the participants.tsv?
+  write.table(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
 
-  # write.csv(stacked_demo, paste0(phenotype_wd, slash, 'demo.tsv'), row.names = FALSE) # should this be the participants.tsv?
-
-  write.csv(stacked_stq, paste0(phenotype_wd, slash, 'stq.tsv'), row.names = FALSE)
-  write.csv(stacked_kbas, paste0(phenotype_wd, slash, 'kbas.tsv'), row.names = FALSE)
-  write.csv(stacked_household, paste0(phenotype_wd, slash, 'household.tsv'), row.names = FALSE) # should this be the participants.tsv?
-  write.csv(stacked_cebq, paste0(phenotype_wd, slash, 'cebq.tsv'), row.names = FALSE)
-  write.csv(stacked_cbq, paste0(phenotype_wd, slash, 'cbq.tsv'), row.names = FALSE)
-
-  # write.csv(stacked_cshq, paste0(phenotype_wd, slash, 'cshq.tsv'), row.names = FALSE)
-  # write.csv(stacked_pstca, paste0(phenotype_wd, slash, 'pstca.tsv'), row.names = FALSE)
-  write.csv(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), row.names = FALSE)
-  # write.csv(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), row.names = FALSE)
-  write.csv(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), row.names = FALSE)
-  # write.csv(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), row.names = FALSE)
-  write.csv(stacked_puberty, paste0(phenotype_wd, slash, 'puberty.tsv'), row.names = FALSE)
-  write.csv(stacked_loc, paste0(phenotype_wd, slash, 'loc.tsv'), row.names = FALSE)
+  # write.table(stacked_cshq, paste0(phenotype_wd, slash, 'cshq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  # write.table(stacked_pstca, paste0(phenotype_wd, slash, 'pstca.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_audit, paste0(phenotype_wd, slash, 'audit.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  # write.table(stacked_pmum, paste0(phenotype_wd, slash, 'pmum.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_cfpq, paste0(phenotype_wd, slash, 'cfpq.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  # write.table(stacked_rank, paste0(phenotype_wd, slash, 'rank.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_puberty, paste0(phenotype_wd, slash, 'puberty.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(stacked_loc, paste0(phenotype_wd, slash, 'loc.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
 
 
   # export merged data
-  write.csv(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), row.names = FALSE)
-  write.csv(merged_intake, paste0(phenotype_wd, slash, 'intake.tsv'), row.names = FALSE)
+  write.table(merged_anthro, paste0(phenotype_wd, slash, 'anthropometrics.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
+  write.table(merged_intake, paste0(phenotype_wd, slash, 'intake.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
 
   # export double entry dexa data
-  write.csv(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), row.names = FALSE)
+  write.table(processed_de_data$dexa_data, paste0(phenotype_wd, slash, 'dexa.tsv'), quote=FALSE, sep='\t', col.names = TRUE, row.names = FALSE)
 
 
   # Export meta-data
