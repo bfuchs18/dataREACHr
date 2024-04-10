@@ -86,11 +86,11 @@ write_phenotype_data <- function(export_dir, overwrite) {
     json <- json_func()
 
     # add extensions to phenotype_name
-    filename_tsv <- paste0(export_dir, slash, data_to_export[[i]][[2]], ".tsv")
-    filename_json <- paste0(export_dir, slash, data_to_export[[i]][[2]], ".json")
+    filename_tsv <- paste0(export_dir, slash, phenotype_name, ".tsv")
+    filename_json <- paste0(export_dir, slash, phenotype_name, ".json")
 
     # write tsv
-    if ( isTRUE(overwrite) | (isFALSE(overwrite) & !file.exists(filename_tsv)) ) {
+    if ( isTRUE(overwrite) | !file.exists(filename_tsv) ) {
       # write tsv
       write.table(
         df,
@@ -104,7 +104,7 @@ write_phenotype_data <- function(export_dir, overwrite) {
 
 
     # write json
-    if ( isTRUE(overwrite) | (isFALSE(overwrite) & !file.exists(filename_json)) ) {
+    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
 
       # write json
       write(json, filename_json)
