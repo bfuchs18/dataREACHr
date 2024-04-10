@@ -59,10 +59,13 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   # rename parent variables with parent1
   colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
 
-  # remove child bmi values that were entered into redcao
+  # rename parent1 sex variable
+  colnames(anthro_data) <- gsub("parent1_height_sex", "parent1_sex", colnames(anthro_data))
+
+  # remove child bmi values that were entered into redcap
   anthro_data <- anthro_data[, -grep("child_bmi", names(anthro_data))]
 
-  # make all vales numeric except column 1 (participant_id)
+  # make all values numeric except column 1 (participant_id)
   anthro_data <- dplyr::mutate_at(anthro_data, -1, function(x) as.numeric(as.character(x)))
 
   # add sex and age to calculate BMI derivatives
@@ -107,7 +110,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   stacked_anthro <- dplyr::bind_rows(
     transform(anthro_v1_data, visit = "1", session_id = "ses-1"),
     transform(anthro_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
 
 
   ## DEXA data ####
@@ -124,11 +127,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, -1, function(x) as.numeric(as.character(x)))
   dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, -1, function(x) as.numeric(as.character(x)))
 
-  # stack visit 1 and visit 5 data, add "visit" column, move "visit" to column 2
+  # stack visit 1 and visit 5 data, add "visit" and "session_id" columns and reorder
   stacked_dexa <- dplyr::bind_rows(
     transform(dexa_v1_data, visit = "1", session_id = "ses-1"),
     transform(dexa_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
 
 
   ## intake data ####
@@ -165,7 +168,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
     transform(v3_intake_data, visit = "3", session_id = "ses-1"),
     transform(v4_intake_data, visit = "4", session_id = "ses-1"),
     transform(v5_intake_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate(.data$session_id, .after = 1) %>% dplyr::relocate(.data$visit, .after = 2)
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
 
   # compute intake variables
   stacked_intake <- util_calc_intake(stacked_intake)
