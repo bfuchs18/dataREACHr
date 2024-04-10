@@ -1,4 +1,4 @@
-#' json_anthro: Generates a json file for anthropometric data
+#' json_anthropometrics: Generates a json file for anthropometric data
 #'
 #' This function generates a json file for anthropometric data
 #'
@@ -7,12 +7,14 @@
 #'
 #' @export
 
-json_anthro <- function() {
+json_anthropometrics <- function() {
 
   anthro_list <- list(
     participant_id = list( Description = 'participant id number'),
-    visit = list( Description = 'participant id number'),
-    session_id = list( Description = 'session description'),
+    visit = list( Description = 'REACH visit protocol for data collection'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
     child_height_1_cm = list( Description = 'child height measurement 1',
                               Unit = "cm"),
     child_height_2_cm = list( Description = 'child height measurement 2',
