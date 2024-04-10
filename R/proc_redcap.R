@@ -330,13 +330,10 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
 
   #### Export Data ####
-  # make separate overwrite args -- 1 for dataframes and 1 for jsons?
-
   # participant data (participant.tsv)
 
-  # phenotype data and jsons
+  # phenotype data (tsv and json files)
   write_phenotype_data(export_dir = phenotype_wd, overwrite = overwrite)
-  meta_data = write_phenotype_jsons(export_dir = phenotype_wd, overwrite = overwrite)
 
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,
@@ -349,8 +346,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                  parent_v3_data = parent_v3_data,
                  parent_v4_data = parent_v4_data,
                  parent_v5_data = parent_v5_data,
-                 processed_de_data = processed_de_data,
-                 meta_data = meta_data
+                 processed_de_data = processed_de_data
                  ))
   }
 }
