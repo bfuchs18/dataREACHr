@@ -104,7 +104,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # make all values numeric except column 1 (participant_id)
   anthro_v1_data <- dplyr::mutate_at(anthro_v1_data, -1, function(x) as.numeric(as.character(x)))
-  anthro_v5_data <- dplyr::mutate_at(anthro_v1_data, -1, function(x) as.numeric(as.character(x)))
+  anthro_v5_data <- dplyr::mutate_at(anthro_v5_data, -1, function(x) as.numeric(as.character(x)))
 
   # stack anthro data
   stacked_anthro <- dplyr::bind_rows(
