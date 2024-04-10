@@ -1,11 +1,11 @@
-#' write_redcap_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
+#' write_phenotype_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
 #'#'
 #' This function exports json meta-data files for phenotype data
 #' @param export_dir string with absolute path to export directory (typically bids phenotype directory)
 #' @param overwrite logical (TRUE/FALSE) to indicate if json files should be overwritten
 
 
-write_redcap_jsons <- function(export_dir, overwrite) {
+write_phenotype_jsons <- function(export_dir, overwrite) {
 
   #### Set up/initial checks #####
 
@@ -73,10 +73,11 @@ write_redcap_jsons <- function(export_dir, overwrite) {
     json_class = "class.json",
     json_stq = "stq.json",
     json_scpf = "scpf.json",
+    json_cfpq = "cfpq.json",
 
     # non-questionnaire jsons
     json_mri_visit = "mri_visit.json",
-    json_anthro = "anthro.json",
+    json_anthro = "anthropometrics.json",
     json_intake = "intake.json",
     json_household = "household.json"
 
