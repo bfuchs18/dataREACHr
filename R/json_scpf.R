@@ -12,7 +12,7 @@ json_scpf <- function() {
 
   scpf_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Structure and Control in Parent Feeding questionnaire.',
+      Description = 'Structure and Control in Parent Feeding questionnaire. This scale had an error when administered, see description of scpf17.',
       Reference = 'Savage, J.S., Rollins, B.Y., Kugler, K.C. et al. Development of a theory-based questionnaire to assess structure and control in parent feeding (SCPF). Int J Behav Nutr Phys Act 14, 9 (2017). https://doi.org/10.1186/s12966-017-0466-2',
       TermURL = 'https://ijbnpa.biomedcentral.com/articles/10.1186/s12966-017-0466-2'),
     participant_id = list( Description = 'participant id number'),
@@ -112,12 +112,7 @@ json_scpf <- function() {
                                   '2' = 'Sometimes',
                                   '3' = 'Often',
                                   '4' = 'Always')),
-    scpf17 = list( Description = 'I give snacks or drinks as a way to distract and keep my child quiet when my child is sad or upset.',
-                   Levels = list ('0' = 'Never',
-                                  '1' = 'Rarely',
-                                  '2' = 'Sometimes',
-                                  '3' = 'Often',
-                                  '4' = 'Always')),
+    scpf17 = list( Description = 'This item should have been "If I did not control my child\'s eating, s/he would eat much less than s/he should." but was erroneously replaced with "I give snacks or drinks as a way to distract and keep my child quiet when my child is sad or upset." Therefore, data for scpf17 have been marked as missing.'),
     scpf18 = list( Description = 'If my child seems full, I encourage him/her to finish his/her food anyway.',
                    Levels = list ('0' = 'Never',
                                   '1' = 'Rarely',
@@ -226,10 +221,6 @@ json_scpf <- function() {
     scpf_restriction = list( Description = 'Restriction',
                             Derivative = TRUE),
     scpf_pressure = list( Description = 'Pressure',
-                            Derivative = TRUE),
-    scpf_structure = list( Description = 'Structure',
-                            Derivative = TRUE),
-    scpf_control = list( Description = 'Control',
                             Derivative = TRUE)
   )
 

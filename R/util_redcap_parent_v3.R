@@ -68,7 +68,8 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
 
   ## SCPF Data ####
   scpf_data <- data[, grepl('participant_id', names(data)) | grepl('scpf', names(data))]
-  # score -- need to develop score script
+  scpf_data$scpf_17 <- NA # marking item 17 data as missing -- the wrong question was administered here.
+  scpf_scored <- dataprepr::score_scpf(scpf_data, score_base = TRUE, id = 'participant_id')
 
   ## compile and return data ####
   if (isTRUE(return_data)){
@@ -82,8 +83,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
       ptsca_data = ptsca_data,
       #      ptsca_data = ptsca_scored,
       debq_data = debq_scored,
-      #     scpf_data = scpf_scored, #need to develop score script
-      scpf_data = scpf_data
+      scpf_data = scpf_scored
     ))
   }
 }
