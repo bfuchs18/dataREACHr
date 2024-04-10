@@ -8,7 +8,7 @@
 #'
 #' @export
 
-json_tfeq18 <- function() {
+json_tfeq <- function() {
 
   tfeq_list <- list(
     'MeasurementToolMetadata' = list(
