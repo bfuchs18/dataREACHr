@@ -1,6 +1,8 @@
-#' write_phenotype_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
-#'#'
+#' write_phenotype_jsons: Write meta-data for phenotype data created with json functions
+#'
 #' This function exports json meta-data files for phenotype data
+#' This function is not currently called as part of proc_redcap() as write_phenotype_data() is called instead to export both .tsv and associated meta-data
+#'
 #' @param export_dir string with absolute path to export directory (typically bids phenotype directory)
 #' @param overwrite logical (TRUE/FALSE) to indicate if json files should be overwritten
 

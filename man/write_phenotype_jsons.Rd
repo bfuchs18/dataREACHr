@@ -2,9 +2,7 @@
 % Please edit documentation in R/write_phenotype_jsons.R
 \name{write_phenotype_jsons}
 \alias{write_phenotype_jsons}
-\title{write_phenotype_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
-#'
-This function exports json meta-data files for phenotype data}
+\title{write_phenotype_jsons: Write meta-data for phenotype data created with json functions}
 \usage{
 write_phenotype_jsons(export_dir, overwrite)
 }
@@ -14,7 +12,6 @@ write_phenotype_jsons(export_dir, overwrite)
 \item{overwrite}{logical (TRUE/FALSE) to indicate if json files should be overwritten}
 }
 \description{
-write_phenotype_jsons: Write meta-data for phenotype data created with json functions (called within proc_task.R)
-#'
 This function exports json meta-data files for phenotype data
+This function is not currently called as part of proc_redcap() as write_phenotype_data() is called instead to export both .tsv and associated meta-data
 }

@@ -2,17 +2,17 @@
 % Please edit documentation in R/write_phenotype_data.R
 \name{write_phenotype_data}
 \alias{write_phenotype_data}
-\title{write_phenotype_data: Export phenotype data as .tsv. (called within proc_task.R)
-This function exports phenotype data. For bids compliance, missing data is replaced with 'n/a'}
+\title{write_phenotype_data: Export phenotype data and associated meta-data (called within proc_task.R)
+This function exports phenotype data as .tsv and associated meta-data as .json. For bids compliance, missing data is replaced with 'n/a'}
 \usage{
 write_phenotype_data(export_dir, overwrite)
 }
 \arguments{
 \item{export_dir}{string with absolute path to export directory (typically bids phenotype directory)}
 
-\item{overwrite}{logical (TRUE/FALSE) to indicate if .tsv files should be overwritten}
+\item{overwrite}{logical (TRUE/FALSE) to indicate if  files should be overwritten}
 }
 \description{
-write_phenotype_data: Export phenotype data as .tsv. (called within proc_task.R)
-This function exports phenotype data. For bids compliance, missing data is replaced with 'n/a'
+write_phenotype_data: Export phenotype data and associated meta-data (called within proc_task.R)
+This function exports phenotype data as .tsv and associated meta-data as .json. For bids compliance, missing data is replaced with 'n/a'
 }
