@@ -45,7 +45,7 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
   # CAMS and Freddy Fullness data will come from double-data entry forms
 
-
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 mri_notes = mri_notes,

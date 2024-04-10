@@ -108,8 +108,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   cfpq_data <- data[, grepl('participant_id', names(data)) | grepl('cfpq', names(data))]
   cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id')
 
-
-  ## compile and return data ####
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(
       visit_data_parent = visit_data_parent,

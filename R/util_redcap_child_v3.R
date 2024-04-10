@@ -52,6 +52,7 @@ util_redcap_child_v3 <- function(data, return_data = TRUE) {
   ## sleep log ####
   sleeplog_data <-data[, grep("participant_id|^date|^bedtime|^asleep|^times|^waso|^awake|^out_on|^rating|^comment", names(data))]
 
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,

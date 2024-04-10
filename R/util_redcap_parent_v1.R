@@ -102,8 +102,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
   lbc_scored <- dataprepr::score_lbc(lbc_data, score_base = TRUE, id = 'participant_id')
 
-
-  ## compile and return data ####
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(
       demo_data = demo_data,

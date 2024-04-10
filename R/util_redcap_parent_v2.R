@@ -86,7 +86,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   fsq_data <- fsq_data[, !(names(fsq_data) %in% c('fsq_missingcheck'))]
   #score -- need to develop score script
 
-  ## compile and return data ####
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(
       visit_data_parent = visit_data_parent,

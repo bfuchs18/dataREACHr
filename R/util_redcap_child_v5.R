@@ -113,6 +113,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   ## tictoc data ####
   tictoc_data <-data[, grep("participant_id|tictoc", names(data))]
 
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,

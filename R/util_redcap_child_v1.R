@@ -11,7 +11,7 @@
 
 util_redcap_child_v1 <- function(data, return_data = TRUE) {
 
-  #### 1. Set up/initial checks #####
+  #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
   data_arg <- methods::hasArg(data)
@@ -33,7 +33,7 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v1_post_check_notes', 'v1_date', 'child_assent', 'dxa_notes', 'rrv_task_notes')]
   names(visit_data_child)[names(visit_data_child) == "v1_post_check_notes"] <- "v1_notes"
 
-  ## intake information ####
+  ## intake data ####
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
 
   ## meal data
@@ -48,13 +48,14 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   eah_vas_data <- data[, grepl('participant_id|brownie|corn_chip|chocolate|icecream|cookie|popcorn|pretzel|skittle|starburst', names(data))]
   names(eah_vas_data) <- gsub('cookie', 'oreo', names(eah_vas_data))
 
-  ## kbas ####
+  ## kbas data ####
   kbas_data <-data[, grep("participant_id|toy_|food_|^q.*score", names(data))]
   # score this data?
 
   ## stq data ####
   stq_data <-data[, grep("participant_id|stq", names(data))]
 
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,

@@ -60,6 +60,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   sic_data <-data[, grep("participant_id|^sic", names(data))]
   # score?
 
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,

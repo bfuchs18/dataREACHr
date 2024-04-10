@@ -71,7 +71,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   scpf_data$scpf_17 <- NA # marking item 17 data as missing -- the wrong question was administered here.
   scpf_scored <- dataprepr::score_scpf(scpf_data, score_base = TRUE, id = 'participant_id')
 
-  ## compile and return data ####
+  ## return data ####
   if (isTRUE(return_data)){
     return(list(
       visit_data_parent = visit_data_parent,
