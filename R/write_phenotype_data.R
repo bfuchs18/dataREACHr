@@ -1,5 +1,6 @@
 #' write_phenotype_data: Export phenotype data and associated meta-data (called within proc_task.R)
 #' This function exports phenotype data as .tsv and associated meta-data as .json. For bids compliance, missing data is replaced with 'n/a'
+#' This function will only work if called within proc_task.R because it uses objects saved in the global environment by proc_task.R
 #'
 #' @param export_dir string with absolute path to export directory (typically bids phenotype directory)
 #' @param overwrite logical (TRUE/FALSE) to indicate if  files should be overwritten
@@ -17,7 +18,7 @@ write_phenotype_data <- function(export_dir, overwrite) {
   # make a list of lists including dataframe, and export name (without extension)
   data_to_export <- list(
 
-    # single visit data
+    # # single visit data
     list(parent_v1_data$cfq_data$bids_phenotype, "cfq"),
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
