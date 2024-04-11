@@ -27,14 +27,15 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # add session column
+  data$session_id <- "ses-2"
+
   #reduce columns and update names
 
-  ## Visit Data ####
-  visit_data_parent <- data[, grep("participant_id|update", names(data))]
+  ## Update form Data ####
+  visit_data_parent <- data[, grep("participant_id|session_id|update", names(data))]
+  visit_data_parent$update_form_date <- lubridate::as_date(visit_data_parent$participant_update_form_timestamp) # add form date column
   visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
-  # notes: update_form_visit_number -- looks to be the session number attended, not protocol visit number
-  # add column to specify v5data?
-
 
   ## demographics data ####
   # this data will be split into 2 dataframes:
@@ -65,47 +66,62 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   # score?
 
   ## Puberty Data ####
-  puberty_data <-data[, grep("participant_id|^prs|tanner_", names(data))]
-  puberty_data <-puberty_data[, -grep("prs_missingcheck", names(puberty_data))]
-  puberty_data_for_scoring <-util_format_puberty_data(puberty_data)
+  puberty_data <-data[, grep("participant_id|session_id|^prs|tanner_|parental_rating_scale_for_pubertal_development_timestamp", names(data))]
+  puberty_data$puberty_form_date <- lubridate::as_date(puberty_data$parental_rating_scale_for_pubertal_development_timestamp) # add form date column
+  puberty_data <- puberty_data[, -grep("missingcheck|timestamp", names(puberty_data))] # remove extra columns
+  puberty_data_for_scoring <- util_format_puberty_data(puberty_data)
   puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "1", female = "0", id = 'participant_id')
 
   ## CEBQ Data ####
-  cebq_data <- data[, grepl('participant_id', names(data)) | grepl('cebq', names(data))]
-  cebq_data <- cebq_data[, !(names(cebq_data) %in% c('cebq_missingcheck'))]
+  cebq_data <- data[, grepl('participant_id|session_id|cebq|child_eating_behavior_questionnaire_timestamp', names(data))]
+  cebq_data$cebq_form_date <- lubridate::as_date(cebq_data$child_eating_behavior_questionnaire_timestamp)
+  cebq_data <- cebq_data[, -grep("missingcheck|timestamp", names(cebq_data))] # remove extra columns
   cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id')
 
   ## CBQ Data ####
-  cbq_data <- data[, grepl('participant_id', names(data)) | grepl('cbq', names(data))]
-  cbq_data <- cbq_data[, !(names(cbq_data) %in% c('cbq_missingcheck'))]
+  cbq_data <- data[, grepl('participant_id|session_id|cbq|childrens_behavior_questionnaire_timestamp', names(data))]
+  cbq_data$cbq_form_date <- lubridate::as_date(cbq_data$childrens_behavior_questionnaire_timestamp) # add form date column
+  cbq_data <- cbq_data[, -grep("missingcheck|timestamp", names(cbq_data))] # remove extra columns
   cbq_scored <- dataprepr::score_cbq(cbq_data, score_base = TRUE, id = 'participant_id')
 
-  ## CHSQ Data ####
-  cshq_data <- data[, grepl('participant_id', names(data)) | grepl('cshq', names(data))]
-  cshq_data <- cshq_data[, !(names(cshq_data) %in% c('cshq_missingcheck'))]
-  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, id = 'participant_id')
+  ## CSHQ Data ####
+  cshq_data <- data[, grepl('participant_id|session_id|cshq|childs_sleep_habits_questionnaire_timestamp', names(data))]
+  cshq_data$cshq_form_date <- lubridate::as_date(cshq_data$childs_sleep_habits_questionnaire_timestamp) # add form date column
+  cshq_data <- cshq_data[, -grep("missingcheck|timestamp", names(cshq_data))] # remove extra columns
+  names(cshq_data) <- gsub('_a', '_prob', names(cshq_data))
+
+  # update values for scoring (3 - Usually, 2 - Sometimes, 1 - Rarely)
+  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, reverse_score = FALSE, id = 'participant_id')
 
 
   ## CLASS Data ####
-  class_data <- data[, grepl('participant_id', names(data)) | grepl('class', names(data))]
+  class_data <- data[, grepl('participant_id|session_id|class|childrens_leisure_activities_study_survey_timestamp', names(data))]
+  class_data$class_form_date <- lubridate::as_date(class_data$childrens_leisure_activities_study_survey_timestamp) # add form date column
+  class_data <- class_data[, -grep("missingcheck|timestamp", names(class_data))] # remove extra columns
   # score? -- need to develop score script
 
-  ## PSTCA Data  ####
-  ptsca_data <- data[, grepl('participant_id', names(data)) | grepl('ptsca', names(data))]
-  ptsca_data <- ptsca_data[, !(names(ptsca_data) %in% c('ptsca_missingcheck'))]
+  ## PTSCA Data ####
+  ptsca_data <- data[, grepl('participant_id|session_id|ptsca|parental_strategies_to_teach_children_about_advert_timestamp', names(data))]
+  ptsca_data$ptsca_form_date <- lubridate::as_date(ptsca_data$parental_strategies_to_teach_children_about_advert_timestamp) # add form date column
+  ptsca_data <- ptsca_data[, -grep("missingcheck|timestamp", names(ptsca_data))] # remove extra columns
   # score -- need to develop score script
 
-  ## PMUM Data  ####
-  pmum_data <- data[, grepl('participant_id', names(data)) | grepl('pmum', names(data))]
+  ## PMUM Data ####
+  pmum_data <- data[, grepl('participant_id|session_id|pmum|problematic_media_use_measure_timestamp', names(data))]
+  pmum_data$pmum_form_date <- lubridate::as_date(pmum_data$problematic_media_use_measure_timestamp) # add form date column
+  pmum_data <- pmum_data[, -grep("missingcheck|timestamp", names(pmum_data))] # remove extra columns
   # score -- need to develop score script
 
-  ## AUDIT Data  ####
-  audit_data <- data[, grepl('participant_id', names(data)) | grepl('audit', names(data))]
-  audit_data <- audit_data[, !(names(audit_data) %in% c('audit_missingcheck'))]
+  ## AUDIT Data ####
+  audit_data <- data[, grepl('participant_id|session_id|audit|alcohol_use_disorders_identification_test_timestamp', names(data))]
+  audit_data$audit_form_date <- lubridate::as_date(audit_data$alcohol_use_disorders_identification_test_timestamp) # add form date column
+  audit_data <- audit_data[, -grep("missingcheck|timestamp", names(audit_data))] # remove extra columns
   audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id')
 
   ## CFPQ Data ####
-  cfpq_data <- data[, grepl('participant_id', names(data)) | grepl('cfpq', names(data))]
+  cfpq_data <- data[, grepl('participant_id|session_id|cfpq|comprehensive_feeding_practices_questionnaire_timestamp', names(data))]
+  cfpq_data$cfpq_form_date <- lubridate::as_date(cfpq_data$comprehensive_feeding_practices_questionnaire_timestamp) # add form date column
+  cfpq_data <- cfpq_data[, -grep("missingcheck|timestamp", names(cfpq_data))] # remove extra columns
   cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id')
 
   ## return data ####

@@ -25,50 +25,65 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # add session column
+  data$session_id <- "ses-1"
+
   #reduce columns and update names
 
-  ## V3 Data ####
-  visit_data_parent <- data[, grep("participant_id|update", names(data))]
+  ## Update form Data ####
+  visit_data_parent <- data[, grep("participant_id|session_id|update", names(data))]
+  visit_data_parent$update_form_date <- lubridate::as_date(visit_data_parent$participant_update_form_timestamp) # add form date column
   visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
-  # notes: update_form_visit_number -- looks to be the session number attended, not protocol visit number
-  # add column to specify v3 data?
-
 
   ## SPSRQ Data ####
-  spsrq_data <- data[, grepl('participant_id', names(data)) | grepl('spsrq', names(data))]
+  spsrq_data <- data[, grepl('participant_id|session_id|spsrq|sensitivity_to_punishment_and_reward_questio_833adf_timestamp', names(data))]
+  spsrq_data$spsrq_form_date <- lubridate::as_date(spsrq_data$sensitivity_to_punishment_and_reward_questio_833adf_timestamp) # add form date column
+  spsrq_data <- spsrq_data[, -grep("missingcheck|timestamp", names(spsrq_data))] # remove extra columns
   spsrq_scored <- dataprepr::score_spsrq(spsrq_data, score_base = TRUE, id = 'participant_id')
 
   ## PWLB Data ####
-  pwlb_data <- data[, grepl('participant_id', names(data)) | grepl('pwlb', names(data))]
-  pwlb_data <- pwlb_data[, !(names(pwlb_data) %in% c('pwlb_missingcheck'))]
+  pwlb_data <- data[, grepl('participant_id|session_id|pwlb|parent_weight_loss_behavior_questionnaire_timestamp', names(data))]
+  pwlb_data$pwlb_form_date <- lubridate::as_date(pwlb_data$parent_weight_loss_behavior_questionnaire_timestamp) # add form date column
+  pwlb_data <- pwlb_data[, -grep("missingcheck|timestamp", names(pwlb_data))] # remove extra columns
   pwlb_scored <- dataprepr::score_pwlb(pwlb_data, score_base = TRUE, id = 'participant_id')
 
   ## TFEQ Data ####
   #note: REACH used tfeq-r18 (revised scale)
-  tfeq_data <- data[, grepl('participant_id', names(data)) | grepl('tfeq', names(data))]
+  tfeq_data <- data[, grepl('participant_id|session_id|tfeq|three_factor_eating_questionnaire_revised_timestamp', names(data))]
+  tfeq_data$tfeq_form_date <- lubridate::as_date(tfeq_data$three_factor_eating_questionnaire_revised_timestamp) # add form date column
+  tfeq_data <- tfeq_data[, -grep("missingcheck|timestamp", names(tfeq_data))] # remove extra columns
   tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, score_base = TRUE, id = 'participant_id')
 
   ## CLASS Data ####
-  class_data <- data[, grepl('participant_id', names(data)) | grepl('class', names(data))]
+  class_data <- data[, grepl('participant_id|session_id|class|childrens_leisure_activities_study_survey_timestamp', names(data))]
+  class_data$class_form_date <- lubridate::as_date(class_data$childrens_leisure_activities_study_survey_timestamp) # add form date column
+  class_data <- class_data[, -grep("missingcheck|timestamp", names(class_data))] # remove extra columns
   # score? -- need to develop score script
 
   ## BISBAS Data ####
-  bisbas_data <- data[, grepl('participant_id', names(data)) | grepl('bisbas', names(data))]
+  bisbas_data <- data[, grepl('participant_id|session_id|bisbas|behavioral_approachinhibition_scale_questionnaire_timestamp', names(data))]
+  bisbas_data$bisbas_form_date <- lubridate::as_date(bisbas_data$behavioral_approachinhibition_scale_questionnaire_timestamp) # add form date column
+  bisbas_data <- bisbas_data[, -grep("missingcheck|timestamp", names(bisbas_data))] # remove extra columns
   bisbas_scored <- dataprepr::score_bisbas(bisbas_data, score_base = TRUE, id = 'participant_id')
 
   ## PTSCA Data ####
-  ptsca_data <- data[, grepl('participant_id', names(data)) | grepl('ptsca', names(data))]
-  ptsca_data <- ptsca_data[, !(names(ptsca_data) %in% c('ptsca_missingcheck'))]
+  ptsca_data <- data[, grepl('participant_id|session_id|ptsca|parental_strategies_to_teach_children_about_advert_timestamp', names(data))]
+  ptsca_data$ptsca_form_date <- lubridate::as_date(ptsca_data$parental_strategies_to_teach_children_about_advert_timestamp) # add form date column
+  ptsca_data <- ptsca_data[, -grep("missingcheck|timestamp", names(ptsca_data))] # remove extra columns
   # score -- need to develop score script
 
   ## DEBQ Data ####
-  debq_data <- data[, grepl('participant_id', names(data)) | grepl('debq', names(data))]
-  debq_data$debq_20 <- NA # debq question 20 was not administered in REACH -- debq question 23 was repeated in its place
+  debq_data <- data[, grepl('participant_id|session_id|debq|dutch_eating_behavior_questionnaire_timestamp', names(data))]
+  debq_data$debq_form_date <- lubridate::as_date(debq_data$dutch_eating_behavior_questionnaire_timestamp) # add form date column
+  debq_data <- debq_data[, -grep("missingcheck|timestamp", names(debq_data))] # remove extra columns
+  debq_data$debq_20 <- NA # mark item 20 data as missing. debq question 20 was not administered in REACH -- debq question 23 was repeated in its place
   debq_scored <- dataprepr::score_debq(debq_data, score_base = TRUE, id = 'participant_id')
 
   ## SCPF Data ####
-  scpf_data <- data[, grepl('participant_id', names(data)) | grepl('scpf', names(data))]
-  scpf_data$scpf_17 <- NA # marking item 17 data as missing -- the wrong question was administered here.
+  scpf_data <- data[, grepl('participant_id|session_id|scpf|structure_and_control_in_parent_feeding_timestamp', names(data))]
+  scpf_data$scpf_form_date <- lubridate::as_date(scpf_data$structure_and_control_in_parent_feeding_timestamp) # add form date column
+  scpf_data <- scpf_data[, -grep("missingcheck|timestamp", names(scpf_data))] # remove extra columns
+  scpf_data$scpf_17 <- NA # mark item 17 data as missing -- the wrong question was administered here.
   scpf_scored <- dataprepr::score_scpf(scpf_data, score_base = TRUE, id = 'participant_id')
 
   ## return data ####
