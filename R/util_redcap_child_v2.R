@@ -27,6 +27,9 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # add session column
+  data$session_id <- "ses-1"
+
   #reduce columns and update names
 
   ## visit data ####
@@ -40,7 +43,9 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
 
   ## MRI behavioral assessment ####
-  mri_assessment_data <- data[, grepl('participant_id', names(data)) | grepl('_familiarity', names(data)) | grepl('_recall', names(data)) | grepl("_liking", names(data))]
+  mri_assessment_data <- data[, grepl('participant_id|_familiarity|_recall|_liking|fmri_behavioral_assessment_timestamp', names(data))]
+  mri_assessment_data$mri_assessment_form_date <- lubridate::as_date(mri_assessment_data$fmri_behavioral_assessment_timestamp) # add form date column
+  mri_assessment_data <- mri_assessment_data[, -grep("missingcheck|timestamp", names(mri_assessment_data))] # remove extra columns
   # score this data?
 
   # CAMS and Freddy Fullness data will come from double-data entry forms

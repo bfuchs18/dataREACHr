@@ -27,6 +27,9 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # add session column
+  data$session_id <- "ses-1"
+
   #reduce columns and update names
 
   ## visit data ####
@@ -37,23 +40,32 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
 
   ## meal data
-  meal_data <- data[, grepl('participant_id|meal|advertisement_condition', names(data))]
+  meal_data <- data[, grepl('participant_id|session_id|meal|advertisement_condition', names(data))]
   meal_data <- meal_data[, !grepl('complete|freddy|consumed', names(meal_data))]
   names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
 
   ## meal vas data
-  meal_vas_data <- data[, grepl('participant_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water', names(data))]
+  meal_vas_data <- data[, grepl('participant_id|session_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water', names(data))]
 
   ## eah vas data
-  eah_vas_data <- data[, grepl('participant_id|brownie|corn_chip|chocolate|icecream|cookie|popcorn|pretzel|skittle|starburst', names(data))]
+  eah_vas_data <- data[, grepl('participant_id|session_id|brownie|corn_chip|chocolate|icecream|cookie|popcorn|pretzel|skittle|starburst', names(data))]
   names(eah_vas_data) <- gsub('cookie', 'oreo', names(eah_vas_data))
 
   ## kbas data ####
-  kbas_data <-data[, grep("participant_id|toy_|food_|^q.*score", names(data))]
-  # score this data?
+  kbas_data <-data[, grep("participant_id|session_id|toy_|food_|^q.*score|kids_brand_awareness_survey_version_b_timestamp|kids_brand_awareness_survey_version_a_timestamp", names(data))]
+  kbas_data$kbas_form_date <-
+    dplyr::if_else(kbas_data$kids_brand_awareness_survey_version_a_timestamp != "",
+      lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_a_timestamp),
+      lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_b_timestamp)
+    ) # using dplyr::if_else here because it preserves the type/class of inputs (i.e, dates)
+  kbas_data <- kbas_data[, !grepl('timestamp', names(meal_data))] #remove timestamp columns
+    # score this data?
 
   ## stq data ####
-  stq_data <-data[, grep("participant_id|stq", names(data))]
+  stq_data <-data[, grep("participant_id|session_id|stq|child_screen_time_questionnaire_timestamp", names(data))]
+  stq_data$stq_form_date <- lubridate::as_date(stq_data$child_screen_time_questionnaire_timestamp) # add form date column
+  stq_data <- stq_data[, -grep("missingcheck|timestamp", names(stq_data))] # remove extra columns
+  #score?
 
   ## return data ####
   if (isTRUE(return_data)){

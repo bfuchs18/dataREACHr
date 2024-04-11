@@ -27,6 +27,9 @@ util_redcap_child_v3 <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # add session column
+  data$session_id <- "ses-1"
+
   #reduce columns and update names
 
   ## visit data ####
@@ -37,20 +40,20 @@ util_redcap_child_v3 <- function(data, return_data = TRUE) {
   # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
 
   # meal data
-  meal_data <- data[, grep("participant_id|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes", names(data))]
+  meal_data <- data[, grep("participant_id|session_id|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes", names(data))]
   meal_data <- meal_data[, -grep("complete", names(meal_data))]
   names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
 
 
   # EAH data
-  eah_data <- data[, grep("participant_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
+  eah_data <- data[, grep("participant_id||session_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
   eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
   names(eah_data) <- gsub('intake_notes', 'prep_notes', names(eah_data))
   names(eah_data) <- gsub('eah_notes', 'eah_protocol_notes', names(eah_data))
 
 
   ## sleep log ####
-  sleeplog_data <-data[, grep("participant_id|^date|^bedtime|^asleep|^times|^waso|^awake|^out_on|^rating|^comment", names(data))]
+  sleeplog_data <-data[, grep("participant_id|session_id|^date|^bedtime|^asleep|^times|^waso|^awake|^out_on|^rating|^comment", names(data))]
 
   ## return data ####
   if (isTRUE(return_data)){
