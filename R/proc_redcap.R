@@ -51,9 +51,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
-    slash <<- '/'
+    slash <- '/'
   } else {
-    slash <<- "\\"
+    slash <- "\\"
     print('The proc_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
@@ -148,108 +148,108 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(date_data)[names(date_data) == "prs_sex"] <- "sex"
 
   # # organize event data
-  child_v1_data <<- util_redcap_child_v1(child_visit_1_arm_1)
-  parent_v1_data <<- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = date_data)
-  child_v2_data <<- util_redcap_child_v2(child_visit_2_arm_1)
-  parent_v2_data <<- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
-  child_v3_data <<- util_redcap_child_v3(child_visit_3_arm_1)
-  parent_v3_data <<- util_redcap_parent_v3(parent_visit_3_arm_1)
-  child_v4_data <<- util_redcap_child_v4(child_visit_4_arm_1)
-  parent_v4_data <<- util_redcap_parent_v4(parent_visit_4_arm_1)
-  parent_v5_data <<- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= date_data)
-  child_v5_data <<- util_redcap_child_v5(child_visit_5_arm_1)
+  child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = date_data)
+  child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
+  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
+  child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
+  parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
+  child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
+  parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
+  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= date_data)
+  child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
 
   #### Load and organize double-entry data ####
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
-  processed_de_data <<- util_redcap_de(redcap_de_data, agesex_data = date_data)
+  processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
 
   #### Stack visit data collected on 2 visits ####
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
-  stacked_stq <<-
+  stacked_stq <-
     dplyr::bind_rows(child_v1_data$stq_data, child_v5_data$stq_data) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("stq_form_date", .after = 2)
 
-  stacked_kbas <<-
+  stacked_kbas <-
     dplyr::bind_rows(child_v1_data$kbas_data, child_v5_data$kbas_data) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("kbas_form_date", .after = 2)
 
-  stacked_loc <<-
+  stacked_loc <-
     dplyr::bind_rows(child_v4_data$loc_data,
                      child_v5_data$loc_data) %>% dplyr::relocate("session_id", .after = 1)
 
-  stacked_household <<-
+  stacked_household <-
     dplyr::bind_rows(parent_v1_data$household_data,
                      parent_v5_data$household_data) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("household_form_date", .after = 2)
 
-  stacked_cebq <<-
+  stacked_cebq <-
     dplyr::bind_rows(
       parent_v1_data$cebq_data$bids_phenotype,
       parent_v5_data$cebq_data$bids_phenotype
     ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("cebqform_date", .after = 2)
 
-  stacked_cbq <<-
+  stacked_cbq <-
     dplyr::bind_rows(parent_v2_data$cbq_data$bids_phenotype,
                      parent_v5_data$cbq_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("cbqform_date", .after = 2)
 
   # not scored/in bids_phenotype yet
-  # stacked_cshq <<- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("cshq_form_data", .after = 2)
+  # stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("cshq_form_data", .after = 2)
 
   # not scored/in bids_phenotype yet
-  # stacked_pstca <<- dplyr::bind_rows(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("pstca_form_data", .after = 2)
+  # stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("pstca_form_data", .after = 2)
 
-  stacked_audit <<-
+  stacked_audit <-
     dplyr::bind_rows(
       parent_v4_data$audit_data$bids_phenotype,
       parent_v5_data$audit_data$bids_phenotype
     ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("auditform_date", .after = 2)
 
   # not scored/in bids_phenotype yet
-  # stacked_pmum <<- dplyr::bind_rows(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype) %>% dplyr::relocate("session", .after = 1) %>% dplyr::relocate("pmum_form_data", .after = 2)
+  # stacked_pmum <- dplyr::bind_rows(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype) %>% dplyr::relocate("session", .after = 1) %>% dplyr::relocate("pmum_form_data", .after = 2)
 
-  stacked_cfpq <<-
+  stacked_cfpq <-
     dplyr::bind_rows(
       parent_v4_data$cfpq_data$bids_phenotype,
       parent_v5_data$cfpq_data$bids_phenotype
     ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("cfpqform_date", .after = 2)
 
   # not scored/in bids_phenotype yet - will it be?
-  # stacked_rank <<- dplyr::bind_rows(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) %>% dplyr::relocate("session", .after = 1) %>% dplyr::relocate("rank_form_date", .after = 2)
+  # stacked_rank <- dplyr::bind_rows(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype) %>% dplyr::relocate("session", .after = 1) %>% dplyr::relocate("rank_form_date", .after = 2)
 
   # not scored/in bids_phenotype yet - will it be?
-  # stacked_class <<- dplyr::bind_rows(parent_v3_data$class_data$bids_phenotype, parent_v5_data$class_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("class_form_date", .after = 2)
+  # stacked_class <- dplyr::bind_rows(parent_v3_data$class_data$bids_phenotype, parent_v5_data$class_data$bids_phenotype) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("class_form_date", .after = 2)
 
   # stack child (V5) and parent (V1, V5) puberty data
-  stacked_puberty <<- dplyr::bind_rows(
+  stacked_puberty <- dplyr::bind_rows(
     transform(parent_v1_data$puberty_data$bids_phenotype, respondent = "parent"),
     transform(parent_v5_data$puberty_data$bids_phenotype, respondent = "parent"),
     transform(child_v5_data$puberty_data$bids_phenotype, respondent = "child"),
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("puberty_form_date", .after = 2) %>% dplyr::relocate("respondent", .after = 3)
 
   # note: visit column is vas_visit -- this data will merged with intake data by session_id only
-  stacked_meal_vas_data <<- dplyr::bind_rows(
+  stacked_meal_vas_data <- dplyr::bind_rows(
     transform(child_v1_data$meal_vas_data, vas_visit = "1"),
     transform(child_v5_data$meal_vas_data, vas_visit = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("vas_visit", .after = 2)
 
   # note: visit column is vas_visit -- this data will merged with intake data by session_id only
-  stacked_eah_vas_data <<- dplyr::bind_rows(
+  stacked_eah_vas_data <- dplyr::bind_rows(
     transform(child_v1_data$eah_vas_data, vas_visit = "1"),
     transform(child_v5_data$eah_vas_data, vas_visit = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("vas_visit", .after = 2)
 
-  stacked_meal_data <<- dplyr::bind_rows(
+  stacked_meal_data <- dplyr::bind_rows(
     transform(child_v1_data$meal_data, visit = "1"),
     transform(child_v3_data$meal_data, visit = "3"),
     transform(child_v4_data$meal_data, visit = "4"),
     transform(child_v5_data$meal_data, visit = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
 
-  stacked_eah_data <<- dplyr::bind_rows(
+  stacked_eah_data <- dplyr::bind_rows(
     transform(child_v3_data$eah_data, visit = "3"),
     transform(child_v4_data$eah_data, visit = "4"),
     transform(child_v5_data$eah_data, visit = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
 
-  stacked_parent2_anthro <<-
+  stacked_parent2_anthro <-
     dplyr::bind_rows(parent_v1_data$household_data[, c("participant_id",
                                                        "parent2_reported_bmi",
                                                        "session_id",
@@ -259,7 +259,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                                                        "session_id",
                                                        "household_form_date")])
 
-  stacked_updates <<- dplyr::bind_rows(
+  stacked_updates <- dplyr::bind_rows(
     parent_v2_data$visit_data_parent,
     parent_v3_data$visit_data_parent,
     parent_v4_data$visit_data_parent,
@@ -300,22 +300,22 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # reorder columns
 
   #### Merge visit intake (meal, EAH, vas) data ####
-  merged_vas_data <<- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
-  merged_intake <<- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session_id", "advertisement_condition"), all = TRUE)
-  merged_intake <<- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
+  merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit"), all = TRUE)
+  merged_intake <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit", "session_id", "advertisement_condition"), all = TRUE)
+  merged_intake <- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
 
   #### Merge visit data and double entry (de) data ####
 
   # de anthro_data with stacked_parent2_anthro (data from household_data)
-  merged_anthro <<- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+  merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
 
   # merge intake data
-  merged_intake <<- merge(merged_intake, processed_de_data$stacked_intake, by=c("participant_id","visit", "session_id"), all = TRUE)
+  merged_intake <- merge(merged_intake, processed_de_data$stacked_intake, by=c("participant_id","visit", "session_id"), all = TRUE)
 
   # merge notes/visit data? update data?
 
   # merge MRI visit data double entry CAMS / MRI freddies
-  merged_mri <<- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
+  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
 
   #### Export Data ####
@@ -344,7 +344,104 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 #   }
 
   # write phenotype data (tsv and json files)
-  write_phenotype_data(export_dir = phenotype_wd, overwrite = overwrite)
+
+  # generate phenotype_wd if it doesnt exist
+  if (!file.exists(phenotype_wd)){
+    dir.create(file.path(phenotype_wd))
+  }
+
+  # make a list of lists including dataframe, and export name (without extension)
+  data_to_export <- list(
+
+    # # single visit data
+    # list(parent_v1_data$birth_data, "birth_data"), # no json yet
+    list(parent_v1_data$cfq_data$bids_phenotype, "cfq"),
+    list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
+    list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
+    list(parent_v1_data$pss_data$bids_phenotype, "pss"),
+    # list(parent_v1_data$chaos_data$bids_phenotype, "chaos"), # not in bids_phenotype yet
+
+    list(parent_v2_data$brief_data$bids_phenotype, "brief2"),
+    list(parent_v2_data$bes_data$bids_phenotype, "bes"),
+    list(parent_v2_data$ffbs_data$bids_phenotype, "ffbs"),
+    # list(parent_v2_data$ffq_data$bids_phenotype, "ffq"), # not in bids_phenotype yet
+
+    list(parent_v3_data$spsrq_data$bids_phenotype, "spsrq"),
+    list(parent_v3_data$pwlb_data$bids_phenotype, "pwlb"),
+    list(parent_v3_data$tfeq_data$bids_phenotype, "tfeq"),
+    list(parent_v3_data$bisbas_data$bids_phenotype, "bisbas"),
+    list(parent_v3_data$debq_data$bids_phenotype, "debq"),
+    list(parent_v3_data$scpf_data$bids_phenotype, "scpf"),
+
+    list(child_v4_data$pptq_data$bids_phenotype, "pptq"),
+
+    # stacked visit data
+    list(stacked_stq, "stq"),
+    list(stacked_kbas, "kbas"),
+    list(stacked_household, "household"),
+    list(stacked_cebq, "cebq"),
+    list(stacked_cbq, "cbq"),
+    list(stacked_stq, "stq"),
+    # list(stacked_cshq, "cshq"), # not in bids_phenotype yet
+    # list(stacked_pstca, "pstca"), # not in bids_phenotype yet
+    list(stacked_audit, "audit"),
+    # list(stacked_pmum, "pmum"), # not in bids_phenotype yet
+    list(stacked_cfpq, "cfpq"),
+    # list(stacked_rank, "rank"),  # not in bids_phenotype yet
+    list(stacked_puberty, "puberty"),
+    list(stacked_loc, "loc"),
+
+    # merged data
+    list(merged_anthro, "anthropometrics"),
+    list(merged_intake, "intake"),
+    list(merged_mri, "mri_visit"),
+
+    # double entry data
+    list(processed_de_data$dexa_data, "dexa")
+
+  )
+
+
+  for (i in 1:length(data_to_export)) {
+
+    # Get the dataframe
+    df <- data_to_export[[i]][[1]]
+
+    # get the phenotype name
+    phenotype_name <- data_to_export[[i]][[2]]
+
+    # define json function name
+    json_func_name = paste0("json_", phenotype_name)
+
+    # Get the json function by name
+    json_func <- get(json_func_name)
+
+    # Call the function
+    json <- json_func()
+
+    # add extensions to phenotype_name
+    filename_tsv <- paste0(phenotype_wd, slash, phenotype_name, ".tsv")
+    filename_json <- paste0(phenotype_wd, slash, phenotype_name, ".json")
+
+    # write tsv
+    if ( isTRUE(overwrite) | !file.exists(filename_tsv) ) {
+      write.table(
+        df,
+        filename_tsv,
+        quote = FALSE,
+        sep = '\t',
+        col.names = TRUE,
+        row.names = FALSE,
+        na = "n/a" # use 'n/a' for missing values for BIDS compliance
+      )
+    }
+
+
+    # write json
+    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+      write(json, filename_json)
+    }
+  }
 
   #### Return Data ####
   if (isTRUE(return_data)){
