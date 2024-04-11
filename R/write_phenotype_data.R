@@ -19,6 +19,7 @@ write_phenotype_data <- function(export_dir, overwrite) {
   data_to_export <- list(
 
     # # single visit data
+    # list(parent_v1_data$birth_data, "birth_data"), # no json yet
     list(parent_v1_data$cfq_data$bids_phenotype, "cfq"),
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
@@ -71,9 +72,6 @@ write_phenotype_data <- function(export_dir, overwrite) {
     # Get the dataframe
     df <- data_to_export[[i]][[1]]
 
-    # replace na in dataframe with 'n/a'
-    df[is.na(df)] <- 'n/a'
-
     # get the phenotype name
     phenotype_name <- data_to_export[[i]][[2]]
 
@@ -99,7 +97,8 @@ write_phenotype_data <- function(export_dir, overwrite) {
         quote = FALSE,
         sep = '\t',
         col.names = TRUE,
-        row.names = FALSE
+        row.names = FALSE,
+        na = "n/a" # use 'n/a' for missing values for BIDS compliance
       )
     }
 
