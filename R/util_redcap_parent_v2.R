@@ -64,13 +64,26 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## BES Data ####
   bes_data <- data[, grepl('participant_id|session_id|bes|binge_eating_scale_timestamp', names(data))]
   bes_data$bes_form_date <- lubridate::as_date(bes_data$binge_eating_scale_timestamp) # add form date column
+  bes_data <-
+    bes_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("bes_form_date", .after = 2)
   bes_data <- bes_data[, -grep("missingcheck|timestamp", names(bes_data))] # remove extra columns
 
   # change pna ('Don't want to answer') responses to 999
-  ## for bes_6 bes_13, bes_14, bes_15, and bes_16, 3 indicates pna; for all other variables, 4 indicates pna
   bes_data_for_scoring <- bes_data %>%
-    dplyr::mutate_at(dplyr::vars(dplyr::starts_with("bes_")), ~ ifelse(. %in% c(4), 999, .)) %>%
     dplyr::mutate(
+      # 4 indicates pna
+      bes_1 = ifelse(.data$bes_1 == 4, 999, .data$bes_1),
+      bes_2 = ifelse(.data$bes_2 == 4, 999, .data$bes_2),
+      bes_3 = ifelse(.data$bes_3 == 4, 999, .data$bes_3),
+      bes_4 = ifelse(.data$bes_4 == 4, 999, .data$bes_4),
+      bes_5 = ifelse(.data$bes_5 == 4, 999, .data$bes_5),
+      bes_7 = ifelse(.data$bes_7 == 4, 999, .data$bes_7),
+      bes_8 = ifelse(.data$bes_8 == 4, 999, .data$bes_8),
+      bes_9 = ifelse(.data$bes_9 == 4, 999, .data$bes_9),
+      bes_10 = ifelse(.data$bes_10 == 4, 999, .data$bes_10),
+      bes_11 = ifelse(.data$bes_11 == 4, 999, .data$bes_11),
+      bes_12 = ifelse(.data$bes_12 == 4, 999, .data$bes_12),
+      # 3 indicates pna
       bes_6 = ifelse(.data$bes_6 == 3, 999, .data$bes_6),
       bes_13 = ifelse(.data$bes_13 == 3, 999, .data$bes_13),
       bes_14 = ifelse(.data$bes_14 == 3, 999, .data$bes_14),
