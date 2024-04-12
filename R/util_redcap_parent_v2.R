@@ -35,17 +35,21 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   visit_data_parent <- data[, grep("participant_id|session_id|update", names(data))]
   visit_data_parent$update_form_date <- lubridate::as_date(visit_data_parent$participant_update_form_timestamp) # add form date column
   visit_data_parent <- visit_data_parent[, -grep("timestamp|participant_update_form_complete|contact|moving", names(visit_data_parent))]
+  visit_data_parent <- visit_data_parent %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("update_form_date", .after = 2) # relocate columns
 
   ## CBQ Data ####
   cbq_data <- data[, grepl('participant_id|session_id|cbq|childrens_behavior_questionnaire_timestamp', names(data))]
   cbq_data$cbq_form_date <- lubridate::as_date(cbq_data$childrens_behavior_questionnaire_timestamp) # add form date column
   cbq_data <- cbq_data[, -grep("missingcheck|timestamp", names(cbq_data))] # remove extra columns
+  cbq_data <- cbq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
   cbq_scored <- dataprepr::score_cbq(cbq_data, score_base = TRUE, id = 'participant_id')
 
   ## BRIEF Data ####
   brief_data <- data[, grepl('participant_id|session_id|brief|behavior_rating_inventory_of_executive_function_timestamp', names(data))]
   brief_data$brief_form_date <- lubridate::as_date(brief_data$behavior_rating_inventory_of_executive_function_timestamp) # add form date column
-  brief_data <- brief_data[, !(names(brief_data) %in% c('brief_missing_check', 'behavior_rating_inventory_of_executive_function_timestamp'))]
+  brief_data <- brief_data[, -grep("missingcheck|timestamp", names(brief_data))] # remove extra columns
+  brief_data <- brief_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+
   # add age and sex to brief_data
   brief_data <- merge(brief_data, agesex_data[c("participant_id", "brief_age", "sex")], by = "participant_id")
   brief_scored <- dataprepr::score_brief2(brief_data, age_var = "brief_age", sex_var = "sex", score_base = TRUE, male = 1, female = 0, id = "participant_id")
@@ -54,6 +58,8 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   cshq_data <- data[, grepl('participant_id|session_id|cshq|childs_sleep_habits_questionnaire_timestamp', names(data))]
   cshq_data$cshq_form_date <- lubridate::as_date(cshq_data$childs_sleep_habits_questionnaire_timestamp) # add form date column
   cshq_data <- cshq_data[, -grep("missingcheck|timestamp", names(cshq_data))] # remove extra columns
+  cshq_data <- cshq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+
   names(cshq_data) <- gsub('_a', '_prob', names(cshq_data))
 
   # update values for scoring (3 - Usually, 2 - Sometimes, 1 - Rarely)
@@ -64,8 +70,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## BES Data ####
   bes_data <- data[, grepl('participant_id|session_id|bes|binge_eating_scale_timestamp', names(data))]
   bes_data$bes_form_date <- lubridate::as_date(bes_data$binge_eating_scale_timestamp) # add form date column
-  bes_data <-
-    bes_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("bes_form_date", .after = 2)
+  bes_data <- bes_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
   bes_data <- bes_data[, -grep("missingcheck|timestamp", names(bes_data))] # remove extra columns
 
   # change pna ('Don't want to answer') responses to 999
@@ -91,12 +96,13 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
       bes_16 = ifelse(.data$bes_16 == 3, 999, .data$bes_16)
     )
 
-  bes_scored <- dataprepr::score_bes(bes_data_for_scoring, score_base = TRUE, pna = 999, id = 'participant_id')
+  bes_scored <- dataprepr::score_bes(bes_data_for_scoring, score_base = TRUE, pna = 999, id = 'participant_id', extra_scale_cols = c("bes_form_date"))
 
   ## FFBS Data ####
   ffbs_data <- data[, grepl('participant_id|session_id|ffbs|family_food_behavior_survey_timestamp', names(data))]
   ffbs_data$ffbs_form_date <- lubridate::as_date(ffbs_data$family_food_behavior_survey_timestamp) # add form date column
   ffbs_data <- ffbs_data[, -grep("missingcheck|timestamp", names(ffbs_data))] # remove extra columns
+  ffbs_data <- ffbs_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
 
   ffbs_scored <- dataprepr::score_ffbs(ffbs_data, score_base = TRUE, id = 'participant_id')
@@ -105,6 +111,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   fsq_data <- data[, grepl('participant_id|session_id|fsq|feeding_strategies_questionnaire_timestamp', names(data))]
   fsq_data$fsq_form_date <- lubridate::as_date(fsq_data$feeding_strategies_questionnaire_timestamp) # add form date column
   fsq_data <- fsq_data[, -grep("missingcheck|timestamp", names(fsq_data))] # remove extra columns
+  fsq_data <- fsq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   #score -- need to develop score script
 
