@@ -78,7 +78,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   cebq_data <- cebq_data[, -grep("missingcheck|timestamp", names(cebq_data))] # remove extra columns
   cebq_data <- cebq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id')
+  cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("cebq_form_date"))
 
   ## CBQ Data ####
   cbq_data <- data[, grepl('participant_id|session_id|cbq|childrens_behavior_questionnaire_timestamp', names(data))]
@@ -86,7 +86,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   cbq_data <- cbq_data[, -grep("missingcheck|timestamp", names(cbq_data))] # remove extra columns
   cbq_data <- cbq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cbq_scored <- dataprepr::score_cbq(cbq_data, score_base = TRUE, id = 'participant_id')
+  cbq_scored <- dataprepr::score_cbq(cbq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("cbq_form_date"))
 
   ## CSHQ Data ####
   cshq_data <- data[, grepl('participant_id|session_id|cshq|childs_sleep_habits_questionnaire_timestamp', names(data))]
@@ -138,7 +138,7 @@ util_redcap_parent_v5 <- function(data, v5_date_data, return_data = TRUE) {
   cfpq_data <- cfpq_data[, -grep("missingcheck|timestamp", names(cfpq_data))] # remove extra columns
   cfpq_data <- cfpq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id')
+  cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("cfpq_form_date"))
 
   ## return data ####
   if (isTRUE(return_data)){

@@ -42,7 +42,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   spsrq_data <- spsrq_data[, -grep("missingcheck|timestamp", names(spsrq_data))] # remove extra columns
   spsrq_data <- spsrq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  spsrq_scored <- dataprepr::score_spsrq(spsrq_data, score_base = TRUE, id = 'participant_id')
+  spsrq_scored <- dataprepr::score_spsrq(spsrq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("spsrq_form_date"))
 
   ## PWLB Data ####
   pwlb_data <- data[, grepl('participant_id|session_id|pwlb|parent_weight_loss_behavior_questionnaire_timestamp', names(data))]
@@ -50,7 +50,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   pwlb_data <- pwlb_data[, -grep("missingcheck|timestamp", names(pwlb_data))] # remove extra columns
   pwlb_data <- pwlb_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  pwlb_scored <- dataprepr::score_pwlb(pwlb_data, score_base = TRUE, id = 'participant_id')
+  pwlb_scored <- dataprepr::score_pwlb(pwlb_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("pwlb_form_date", "pwlb_24a"))
 
   ## TFEQ Data ####
   #note: REACH used tfeq-r18 (revised scale)
@@ -59,7 +59,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   tfeq_data <- tfeq_data[, -grep("missingcheck|timestamp", names(tfeq_data))] # remove extra columns
   tfeq_data <- tfeq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, score_base = TRUE, id = 'participant_id')
+  tfeq_scored <- dataprepr::score_tfeq18(tfeq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("tfeq_form_date"))
 
   ## CLASS Data ####
   class_data <- data[, grepl('participant_id|session_id|class|childrens_leisure_activities_study_survey_timestamp', names(data))]
@@ -75,7 +75,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   bisbas_data <- bisbas_data[, -grep("missingcheck|timestamp", names(bisbas_data))] # remove extra columns
   bisbas_data <- bisbas_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  bisbas_scored <- dataprepr::score_bisbas(bisbas_data, score_base = TRUE, id = 'participant_id')
+  bisbas_scored <- dataprepr::score_bisbas(bisbas_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("bisbas_form_date"))
 
   ## PTSCA Data ####
   ptsca_data <- data[, grepl('participant_id|session_id|ptsca|parental_strategies_to_teach_children_about_advert_timestamp', names(data))]
@@ -92,7 +92,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   debq_data <- debq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   debq_data$debq_20 <- NA # mark item 20 data as missing. debq question 20 was not administered in REACH -- debq question 23 was repeated in its place
-  debq_scored <- dataprepr::score_debq(debq_data, score_base = TRUE, id = 'participant_id')
+  debq_scored <- dataprepr::score_debq(debq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("debq_form_date"))
 
   ## SCPF Data ####
   scpf_data <- data[, grepl('participant_id|session_id|scpf|structure_and_control_in_parent_feeding_timestamp', names(data))]
@@ -101,7 +101,7 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
   scpf_data <- scpf_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   scpf_data$scpf_17 <- NA # mark item 17 data as missing -- the wrong question was administered here.
-  scpf_scored <- dataprepr::score_scpf(scpf_data, score_base = TRUE, id = 'participant_id')
+  scpf_scored <- dataprepr::score_scpf(scpf_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("scpf_form_date"))
 
   ## return data ####
   if (isTRUE(return_data)){

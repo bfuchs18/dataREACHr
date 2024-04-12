@@ -46,7 +46,7 @@ util_redcap_child_v3 <- function(data, return_data = TRUE) {
 
 
   # EAH data
-  eah_data <- data[, grep("participant_id||session_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
+  eah_data <- data[, grep("participant_id|session_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
   eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
   names(eah_data) <- gsub('intake_notes', 'prep_notes', names(eah_data))
   names(eah_data) <- gsub('eah_notes', 'eah_protocol_notes', names(eah_data))

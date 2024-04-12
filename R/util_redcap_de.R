@@ -108,9 +108,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack anthro data
   stacked_anthro <- dplyr::bind_rows(
-    transform(anthro_v1_data, visit = "1", session_id = "ses-1"),
-    transform(anthro_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
+    transform(anthro_v1_data, visit_protocol = "1", session_id = "ses-1"),
+    transform(anthro_v5_data, visit_protocol = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
 
   ## DEXA data ####
@@ -127,11 +127,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, -1, function(x) as.numeric(as.character(x)))
   dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, -1, function(x) as.numeric(as.character(x)))
 
-  # stack visit 1 and visit 5 data, add "visit" and "session_id" columns and reorder
+  # stack visit 1 and visit 5 data, add "visit_protocol" and "session_id" columns and reorder
   stacked_dexa <- dplyr::bind_rows(
-    transform(dexa_v1_data, visit = "1", session_id = "ses-1"),
-    transform(dexa_v5_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
+    transform(dexa_v1_data, visit_protocol = "1", session_id = "ses-1"),
+    transform(dexa_v5_data, visit_protocol = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
 
   ## intake data ####
@@ -164,11 +164,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
 
   # stack intake data
   stacked_intake <- dplyr::bind_rows(
-    transform(v1_intake_data, visit = "1", session_id = "ses-1"),
-    transform(v3_intake_data, visit = "3", session_id = "ses-1"),
-    transform(v4_intake_data, visit = "4", session_id = "ses-1"),
-    transform(v5_intake_data, visit = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit", .after = 2)
+    transform(v1_intake_data, visit_protocol = "1", session_id = "ses-1"),
+    transform(v3_intake_data, visit_protocol = "3", session_id = "ses-1"),
+    transform(v4_intake_data, visit_protocol = "4", session_id = "ses-1"),
+    transform(v5_intake_data, visit_protocol = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
   # compute intake variables
   stacked_intake <- util_calc_intake(stacked_intake)

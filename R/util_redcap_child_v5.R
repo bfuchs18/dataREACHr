@@ -116,7 +116,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   # score this data?
 
   ## stq data ####
-  stq_data <-data[, grep("participant_id|stq|child_screen_time_questionnaire_timestamp", names(data))]
+  stq_data <-data[, grep("participant_id|session_id|stq|child_screen_time_questionnaire_timestamp", names(data))]
   stq_data$stq_form_date <- lubridate::as_date(stq_data$child_screen_time_questionnaire_timestamp) # add form date column
   stq_data <- stq_data[, -grep("missingcheck|timestamp", names(stq_data))] # remove extra columns
   # score

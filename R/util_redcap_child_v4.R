@@ -59,7 +59,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   pptq_data$pptq_form_date <- lubridate::as_date(pptq_data$pictorial_personality_traits_questionnaire_timestamp) # add form date column
   pptq_data <- pptq_data[, -grep("missingcheck|timestamp", names(pptq_data))] # remove extra columns
   pptq_data_for_scoring <- util_format_pptq_data(pptq_data)
-  pptq_scored <- dataprepr::score_pptq(pptq_data_for_scoring, pptq_scale = 3, score_base = FALSE, id = "participant_id")
+  pptq_scored <- dataprepr::score_pptq(pptq_data_for_scoring, pptq_scale = 3, score_base = FALSE, id = "participant_id", extra_scale_cols = c("pptq_form_date"))
 
   ## sic ####
   sic_data <-data[, grep("participant_id|session_id|^sic|stress_in_children_questionnaire_timestamp", names(data))]
