@@ -4,12 +4,10 @@
 \alias{util_redcap_parent_v5}
 \title{util_redcap_parent_v5: Organize parent visit 5 data from REDCap (called within proc_redcap.R)}
 \usage{
-util_redcap_parent_v5(data, v5_date_data, return_data = TRUE)
+util_redcap_parent_v5(data, return_data = TRUE)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_5_arm_1}
-
-\item{v5_date_data}{dataframe with 2 columns: 'participant_id' and 'v5_date'}
 
 \item{return_data}{If return_data is set to TRUE, will return a list including:
 \enumerate{

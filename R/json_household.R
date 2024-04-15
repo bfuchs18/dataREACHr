@@ -18,19 +18,7 @@ json_household <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit = list( Description = 'REACH visit protocol for data collection'),
-
-    # these are part of the demo questionnaire collected on V1 only:
-    # demo_birth_length = list( Description = 'What was your child\'s birth length, in inches?'),
-    # demo_birthweight_pounds = list( Description = 'Child\'s birth weight (pounds):'),
-    # demo_birthweight_ounces = list( Description = 'Child birth weight (ounces):'),
-    # demo_premature = list( Description = ''),
-    # demo_premature_weeks = list( Description = ''),
-    # demo_feeding = list( Description = ''),
-    # demo_exclusive_feeding = list( Description = ''),
-    # demo_tot_breastfeeding = list( Description = ''),
-    # demo_solid_food = list( Description = ''),
-
+    household_form_date = list( Description = 'Date (YYYY-MM-DD)household demographic form was completed'),
     demo_child_relationship = list( Description = 'What is your relationship to the child in the study?',
                                     Levels = list ('0' = 'Biological mother',
                                                    '1' = 'Biological father',
@@ -92,8 +80,8 @@ json_household <- function() {
                                                '4' = 'Separated',
                                                '5' = 'Remarried',
                                                '6' = 'Living together, not married')),
-    # demo_income -- moved to demo/participants
-    # demo_education_mom  -- moved to demo/participants
+    # demo_income -- add this
+    # demo_education_mom  -- add this
     demo_education_dad = list( Description = 'What is the child\'s biological father\'s highest level of formal education?',
                                Levels = list ('0' = 'None',
                                               '1' = 'Preschool',
