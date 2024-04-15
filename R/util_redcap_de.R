@@ -57,10 +57,33 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   anthro_data <- anthro_data[, -grep("complete|self_report", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
 
   # rename parent variables with parent1
-  colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
+  # colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
 
   # rename parent1 sex variable
   colnames(anthro_data) <- gsub("parent1_height_sex", "parent1_sex", colnames(anthro_data))
+
+  # Calculate parental BMI values for each visit
+  for (visit in c(1, 5)) {
+
+    # if measured parent is mom
+    if (anthro_data[[paste0(parent_height_sex_v, visit)]] == 0) {
+
+      # assign data method
+      anthro_data[[paste0(maternal_anthro_method_v, visit)]] <- "measured"
+
+      # calculate BMI (kg divided by height in meters squared)
+      anthro_data[[paste0(maternal_bmi_v, visit)]] <- (anthro_data$parent_weight_average_kg_v1) / ((anthro_data$parent_height_average_cm_v1/100)^ 2)
+
+      # if measured parent is dad
+    } else if (anthro_data$parent_height_sex_v1 == 1) {
+
+      # assign data method
+      anthro_data[[paste0(paternal_anthro_method_v, visit)]] <- "measured"
+
+      # calculate BMI (kg divided by height in meters squared)
+      anthro_data[[paste0(paternal_bmi_v, visit)]] <- (anthro_data$parent_weight_average_kg_v1) / ((anthro_data$parent_height_average_cm_v1/100)^ 2)
+
+  }
 
   # remove child bmi values that were entered into redcap
   anthro_data <- anthro_data[, -grep("child_bmi", names(anthro_data))]
