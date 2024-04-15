@@ -53,46 +53,36 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   wasi_data <- data[, grep("participant_id|wasi.*score$|wasi_percentile", names(data))]
 
   ## Anthropometrics data ####
-  anthro_data <- data[, grep("participant_id|parent_height|child_height|parent_weight|child_weight|child_average_weight|bmi", names(data))]
+  anthro_data <- data[, grep("participant_id|parent_height|child_height|parent_weight|child_weight|child_average_weight", names(data))]
   anthro_data <- anthro_data[, -grep("complete|self_report", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
-
-  # rename parent variables with parent1
-  # colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
-
-  # rename parent1 sex variable
-  colnames(anthro_data) <- gsub("parent1_height_sex", "parent1_sex", colnames(anthro_data))
-
-  # Calculate parental BMI values for each visit
-  for (visit in c(1, 5)) {
-
-    # if measured parent is mom
-    if (anthro_data[[paste0(parent_height_sex_v, visit)]] == 0) {
-
-      # assign data method
-      anthro_data[[paste0(maternal_anthro_method_v, visit)]] <- "measured"
-
-      # calculate BMI (kg divided by height in meters squared)
-      anthro_data[[paste0(maternal_bmi_v, visit)]] <- (anthro_data$parent_weight_average_kg_v1) / ((anthro_data$parent_height_average_cm_v1/100)^ 2)
-
-      # if measured parent is dad
-    } else if (anthro_data$parent_height_sex_v1 == 1) {
-
-      # assign data method
-      anthro_data[[paste0(paternal_anthro_method_v, visit)]] <- "measured"
-
-      # calculate BMI (kg divided by height in meters squared)
-      anthro_data[[paste0(paternal_bmi_v, visit)]] <- (anthro_data$parent_weight_average_kg_v1) / ((anthro_data$parent_height_average_cm_v1/100)^ 2)
-
-  }
-
-  # remove child bmi values that were entered into redcap
-  anthro_data <- anthro_data[, -grep("child_bmi", names(anthro_data))]
 
   # make all values numeric except column 1 (participant_id)
   anthro_data <- dplyr::mutate_at(anthro_data, -1, function(x) as.numeric(as.character(x)))
 
-  # add sex and age to calculate BMI derivatives
-  anthro_data <- merge(anthro_data, agesex_data[c("participant_id", "sex", "v1_age", "v5_age")], by = "participant_id", all = TRUE)
+  # separate visit data
+  anthro_v1_data <- anthro_data[, grep("participant_id|v1", names(anthro_data))]
+  colnames(anthro_v1_data) <- gsub("_v1|v1_", "", colnames(anthro_v1_data)) # Remove "v1_" or "_v1" from column names
+
+  anthro_v5_data <- anthro_data[, grep("participant_id|v5", names(anthro_data))]
+  colnames(anthro_v5_data) <- gsub("_v5|v5_", "", colnames(anthro_v5_data)) # Remove "v5_" or "_v5" from column names
+
+  # stack anthro data
+  stacked_anthro <- dplyr::bind_rows(
+    transform(anthro_v1_data, visit_protocol = "1", session_id = "ses-1"),
+    transform(anthro_v5_data, visit_protocol = "5", session_id = "ses-2")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  # Update columns names
+  colnames(stacked_anthro) <- gsub("parent_", "parent1_", colnames(stacked_anthro))
+
+  # rename parent1 sex variable
+  colnames(stacked_anthro) <- gsub("parent1_height_sex", "parent1_sex", colnames(stacked_anthro))
+
+  # calculate parent1 BMI
+  stacked_anthro$parent1_bmi <- round(stacked_anthro$parent1_weight_average_kg / ((stacked_anthro$parent1_height_average_cm / 100) ^ 2), digits = 2)
+
+  # # add sex and age to calculate BMI derivatives
+  # anthro_data <- merge(anthro_data, agesex_data[c("participant_id", "sex", "v1_age", "v5_age")], by = "participant_id", all = TRUE)
 
   # calculate child bmi values -- need to debug once there is data entered
 
@@ -118,22 +108,6 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   # anthro_data$child_bmi_z_v5 <- round(childsds::sds(value = anthro_data[["child_bmi_v5"]], age = anthro_data[["v5_age"]], sex = anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = 1, female = 0), digits = 2)
   # anthro_data$child_bmi_p_v5 <- round((childsds::sds(value = anthro_data[["child_bmi_v5"]], age = anthro_data[["v5_age"]], sex = anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = 1, female = 0)) * 100, digits = 2)
 
-  # separate visit data
-  anthro_v1_data <- anthro_data[, grep("participant_id|v1", names(anthro_data))]
-  colnames(anthro_v1_data) <- gsub("_v1|v1_", "", colnames(anthro_v1_data)) # Remove "v1_" or "_v1" from column names
-
-  anthro_v5_data <- anthro_data[, grep("participant_id|v5", names(anthro_data))]
-  colnames(anthro_v5_data) <- gsub("_v5|v5_", "", colnames(anthro_v5_data)) # Remove "v5_" or "_v5" from column names
-
-  # make all values numeric except column 1 (participant_id)
-  anthro_v1_data <- dplyr::mutate_at(anthro_v1_data, -1, function(x) as.numeric(as.character(x)))
-  anthro_v5_data <- dplyr::mutate_at(anthro_v5_data, -1, function(x) as.numeric(as.character(x)))
-
-  # stack anthro data
-  stacked_anthro <- dplyr::bind_rows(
-    transform(anthro_v1_data, visit_protocol = "1", session_id = "ses-1"),
-    transform(anthro_v5_data, visit_protocol = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
 
   ## DEXA data ####
@@ -203,8 +177,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
         tictoc_data = tictoc_data,
         wasi_data = wasi_data,
         dexa_data = stacked_dexa,
-        anthro_data = list(anthro_long = stacked_anthro,
-                           anthro_wide = anthro_data),
+        anthro_data = stacked_anthro,
         stacked_intake = stacked_intake
       )
     )

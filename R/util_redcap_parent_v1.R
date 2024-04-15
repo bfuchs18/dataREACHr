@@ -4,13 +4,12 @@
 #'
 #'
 #' @param data data from REDCap event parent_visit_1_arm_1
-#' @param v1_date_data dataframe with columns: 'participant_id' and 'v1_date' -- can have additional columns as long as these are in there
 #' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
 #'
 
-util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
+util_redcap_parent_v1 <- function(data, return_data = TRUE) {
 
   #### 1. Set up/initial checks #####
 
@@ -35,7 +34,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   ## demographics data ####
   # this data will be split into 3 dataframes:
     # (1) participants_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into participants.tsv file
-    # (2) birth_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will not go into participants.tsv file
+    # (2) infancy_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will not go into participants.tsv file
     # (3) household_data: data collected as part of the "Parent Household Demographics" qualtrics form
 
   # select all demo variables
@@ -45,17 +44,22 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   demo_data_all$demo_form_date <- lubridate::as_date(demo_data_all$visit_1_demographics_timestamp)
   demo_data_all$household_form_date <- lubridate::as_date(demo_data_all$parent_household_demographics_questionnaire_timestamp)
 
-  # subset columns for dataframes
-  participants_data <- demo_data_all[c("participant_id", "session_id", "demo_form_date" ,"demo_child_birthdate", "demo_ethnicity", "demo_race")]
+  # select columns for participants_data
+  participants_data <- demo_data_all[c("participant_id", "demo_ethnicity", "demo_race")]
 
-  birth_data <- demo_data_all[c("participant_id","session_id", "demo_form_date", "demo_birth_length", "demo_birthweight_pounds", "demo_birthweight_ounces", "demo_premature", "demo_premature_weeks", "demo_feeding", "demo_exclusive_feeding", "demo_tot_breastfeeding", "demo_solid_food")]
+  # select columns for infancy_data
+  infancy_data <- demo_data_all[c("participant_id","session_id", "demo_form_date", "demo_birth_length", "demo_birthweight_pounds", "demo_birthweight_ounces", "demo_premature", "demo_premature_weeks", "demo_feeding", "demo_exclusive_feeding", "demo_tot_breastfeeding", "demo_solid_food")]
 
+  # derive total birthweight in ounces from lb and oz components
+  infancy_data$birthweight_ounces_total <- (infancy_data$demo_birthweight_pounds)*16 + infancy_data$demo_birthweight_ounces
+
+  # select columns for household_data
   household_data <- demo_data_all[, !(names(demo_data_all) %in% c('demo_v1_missingcheck',
                                                                     'visit_1_demographics_complete',
-                                                                    'parent_household_demographics_questionnaire_timestamp',
+                                                                    'parent_household_demographics_questionnaire_timestamp', 'demo_child_birthdate',
                                                                     'demo_missingcheck', 'demo_missingcheck_2', 'demo_missingcheck_3',
                                                                     'parent_household_demographics_questionnaire_complete',
-                                                                  names(participants_data[3:ncol(participants_data)]), names(birth_data[3:ncol(birth_data)])))]
+                                                                  names(participants_data[3:ncol(participants_data)]), names(infancy_data[3:ncol(infancy_data)])))]
 
   # relocate household_data columns
   household_data <- household_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("household_form_date", .after = 2) # relocate columns
@@ -149,7 +153,7 @@ util_redcap_parent_v1 <- function(data, v1_date_data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(
       participants_data = participants_data,
-      birth_data = birth_data,
+      infancy_data = infancy_data,
       household_data = household_data,
       rank_data = rank_data,
       puberty_data = puberty_scored,

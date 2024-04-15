@@ -149,7 +149,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
-  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, v1_date_data = date_data)
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
   parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
   child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
@@ -157,7 +157,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
   parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
-  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, v5_date_data= date_data)
+  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
 
   #### Load and organize double-entry data ####
   redcap_de_data <- read.csv(data_de_path, header = TRUE)
@@ -191,9 +191,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                      parent_v5_data$cbq_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
+  stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data, parent_v5_data$cshq_data)
   # stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
+  stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data, parent_v5_data$pstca_data)
   # stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype)
 
   stacked_audit <-
@@ -202,6 +204,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
       parent_v5_data$audit_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
+  stacked_pmum <- dplyr::bind_rows(parent_v4_data$pmum_data, parent_v5_data$pmum_data)
   # stacked_pmum <- dplyr::bind_rows(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype)
 
   stacked_cfpq <-
@@ -210,9 +213,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
       parent_v5_data$cfpq_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet - will it be?
+  stacked_rank <- dplyr::bind_rows(parent_v1_data$rank_data, parent_v5_data$rank_data)
   # stacked_rank <- dplyr::bind_rows(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet - will it be?
+  stacked_class <- dplyr::bind_rows(parent_v3_data$class_data, parent_v5_data$class_data)
   # stacked_class <- dplyr::bind_rows(parent_v3_data$class_data$bids_phenotype, parent_v5_data$class_data$bids_phenotype)
 
   # stack child (V5) and parent (V1, V5) puberty data
@@ -246,16 +251,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(child_v5_data$eah_data, visit_protocol = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
-  stacked_parent2_anthro <-
-    dplyr::bind_rows(parent_v1_data$household_data[, c("participant_id",
-                                                       "parent2_reported_bmi",
-                                                       "session_id",
-                                                       "household_form_date")],
-                     parent_v5_data$household_data[, c("participant_id",
-                                                       "parent2_reported_bmi",
-                                                       "session_id",
-                                                       "household_form_date")])
-
   stacked_updates <- dplyr::bind_rows(
     parent_v2_data$visit_data_parent,
     parent_v3_data$visit_data_parent,
@@ -263,10 +258,46 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     parent_v5_data$visit_data_parent
   )
 
+
+  #### Merge visit intake (meal, EAH, vas) data ####
+  merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit_protocol"), all = TRUE)
+  merged_intake <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit_protocol", "session_id", "advertisement_condition"), all = TRUE)
+  merged_intake <- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
+
+  #### Merge visit data and double entry (de) data ####
+
+  # merge intake data
+  merged_intake <- merge(merged_intake, processed_de_data$stacked_intake, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
+
+  # merge notes/visit data? update data?
+
+  # merge MRI visit data double entry CAMS / MRI freddies
+  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
+
+  #### Process anthro data ####
+
+  # Extract parent 2 BMI from household_data
+  stacked_parent2_anthro <-
+    dplyr::bind_rows(parent_v1_data$household_data[, c("participant_id",
+                                                       "parent2_reported_bmi",
+                                                       "session_id")],
+                     parent_v5_data$household_data[, c("participant_id",
+                                                       "parent2_reported_bmi",
+                                                       "session_id")])
+
+  # Merge double entered anthro_data with stacked_parent2_anthro
+  merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+
+  # Define parental BMI values
+  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 0, "measured", "reported")
+  merged_anthro$maternal_bmi <- ifelse(merged_anthro$parent1_sex == 0, merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
+  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 1, "measured", "reported")
+  merged_anthro$paternal_bmi <- ifelse(merged_anthro$parent1_sex == 1, merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
+
   #### Add to participants_data ####
 
-  # add sex
-  participants_data <- merge(parent_v1_data$participants_data, parent_v1_data$puberty_data$bids_phenotype[, c("participant_id", "sex")], by = "participant_id", all = TRUE)
+  # add date_data (visit dates, visit ages, child sex)
+  participants_data <- merge(parent_v1_data$participants_data, date_data, by = "participant_id", all = TRUE)
 
   # add maternal edu and income from visit 1 and append "v1" to variable names
   participants_data <- merge(participants_data,
@@ -278,21 +309,26 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   participants_data <- merge(participants_data,
                              parent_v5_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
                              by = "participant_id",
-                             all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = .data$demo_education_mom, demo_income_v5 = .data$demo_income)
-
-  # add date_data (visit dates and ages)
-  participants_data <- merge(participants_data, date_data, by=c("participant_id","sex"), all = TRUE)
+                             all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = "demo_education_mom", demo_income_v5 = "demo_income")
 
   # add maternal BMI
-  # add risk status
+  participants_data <- merge(participants_data,
+                             merged_anthro[merged_anthro$session_id == "ses-1", c("participant_id", "maternal_bmi", "maternal_anthro_method")],
+                             by = "participant_id",
+                             all = TRUE) %>% dplyr::rename(maternal_bmi_v1 = "maternal_bmi", maternal_anthro_method_v1 = "maternal_anthro_method")
 
-  ## bmi and bmi-z
+  # add risk status
+  participants_data$risk_status <- ifelse(dplyr::between(participants_data$maternal_bmi_v1, 18.5, 25), "low-risk", ifelse(participants_data$maternal_bmi_v1 >= 30, "high-risk", NA))
+
+  ## add child bmi and bmi-z
 
   # remove birthday and other columns
   participants_data <- participants_data[, -grep("birthdate|timestamp|brief", names(participants_data))]
 
   # rename columns
-  names(participants_data) <- gsub('demo_', '', names(participants_data))
+  names(participants_data)[names(participants_data) == "demo_ethnicity"] <- "ethnicity"
+  names(participants_data)[names(participants_data) == "demo_race"] <- "race"
+
   names(participants_data)[names(participants_data) == "v1_date"] <- "child_protocol_1_date"
   names(participants_data)[names(participants_data) == "v2_date"] <- "child_protocol_2_date"
   names(participants_data)[names(participants_data) == "v3_date"] <- "child_protocol_3_date"
@@ -304,26 +340,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(participants_data)[names(participants_data) == "v4_age"] <- "child_protocol_4_age"
   names(participants_data)[names(participants_data) == "v5_age"] <- "child_protocol_5_age"
 
+  # child protocol order
+
   # reorder columns
-
-  #### Merge visit intake (meal, EAH, vas) data ####
-  merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit_protocol"), all = TRUE)
-  merged_intake <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit_protocol", "session_id", "advertisement_condition"), all = TRUE)
-  merged_intake <- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
-
-  #### Merge visit data and double entry (de) data ####
-
-  # de anthro_data with stacked_parent2_anthro (data from household_data)
-  merged_anthro <- merge(processed_de_data$anthro_data$anthro_long, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
-
-  # merge intake data
-  merged_intake <- merge(merged_intake, processed_de_data$stacked_intake, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
-
-  # merge notes/visit data? update data?
-
-  # merge MRI visit data double entry CAMS / MRI freddies
-  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
-
 
   #### Export Data ####
 #
@@ -357,11 +376,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dir.create(file.path(phenotype_wd))
   }
 
-  # make a list of lists including dataframe, and export name (without extension)
+  # make a list of lists including dataframe, and export name (without extension; also json function names without json_)
   data_to_export <- list(
 
-    # # single visit data
-    # list(parent_v1_data$birth_data, "birth_data"), # no json yet
+    # single visit data
+    list(parent_v1_data$infancy_data, "infancy"),
     list(parent_v1_data$cfq_data$bids_phenotype, "cfq"),
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
@@ -389,12 +408,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     list(stacked_cebq, "cebq"),
     list(stacked_cbq, "cbq"),
     list(stacked_stq, "stq"),
-    # list(stacked_cshq, "cshq"), # not in bids_phenotype yet
-    # list(stacked_pstca, "pstca"), # not in bids_phenotype yet
+    list(stacked_cshq, "cshq"),
+    list(stacked_pstca, "pstca"),
     list(stacked_audit, "audit"),
-    # list(stacked_pmum, "pmum"), # not in bids_phenotype yet
+    list(stacked_pmum, "pmum"),
     list(stacked_cfpq, "cfpq"),
-    # list(stacked_rank, "rank"),  # not in bids_phenotype yet
+    list(stacked_rank, "rank"),
     list(stacked_puberty, "puberty"),
     list(stacked_loc, "loc"),
 
@@ -403,7 +422,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     list(merged_intake, "intake"),
     list(merged_mri, "mri_visit"),
 
-    # double entry data
+    # non-merged double-entry data
     list(processed_de_data$dexa_data, "dexa")
 
   )
