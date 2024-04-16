@@ -14,6 +14,10 @@ json_kbas <- function() {
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
+    kbas_form_date = list( Description = 'Date (YYYY-MM-DD) the KBAS was completed on Redcap'),
     kbas1 = list( Description = 'add'),
     kbas_total = list( Description = '',
                       Derivative = TRUE))

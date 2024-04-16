@@ -19,7 +19,7 @@ json_cebq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit = list( Description = 'REACH visit protocol for data collection'),
+    cebq_form_date = list( Description = 'Date (YYYY-MM-DD) CEBQ form was completed on redcap'),
     cebq1 = list( Description = 'My child loves food',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Rarely',

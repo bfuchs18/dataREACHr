@@ -13,7 +13,7 @@ json_infancy <- function() {
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline')),
-    demo_form_date = list( Description = 'Date visit_1_demographics form was completed on Redcap.'),
+    demo_form_date = list( Description = 'Date (YYYY-MM-DD) visit_1_demographics form was completed on Redcap.'),
     demo_birth_length = list( Description = 'What was your child\'s birth length, in inches?',
                               Unit = "inches"),
     demo_birthweight_pounds_component = list( Description = 'What was your child\'s birthweight? -- Pounds box'),
@@ -26,7 +26,7 @@ json_infancy <- function() {
     demo_solid_food = list( Description = 'At what age, in months, was your child first introduced to solid food? '),
     birthweight_ounces_total = list( Description = 'Chid birthweight computed from demo_birthweight_pounds_component and demo_birthweight_ounces_component (16*demo_birthweight_pounds_component + demo_birthweight_ounces_component)',
                                      Derivative = TRUE,
-                                     Unit = ounces)
+                                     Unit = "ounces")
     )
 
   # convert formatting to JSON
