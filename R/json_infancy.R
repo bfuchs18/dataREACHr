@@ -1,4 +1,4 @@
-#' json_infancy_data: Generates a json file for infancy data
+#' json_infancy: Generates a json file for infancy data
 #'
 #' This function generates a json file for infant-related data collected in the visit 1 demographics form
 #'
@@ -7,7 +7,7 @@
 #'
 #' @export
 
-json_infancy_data <- function() {
+json_infancy <- function() {
 
   infancy_list <- list(
     participant_id = list( Description = 'participant id number'),
