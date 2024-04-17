@@ -2,7 +2,7 @@
 % Please edit documentation in R/json_kbas.R
 \name{json_kbas}
 \alias{json_kbas}
-\title{json_kbas: Generates a json file for the kbas}
+\title{json_kbas: Generates a json file for the Kid's Brand Awareness Survey}
 \usage{
 json_kbas()
 }
@@ -10,5 +10,5 @@ json_kbas()
 A string with data stored in JSON format containing meta-data for the KBAS
 }
 \description{
-This function generates a json file for XXXX
+This function generates a json file for Kid's Brand Awareness Survey
 }

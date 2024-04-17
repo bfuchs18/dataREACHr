@@ -11,9 +11,7 @@ json_pstca <- function() {
 
   pstca_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Parental Strategies to Teach Children about Advertising',
-      Reference = '',
-      TermURL = ''),
+      Description = 'Parental Strategies to Teach Children about Advertising. This survey was developed by the Keller Lab based on multiple existing scales/questionnaires for Project REACH.'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
