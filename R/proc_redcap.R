@@ -27,7 +27,7 @@
 #'
 #' }
 #'
-#' @importFrom utils tail write.table read.csv
+#' @importFrom utils tail write.table read.csv head
 #' @importFrom rlang .data
 #' @export
 
@@ -147,7 +147,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(date_data)[names(date_data) == "record_id"] <- "participant_id"
   names(date_data)[names(date_data) == "prs_sex"] <- "sex"
 
-  # # organize event data
+  # # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
@@ -289,6 +289,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
 
   # Define parental BMI values
+  ## parent1_sex is the parent with measured anthro -- is there ever a scenario where parent1 with anthro measurements is not the same parent that completed the demo form? -- if so, need to also reference who was completing the demo form
   merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 0, "measured", "reported")
   merged_anthro$maternal_bmi <- ifelse(merged_anthro$parent1_sex == 0, merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
   merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 1, "measured", "reported")
@@ -340,34 +341,60 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(participants_data)[names(participants_data) == "v4_age"] <- "child_protocol_4_age"
   names(participants_data)[names(participants_data) == "v5_age"] <- "child_protocol_5_age"
 
-  # child protocol order
+  # make column child_protocol_order (e.g., 13425) based on order of child protocol dates - only include visits have dates (i.e., occured)
+  participants_data <- participants_data %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(child_protocol_order = {
+
+      # define date columns
+      dates <- c("child_protocol_1_date", "child_protocol_2_date", "child_protocol_3_date", "child_protocol_4_date", "child_protocol_5_date")
+
+      # order visit number characters in a vector based on order of dates, visits with no dates will be ordered last (na.last = TRUE)
+      # note: vector will have length of 5, as values have not been collapsed yet
+      order_chars <- c('1', '2', '3', '4', '5')[order(dates, na.last = TRUE)]
+
+      # get number of NA dates
+      n_na <- sum(is.na(dates))
+
+      # remove the number of NA values from the end order_chars
+      order_chars <- head(order_chars, -n_na)
+
+      # collapse into 1 string
+      paste0(order_chars, collapse = '')
+    })
 
   # reorder columns
+  participants_data <-
+    participants_data %>% dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1
+    dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
+    dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
+    dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
 
   #### Export Data ####
-#
-#   # write participant.tsv
-#   participants_tsv <- paste0(bids_wd, slash, "participants.tsv")
-#
-#   if ( isTRUE(overwrite) | !file.exists(participants_tsv) ) {
-#     # write tsv
-#     write.table(
-#       participants_data,
-#       participants_tsv,
-#       quote = FALSE,
-#       sep = '\t',
-#       col.names = TRUE,
-#       row.names = FALSE
-#     )
-#   }
-#
-#   # write participant.json
-#   participants_json <- paste0(bids_wd, slash, "participants.json")
-#
-#   if ( isTRUE(overwrite) | !file.exists(participants_json) ) {
-#     # write json
-#     write(json_participants(), participants_json)
-#   }
+
+  # write participant.tsv
+  participants_tsv <- paste0(bids_wd, slash, "participants.tsv")
+
+  if ( isTRUE(overwrite) | !file.exists(participants_tsv) ) {
+    # write tsv
+    write.table(
+      participants_data,
+      participants_tsv,
+      quote = FALSE,
+      sep = '\t',
+      col.names = TRUE,
+      row.names = FALSE,
+      na = "n/a" # use 'n/a' for missing values for BIDS compliance
+    )
+  }
+
+  # write participant.json
+  participants_json <- paste0(bids_wd, slash, "participants.json")
+
+  if ( isTRUE(overwrite) | !file.exists(participants_json) ) {
+    # write json
+    write(json_participants(), participants_json)
+  }
 
   # write phenotype data (tsv and json files)
 
@@ -385,12 +412,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
     list(parent_v1_data$pss_data$bids_phenotype, "pss"),
-    # list(parent_v1_data$chaos_data$bids_phenotype, "chaos"), # not in bids_phenotype yet
+    list(parent_v1_data$chaos_data, "chaos"), # not in bids_phenotype yet
 
     list(parent_v2_data$brief_data$bids_phenotype, "brief2"),
     list(parent_v2_data$bes_data$bids_phenotype, "bes"),
     list(parent_v2_data$ffbs_data$bids_phenotype, "ffbs"),
-    # list(parent_v2_data$ffq_data$bids_phenotype, "ffq"), # not in bids_phenotype yet
+    list(parent_v2_data$fsq_data, "fsq"), # not in bids_phenotype yet
 
     list(parent_v3_data$spsrq_data$bids_phenotype, "spsrq"),
     list(parent_v3_data$pwlb_data$bids_phenotype, "pwlb"),
