@@ -19,6 +19,7 @@ json_cshq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    cshq_form_date = list( Description = 'Date (YYYY-MM-DD) CSHQ form was completed on redcap'),
     cshq_bed_time = list( Description = 'Child\'s bedtime (Please answer with a 24 hour clock):'),
     cshq_wake_time = list( Description = 'Child\'s usual wake time (Please answer with a 24 hour clock):'),
     cshq_sleep_total_hours = list( Description = 'Child\'s usual amount of sleep each night (no naps): _ hours'),

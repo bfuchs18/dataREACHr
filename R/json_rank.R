@@ -19,7 +19,7 @@ json_rank <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit = list( Description = 'REACH visit protocol for data collection'),
+    rank_form_date = list( Description = 'Date (YYYY-MM-DD) the Ranking Food Item Questionnaire form was completed on Redcap'),
     rank1 = list(Description = 'Pre-packaged bread items, such as sandwich bread, hamburger buns, hotdog rolls, muffins, or bagels',
                  Levels = list('0' = 'Very Important',
                                 '1' = 'Important',

@@ -11,6 +11,9 @@ json_mri_visit <- function() {
 
   mri_visit_list <- list(
     participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
     mock_fmri_complete_check = list( Description = 'Researcher indication about mock fmri protocol was completed'),
     mock_fmri_notes = list( Description = 'Researcher notes about mock fmri protocol'),
     mri_anatomy_complete_check = list( Description = 'Researcher indication about whether MPRage was completed'),

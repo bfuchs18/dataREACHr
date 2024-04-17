@@ -19,6 +19,7 @@ json_efcr <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    efcr_form_date = list( Description = 'Date (YYYY-MM-DD) ECFR form was completed on redcap'),
     efcr1 = list( Description = 'My child asks for food or drinks that other kids eat',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Rarely',

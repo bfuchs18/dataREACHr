@@ -19,7 +19,7 @@ json_audit <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit = list( Description = 'REACH visit protocol for data collection'),
+    audit_form_date = list( Description = 'Date (YYYY-MM-DD) AUDIT form was completed on redcap'),
     audit1 = list( Description = 'How often do you have a drink containing alcohol?',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Monthly or less',

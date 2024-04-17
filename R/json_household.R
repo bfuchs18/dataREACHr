@@ -18,7 +18,7 @@ json_household <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    household_form_date = list( Description = 'Date (YYYY-MM-DD)household demographic form was completed'),
+    household_form_date = list( Description = 'Date (YYYY-MM-DD) the household demographic form was completed on redcap'),
     demo_child_relationship = list( Description = 'What is your relationship to the child in the study?',
                                     Levels = list ('0' = 'Biological mother',
                                                    '1' = 'Biological father',

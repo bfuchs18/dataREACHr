@@ -19,6 +19,7 @@ json_debq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    debq_form_date = list( Description = 'Date (YYYY-MM-DD) DEBQ form was completed on redcap'),
     debq1 = list( Description = 'Do you have the desire to eat when you are irritated?',
                     Levels = list ('0' = 'Never',
                                    '1' = 'Seldom',

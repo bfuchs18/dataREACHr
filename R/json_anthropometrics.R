@@ -11,10 +11,12 @@ json_anthropometrics <- function() {
 
   anthro_list <- list(
     participant_id = list( Description = 'participant id number'),
-    visit = list( Description = 'REACH visit protocol for data collection'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_protocol = list( Description = 'REACH child visit protocol for data collection',
+                           Levels = list ('1' = 'Child visit protocol 1',
+                                          '5' = 'Child visit protocol 5')),
     child_height_1_cm = list( Description = 'child height measurement 1',
                               Unit = "cm"),
     child_height_2_cm = list( Description = 'child height measurement 2',

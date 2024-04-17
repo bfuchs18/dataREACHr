@@ -22,7 +22,7 @@ json_puberty <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit = list( Description = 'REACH visit protocol for data collection'),
+    pds_form_date = list( Description = 'Date (YYYY-MM-DD) the Pubertal Development Scale form was completed on Redcap'),
     respondent = list( Description = 'String to indicate if parent or child completed the Pubertal Development Scale',
                     Levels = list ('parent' = 'parent',
                                    'child' = 'child')),

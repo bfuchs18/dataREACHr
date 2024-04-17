@@ -18,7 +18,10 @@ json_class <- function() {
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),
-
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
+    class_form_date = list( Description = 'Date (YYYY-MM-DD) CLASS form was completed on redcap'),
     class_1 = list( Description = 'Do your child usually do this activity?: Aerobics',
                   Levels = list ('0' = 'No',
                                  '1' = 'Yes')),
