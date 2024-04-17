@@ -1,7 +1,6 @@
 #' json_rank: Generates a json file for the Ranking Food Item Questionnaire
 #'
-#' This function generates a json file for the (scored?) Ranking Food Item Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_rank function in dataprepr and is only accurate for data collected in Study REACH
+#' This function generates a json file for the Ranking Food Item Questionnaire.
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Ranking Food Item Questionnaire
 #'
@@ -12,7 +11,7 @@ json_rank <- function() {
 
   rank_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Ranking Food Item Questionnaire',
+      Description = 'Ranking Food Item Questionnaire. Participants were provided the following instructions: "Imagine that you are on a typical food shopping trip at your preferred grocery store. Listed below are the different items that you can choose from. Please rank each item based on how important it is for you to buy during your typical grocery trip. The very important items should be foods that you won\'t leave the store without, or always make it into your budget. Items in the middle should be ones you would like to have, but are willing to cut from your budget if needed. Finally, the not important items should be foods that you don\'t buy on a typical trip or don\'t fit into your typical budget."',
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),

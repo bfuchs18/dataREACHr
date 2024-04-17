@@ -12,8 +12,8 @@ json_hfssm <- function() {
 
  hfssm_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'U.S. Household Food Security Survey Module',
-      Reference = '',
+      Description = 'U.S. Household Food Security Survey Module: THREE-STAGE DESIGN, WITH SCREENERS. Participants were provided the following instructions: "These questions are about the food eaten in your household in the last 12 months and whether you were able to afford the food you need." Items containing "hfssm_hh" and "hfssm_ad" were presented under a heading which read: "Now you are going to read several statements that people have made about their food situation. For these statements, please tell me whether the statement was often true, sometimes true or never true for you or your household in the last 12 months.". Items containing "hfssm_ch" were presented under a heading which read: "Now you are going to read several statements that people have made about the food situation of their children. For these statements, please state whether the statement was OFTEN true, SOMETIMES true, or NEVER true in the last 12 months for your child/children living in the household who are under 18 years old."',
+      Reference = 'Bickel G, Nord M, Price C, Hamilton W, Cook J. Guide to Measuring Household Food Security. United States Department of Agriculture. Alexandria, USA. 2000',
       TermURL = 'https://www.ers.usda.gov/media/8271/hh2012.pdf'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

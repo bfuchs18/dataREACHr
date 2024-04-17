@@ -11,9 +11,7 @@ json_household <- function() {
 
   household_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
+      Description = 'A collection of items to assess parent demographics and household environment. This questionnaire was developed within the Keller Lab for Study REACH. Participants were provided the following instructions: "Please answer the following questions:"'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',

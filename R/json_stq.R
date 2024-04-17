@@ -12,7 +12,7 @@ json_stq <- function() {
 
   stq_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
+      Description = 'Child Screen Time Questionnaire. Participants were provided the following instrctions: "Now you are going to answer some questions about screen-time. For each question please tell much time per day you do this activity. Your options are: None, < 30 minutes, 30 minutes, 1 hour, 2 hours, 3 hours, More than 4 hours."',
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),

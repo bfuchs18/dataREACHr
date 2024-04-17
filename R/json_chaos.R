@@ -13,8 +13,8 @@ json_chaos <- function() {
   chaos_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Confusion, Hubbub, and Order Scale. Participants were provided the following instructions: "For each statement below, please assign a number between 1 and 4 to indicate how much each statement describes your home environment. Please use the following scale: 1 = Very much like your own home; 2 = somewhat like your own home; 3 = A little bit like your own home; 4 = Not at all like your own home"',
-      Reference = '',
-      TermURL = ''),
+      Reference = 'Matheny, A. P., Jr., Wachs, T. D., Ludwig, J. L., Phillips, K. (1995). Bringing order out of chaos: Psychometric characteristics of the confusion, hubbub, and order scale. Journal of Applied Developmental Psychology, 16(3), 429–444.',
+      TermURL = 'https://doi.org/10.1016/0193-3973(95)90028-4'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',

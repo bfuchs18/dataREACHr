@@ -12,7 +12,7 @@ json_scpf <- function() {
 
   scpf_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Structure and Control in Parent Feeding questionnaire. This scale had an error when administered, see description of scpf17.',
+      Description = 'Structure and Control in Parent Feeding questionnaire. This scale had an error when administered, see description of scpf17. Participants were provided the following instructions: "Please select your response to indicate how often these things happen."',
       Reference = 'Savage, J.S., Rollins, B.Y., Kugler, K.C. et al. Development of a theory-based questionnaire to assess structure and control in parent feeding (SCPF). Int J Behav Nutr Phys Act 14, 9 (2017). https://doi.org/10.1186/s12966-017-0466-2',
       TermURL = 'https://ijbnpa.biomedcentral.com/articles/10.1186/s12966-017-0466-2'),
     participant_id = list( Description = 'participant id number'),

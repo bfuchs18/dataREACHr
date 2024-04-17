@@ -10,7 +10,7 @@ json_kbas <- function() {
 
   kbas_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
+      Description = 'Kid\'s Brand Awareness Survey. Participants were provided the following instructions: "Now we are going to play a game. For this game, we want you to match the correct picture with the brand logo or character. Some of the pictures will be of foods and others will be of toys. There are no wrong answers to this game. We just want to find out how many different foods and toy brands you can recognize. Does that make sense?"',
       Reference = '',
       TermURL = ''),
     participant_id = list( Description = 'participant id number'),

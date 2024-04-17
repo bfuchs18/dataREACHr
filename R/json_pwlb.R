@@ -13,8 +13,8 @@ json_pwlb <- function() {
   pwlb_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Parent Weight Loss Behavior Questionnaire. Participants were provided the following instructions: "Please read each weight loss strategy listed and indicate how often you have used this strategy IN THE PAST TWO YEARS to lose weight or to maintain weight. If you have never used a strategy, or you have never dieted, please indicate so by marking "Never"."',
-      Reference = '',
-      TermURL = ''),
+      Reference = 'Savage JS, Birch LL. Patterns of weight control strategies predict differences in women’s 4 y weight gain. Obesity (Silver Spring). 2010;18(3):513-520. doi:10.1038/oby.2009.265',
+      TermURL = 'https://pubmed.ncbi.nlm.nih.gov/19696759/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
