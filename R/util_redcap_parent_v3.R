@@ -77,11 +77,12 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
 
   bisbas_scored <- dataprepr::score_bisbas(bisbas_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("bisbas_form_date"))
 
-  ## PTSCA Data ####
-  ptsca_data <- data[, grepl('participant_id|session_id|ptsca|parental_strategies_to_teach_children_about_advert_timestamp', names(data))]
-  ptsca_data$ptsca_form_date <- lubridate::as_date(ptsca_data$parental_strategies_to_teach_children_about_advert_timestamp) # add form date column
-  ptsca_data <- ptsca_data[, -grep("missingcheck|timestamp", names(ptsca_data))] # remove extra columns
-  ptsca_data <- ptsca_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  ## pstca Data ####
+  pstca_data <- data[, grepl('participant_id|session_id|pstca|ptsca|parental_strategies_to_teach_children_about_advert_timestamp', names(data))]
+  colnames(pstca_data) <- gsub("ptsca", "pstca", colnames(pstca_data)) # fix scale abbreviation in column names
+  pstca_data$pstca_form_date <- lubridate::as_date(pstca_data$parental_strategies_to_teach_children_about_advert_timestamp) # add form date column
+  pstca_data <- pstca_data[, -grep("missingcheck|timestamp", names(pstca_data))] # remove extra columns
+  pstca_data <- pstca_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   # score -- need to develop score script
 
@@ -112,8 +113,8 @@ util_redcap_parent_v3 <- function(data, return_data = TRUE) {
       tfeq_data = tfeq_scored,
       class_data = class_data,
       bisbas_data = bisbas_scored,
-      ptsca_data = ptsca_data,
-      #      ptsca_data = ptsca_scored,
+      pstca_data = pstca_data,
+      #      pstca_data = pstca_scored,
       debq_data = debq_scored,
       scpf_data = scpf_scored
     ))
