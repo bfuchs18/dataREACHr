@@ -47,7 +47,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   ## BRIEF Data ####
   brief_data <- data[, grepl('participant_id|session_id|brief|behavior_rating_inventory_of_executive_function_timestamp', names(data))]
   brief_data$brief_form_date <- lubridate::as_date(brief_data$behavior_rating_inventory_of_executive_function_timestamp) # add form date column
-  brief_data <- brief_data[, -grep("missingcheck|timestamp", names(brief_data))] # remove extra columns
+  brief_data <- brief_data[, -grep("missing_check|timestamp", names(brief_data))] # remove extra columns
   brief_data <- brief_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   # add age and sex to brief_data

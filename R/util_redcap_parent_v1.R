@@ -163,7 +163,8 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
 #      chaos_data = chaos_scored, #score script to be developed
       chaos_data = chaos_data,
       pss_data = pss_scored,
-      lbc_data = lbc_scored))
+      # lbc_data = lbc_scored))
+      lbc_data = lbc_data))
   }
 }
 

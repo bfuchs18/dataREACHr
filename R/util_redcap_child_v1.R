@@ -61,8 +61,8 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
 
   # add version column
   ## define version items
-  va_items <- colnames(kbas_data %>% dplyr::select(starts_with("va")) %>% dplyr::select(-contains("score")))
-  vb_items <- colnames(kbas_data %>% dplyr::select(starts_with("vb")) %>% dplyr::select(-contains("score")))
+  va_items <- colnames(kbas_data %>% dplyr::select(dplyr::starts_with("va")) %>% dplyr::select(-dplyr::contains("score")))
+  vb_items <- colnames(kbas_data %>% dplyr::select(dplyr::starts_with("vb")) %>% dplyr::select(-dplyr::contains("score")))
 
   ## assign version -- requires having responses to a given version & no responses to the other version
   kbas_data$kbas_version <- ifelse(rowSums(!is.na(kbas_data[va_items])) > 45 & rowSums(is.na(kbas_data[vb_items])) == 50, "A",
@@ -73,7 +73,7 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
     dplyr::if_else(kbas_data$kids_brand_awareness_survey_version_a_timestamp != "",
       lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_a_timestamp),
       lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_b_timestamp)
-    ) # using dplyr::if_else here because it preserves the type/class of inputs (i.e, dates)
+    )
 
   # combine va and vb total scored columns
   kbas_data$kbas_food_score <- ifelse(kbas_data$kbas_version == "A", kbas_data$va_food_score_kbas,

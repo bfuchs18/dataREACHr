@@ -106,6 +106,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
     return(list(
       visit_data_parent = visit_data_parent,
       # hfias_data = hfias_scored,
+      hfias_data = hfias_data,
       hfssm_data = hfssm_scored,
       pmum_data = pmum_data,
       # pmum_data = pmum_scored,
