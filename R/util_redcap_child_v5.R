@@ -107,13 +107,8 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   ## kbas data ####
   kbas_data <-data[, grep("participant_id|session_id|toy_|food_|^q.*score|kids_brand_awareness_survey_version_b_timestamp|kids_brand_awareness_survey_version_a_timestamp", names(data))]
-  kbas_data$kbas_form_date <-
-    dplyr::if_else(kbas_data$kids_brand_awareness_survey_version_a_timestamp != "",
-                   lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_a_timestamp),
-                   lubridate::as_date(kbas_data$kids_brand_awareness_survey_version_b_timestamp)
-    ) # using dplyr::if_else here because it preserves the type/class of inputs (i.e, dates)
-  kbas_data <- kbas_data[, !grepl('timestamp', names(kbas_data))] #remove timestamp columns
-  # score this data?
+  # process data
+  kbas_data <- util_format_kbas_data(kbas_data)
 
   ## stq data ####
   stq_data <-data[, grep("participant_id|session_id|stq|child_screen_time_questionnaire_timestamp", names(data))]
