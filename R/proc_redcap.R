@@ -143,9 +143,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   date_data[['v5_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v5_date']])/lubridate::years(1), 1)
   date_data[['brief_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['brief_date']])/lubridate::years(1),1)
 
+  # re-label sex var and save to sex
+  date_data$sex <- ifelse(date_data$prs_sex == 0, "female", ifelse(date_data$prs_sex == 1, "male", NA))
+
   #update column names in date_data
   names(date_data)[names(date_data) == "record_id"] <- "participant_id"
-  names(date_data)[names(date_data) == "prs_sex"] <- "sex"
 
   # # # organize event data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
@@ -224,7 +226,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   stacked_puberty <- dplyr::bind_rows(
     transform(parent_v1_data$puberty_data$bids_phenotype, respondent = "parent"),
     transform(parent_v5_data$puberty_data$bids_phenotype, respondent = "parent"),
-    transform(child_v5_data$puberty_data$bids_phenotype, respondent = "child"))
+    transform(child_v5_data$puberty_data$bids_phenotype, respondent = "child")) %>% dplyr::relocate("respondent", .after = 4)
 
   # note: visit column is vas_visit_protocol -- this data will merged with intake data by session_id only
   stacked_meal_vas_data <- dplyr::bind_rows(
@@ -267,7 +269,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Merge visit data and double entry (de) data ####
 
   # merge intake data
-  merged_intake <- merge(merged_intake, processed_de_data$stacked_intake, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
+  merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
 
   # merge notes/visit data? update data?
 
@@ -431,6 +433,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     # list(parent_v4_data$hfias_data, "hfias"), # needs json
     list(parent_v4_data$fhfi_data, "fhfi"), # not in bids_phenotype yet
 
+    # list(child_v3_data$sleeplog_data, "sleeplog"), # needs json
     list(child_v4_data$pptq_data$bids_phenotype, "pptq"),
 
     # stacked visit data

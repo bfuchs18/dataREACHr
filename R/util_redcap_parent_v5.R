@@ -59,8 +59,8 @@ util_redcap_parent_v5 <- function(data, return_data = TRUE) {
   puberty_data <- puberty_data[, -grep("missingcheck|timestamp", names(puberty_data))] # remove extra columns
   puberty_data <- puberty_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  puberty_data_for_scoring <- util_format_puberty_data(puberty_data)
-  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "1", female = "0", id = 'participant_id')
+  puberty_data_for_scoring <- util_format_puberty_data(puberty_data, respondent = "parent")
+  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "male", female = "female", id = 'participant_id')
 
   ## CEBQ Data ####
   cebq_data <- data[, grepl('participant_id|session_id|cebq|child_eating_behavior_questionnaire_timestamp', names(data))]

@@ -52,7 +52,7 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
 
   # add age and sex to brief_data
   brief_data <- merge(brief_data, agesex_data[c("participant_id", "brief_age", "sex")], by = "participant_id")
-  brief_scored <- dataprepr::score_brief2(brief_data, age_var = "brief_age", sex_var = "sex", score_base = TRUE, male = 1, female = 0, id = "participant_id", extra_scale_cols = c("brief_age", "brief_form_date"))
+  brief_scored <- dataprepr::score_brief2(brief_data, age_var = "brief_age", sex_var = "sex", score_base = TRUE, male = "male", female = "female", id = "participant_id", extra_scale_cols = c("brief_age", "brief_form_date"))
 
   ## CSHQ Data ####
   cshq_data <- data[, grepl('participant_id|session_id|cshq|childs_sleep_habits_questionnaire_timestamp', names(data))]

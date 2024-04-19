@@ -62,44 +62,9 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
 
   ## Puberty ####
   puberty_data <- data[, grep("participant_id|session_id|^tanner|^childrep", names(data))]
-  names(puberty_data)[names(puberty_data) == "tanner_sex_v5"] <- "sex"
-
-  # in all columns except 1 (participant_id) replace 4s (I don't know) with 99
-  puberty_data[,-c(1)][puberty_data[,-c(1)]==4]<-99
-
-  # is p6 part of scoring for children? -- not in Table1 A Self-Administered sting Scale for Development Carskadon and Acebo
-
-  # subset and rename girls variables
-  puberty_data_girls <- subset(puberty_data, puberty_data$sex == 0)
-  puberty_data_girls <- puberty_data_girls[, -grep("puberty_voice|puberty_facialhair|boycomp|tanner_male", names(puberty_data_girls))]
-  puberty_data_girls <- puberty_data_girls %>% dplyr::rename(
-    pds_1 = .data$childreport_puberty_height,
-    pds_2 = .data$childreport_puberty_hair,
-    pds_3 = .data$childreport_puberty_acne,
-    pds_4f = .data$childrep_puberty_breast,
-    pds_5fa = .data$childrep_puberty_menses,
-    pds_6 = .data$childrep_puberty_girlcomp,
-    tanner_choice = .data$tanner_female_choice_v5
-  )
-
-  # subset and rename boys variables
-  puberty_data_boys <- subset(puberty_data, puberty_data$sex == 1)
-  puberty_data_boys <- puberty_data_boys[, -grep("puberty_breast|puberty_menses|tanner_female|girlcomp", names(puberty_data_boys))]
-  puberty_data_boys <- puberty_data_boys %>% dplyr::rename(
-    pds_1 = .data$childreport_puberty_height,
-    pds_2 = .data$childreport_puberty_hair,
-    pds_3 = .data$childreport_puberty_acne,
-    pds_4m = .data$childreport_puberty_voice,
-    pds_5m = .data$childreport_puberty_facialhair,
-    pds_6 = .data$childrep_puberty_boycomp,
-    tanner_choice = .data$tanner_male_choice_v5
-  )
-
-  # bind girls and boys dfs -- dplyr::bind_rows fills missing values with NA where columns don't match.
-  puberty_data_for_scoring <- dplyr::bind_rows(puberty_data_girls, puberty_data_boys)
-
+  puberty_data_for_scoring <- util_format_puberty_data(puberty_data, respondent = "child")
   # score
-  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, respondent = "child", score_base = FALSE, male = 1, female = 0, id = "participant_id")
+  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, respondent = "child", score_base = FALSE, male = "male", female = "female", id = "participant_id")
 
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]
