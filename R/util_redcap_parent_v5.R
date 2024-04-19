@@ -41,18 +41,9 @@ util_redcap_parent_v5 <- function(data, return_data = TRUE) {
   household_data <- data[, grepl('participant_id|session_id|demo', names(data))]
   household_data$household_form_date <- lubridate::as_date(household_data$parent_household_demographics_questionnaire_timestamp)  # add form date column
   household_data <- household_data[, -grep("missingcheck|timestamp|complete", names(household_data))] # remove extra columns
-  household_data <- household_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  # rename columns
-  names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft_component"
-  names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_inch_component"
-  names(household_data)[names(household_data) == "demo_self_report_weight"] <- "demo_parent2_reported_weight_lbs"
-
-  # combine parent2 feet and inch components into 1 height variable in meters
-  household_data$parent2_reported_height_m <- ((household_data$demo_parent2_reported_height_ft_component*12) + household_data$demo_parent2_reported_height_inch_component)*0.0254
-
-  # calculate parent2 BMI (kg/m2)
-  household_data$parent2_reported_bmi <- (household_data$demo_parent2_reported_weight_lbs*0.453592) / (household_data$parent2_reported_height_m**2)
+  # process household data
+  household_data <- util_format_household_data(household_data)
 
   ## RANK Data (ranking food item questionnaire) ####
   rank_data <- data[, grepl('participant_id|session_id|rank', names(data))]
