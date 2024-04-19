@@ -178,7 +178,7 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
         wasi_data = wasi_data,
         dexa_data = stacked_dexa,
         anthro_data = stacked_anthro,
-        stacked_intake = stacked_intake
+        intake_data = stacked_intake
       )
     )
   }

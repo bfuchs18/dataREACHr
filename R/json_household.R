@@ -34,9 +34,6 @@ json_household <- function() {
                                           '4' = '4th grade',
                                           '5' = '5th grade',
                                           '6' = '6th grade')),
-    demo_parent_age = list( Description = 'Age of parent calculated from self-reported parent date of birth (data not shared) and date of form completion (data not shared)',
-                            Unit = "years",
-                            Derivative = TRUE),
     demo_parent_ethnicity = list( Description = 'What is your ethnicity?',
                                   Levels = list ('0' = 'Hispanic or Latino',
                                                  '1' = 'Not Hispanic or Latino')),
@@ -261,7 +258,16 @@ json_household <- function() {
     demo_allowance_other = list( Description = 'About how much money per week do you give your child for their allowance?',
                                  Levels = list ('0' = 'Less than $1 a week',
                                                 '1' = '$1 - $5 a week',
-                                                '2' = 'More than $5 a week')))
+                                                '2' = 'More than $5 a week')),
+    demo_parent_age = list( Description = 'Age of parent calculated from self-reported parent date of birth (data not shared) and date of form completion (data not shared)',
+                            Unit = "years",
+                            Derivative = TRUE),
+    parent2_reported_height_m = list( Description = 'Parent2 (i.e., biological parent not at visit) height alculated from demo_parent2_reported_height_ft_component and demo_parent2_reported_height_inch_component',
+                            Unit = "meters",
+                            Derivative = TRUE),
+    parent2_reported_bmi = list( Description = 'Parent2 (i.e., biological parent not at visit) BMI calculated from parent2_reported_height_m and demo_parent2_reported_weight_lbs',
+                            Unit = "kg/m^2",
+                            Derivative = TRUE))
 
   # variables to add:
   # parent2_reported_height_m -- derivative computed from reported feet and inches
