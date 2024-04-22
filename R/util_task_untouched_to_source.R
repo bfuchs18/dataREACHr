@@ -1,4 +1,4 @@
-#' util_org_sourcedata: Move task data from untouchedRaw into bids/sourcedata
+#' util_task_untouched_to_source: Move task data from untouchedRaw into bids/sourcedata
 #'
 #' This function moves task data (food view, sst) from untouchedRaw into bids/sourcedata
 #'
@@ -9,7 +9,7 @@
 #' @examples
 #'
 #' # organize task data in untouchedRaw into sourcedata
-#' util_org_sourcedata(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
+#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
 #'
 #' \dontrun{
 #' }
@@ -17,7 +17,7 @@
 #'
 #' @export
 
-util_org_sourcedata <- function(base_wd, overwrite = FALSE) {
+util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
 
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 

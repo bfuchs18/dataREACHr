@@ -58,7 +58,7 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   ####Copy data into to sourcedata ####
 
   # copy task data from untouchedRaw in to sourcedata
-  util_org_sourcedata(base_wd, overwrite = FALSE)
+  util_task_untouched_to_source(base_wd, overwrite = FALSE)
 
   #### To do ####
   # reduce repetition in processing tasks by looping?
