@@ -53,6 +53,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]
   loc_data <- loc_data[, -grep("share_info_parent", names(loc_data))] # remove extra columns
+  loc_data <- loc_data %>% dplyr::relocate("session_id", .after = 1)
 
   ## pptq ####
   pptq_data <-data[, grep("participant_id|session_id|^pptq|pictorial_personality_traits_questionnaire_timestamp", names(data))]
@@ -65,6 +66,8 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   sic_data <-data[, grep("participant_id|session_id|^sic|stress_in_children_questionnaire_timestamp", names(data))]
   sic_data$sic_form_date <- lubridate::as_date(sic_data$stress_in_children_questionnaire_timestamp) # add form date column
   sic_data <- sic_data[, -grep("missingcheck|timestamp", names(sic_data))] # remove extra columns
+  sic_data <- sic_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("sic_form_date", .after = 2) # relocate columns
+
   # score?
 
   ## return data ####
