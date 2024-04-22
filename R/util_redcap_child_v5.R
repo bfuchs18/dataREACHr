@@ -69,6 +69,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]
   loc_data <- loc_data[, -grep("share_info_parent", names(loc_data))] # remove extra columns
+  loc_data <- loc_data %>% dplyr::relocate("session_id", .after = 1)
 
   ## kbas data ####
   kbas_data <-data[, grep("participant_id|session_id|toy_|food_|^q.*score|kids_brand_awareness_survey_version_b_timestamp|kids_brand_awareness_survey_version_a_timestamp", names(data))]
@@ -79,6 +80,8 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   stq_data <-data[, grep("participant_id|session_id|stq|child_screen_time_questionnaire_timestamp", names(data))]
   stq_data$stq_form_date <- lubridate::as_date(stq_data$child_screen_time_questionnaire_timestamp) # add form date column
   stq_data <- stq_data[, -grep("missingcheck|timestamp", names(stq_data))] # remove extra columns
+  stq_data <- stq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("stq_form_date", .after = 2) # relocate columns
+
   # score
 
   ## tictoc data ####

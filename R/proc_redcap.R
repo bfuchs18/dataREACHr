@@ -430,11 +430,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     list(parent_v4_data$hfssm_data$bids_phenotype, "hfssm"),
     list(parent_v4_data$cchip_data$bids_phenotype, "cchip"),
-    # list(parent_v4_data$hfias_data, "hfias"), # needs json
+    list(parent_v4_data$hfias_data, "hfias"),
     list(parent_v4_data$fhfi_data, "fhfi"), # not in bids_phenotype yet
 
-    # list(child_v3_data$sleeplog_data, "sleeplog"), # needs json
+    list(child_v3_data$sleeplog_data, "sleeplog"),
     list(child_v4_data$pptq_data$bids_phenotype, "pptq"),
+    list(child_v4_data$sic_data, "sic"), # not in bids_phenotype yet
 
     # stacked visit data
     list(stacked_stq, "stq"),
@@ -460,9 +461,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     # non-merged double-entry data
     list(processed_de_data$dexa_data, "dexa")
 
-    # to add:
-    # fhfi?
-    #
   )
 
 

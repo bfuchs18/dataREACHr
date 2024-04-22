@@ -4,10 +4,12 @@
 \alias{util_format_puberty_data}
 \title{util_format_puberty_data: Prepare parent-reported puberty data for scoring (called within util_redcap_parent_v1.R and util_redcap_parent_v5.R)}
 \usage{
-util_format_puberty_data(puberty_data)
+util_format_puberty_data(puberty_data, respondent)
 }
 \arguments{
 \item{puberty_data}{Puberty data (parental_rating_scale_for_pubertal_development, Tanner) extracted from data from REDCap events parent_visit_1_arm_1 and parent_visit_5_arm_1'}
+
+\item{respondent}{string to indicate who completed the form. Must be "child" or "parent"}
 }
 \description{
 This function prepares parent-reported puberty data for scoring with dataprepr::score_puberty()
