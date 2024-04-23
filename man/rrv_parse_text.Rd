@@ -4,7 +4,7 @@
 \alias{rrv_parse_text}
 \title{rrv_parse_text: Parse RRV txt files when csv not available}
 \usage{
-rrv_parse_text(sub, rrv_file, overwrite = FALSE, return_data = TRUE)
+rrv_parse_text(sub, rrv_file, overwrite = FALSE)
 }
 \arguments{
 \item{sub}{subject label used in sub-label. Leading zeros not required}
@@ -15,18 +15,16 @@ rrv_parse_text(sub, rrv_file, overwrite = FALSE, return_data = TRUE)
 
 \item{return_data}{logical indicating if data should be returned. Default = FALSE}
 }
-\value{
-If return_data is set to TRUE, will return XXX
-}
 \description{
-This function formats and organizes Food View task data from bids/sourcedata into bids/rawdata for a given subject
+This function exports game.csv and summary.csv files from the RRV .txt file. This is for use when game.csv and summary.csv were not automatically generated. CSV files will export into the directory with the .txt file
+Function will also return game.csv and summary.csv in dataframes
 }
 \examples{
 
 \dontrun{
 
 # process task data for the Food View Task
-file_name = "~/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/untouchedRaw/rrv_task/060.txt"
+file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
 rrv_csv <- rrv_parse_text(sub = 60, rrv_file = file_name)
 
 }

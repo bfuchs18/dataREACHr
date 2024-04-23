@@ -24,6 +24,7 @@ Imports:
     methods,
     RJSONIO,
     rlang,
+    tools,
     utils,
     varhandle
 Remotes:
