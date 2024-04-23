@@ -93,6 +93,10 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
     Goal2 = unlist(strsplit(session_lines[grep("Goal2", session_lines)], "\t"))[3]
     TimeTaken2 = unlist(strsplit(session_lines[grep("Time Taken2", session_lines)], "\t"))[3]
 
+    # replace null values with empty string
+    TimeTaken1 = ifelse(is.null(TimeTaken1), "", TimeTaken1)
+    TimeTaken2 = ifelse(is.null(TimeTaken2), "", TimeTaken2)
+
     print(paste0("session ", session_number))
     print(TimeTaken1)
     print(TimeTaken2)
@@ -263,7 +267,7 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
           reinforcer = ifelse(screen_number == "1", Goal1, ifelse(screen_number == "2", Goal2, NA)), #reinforcer-level
           type = ifelse(Type == "Slot Machine Game with Reinforcers", "slot machine", NA), #task-level
           session = session_number, #session-level
-          # total_time = ifelse(screen_number == "1", TimeTaken1, ifelse(screen_number == "2", TimeTaken2, NA)), #session x reinforcer level
+          total_time = ifelse(screen_number == "1", TimeTaken1, ifelse(screen_number == "2", TimeTaken2, NA)), #session x reinforcer level
           schedule = ifelse(screen_number == "1", Screen1, ifelse(screen_number == "2", Screen2, NA)), # session level
           total_time_blocks = ifelse(screen_number == "1", total_timeblocks_screen1, ifelse(screen_number == "2", total_timeblocks_screen2, NA)),
           total_nonresp_timeblocks = ifelse(screen_number == "1", total_nonresp_timeblocks_screen1, ifelse(screen_number == "2", total_nonresp_timeblocks_screen2, NA)),
@@ -294,7 +298,6 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
       game_df,
       game_path,
       quote = FALSE,
-      col.names = TRUE,
       row.names = FALSE
     )
   }
@@ -304,7 +307,6 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
       summary_df,
       summary_path,
       quote = FALSE,
-      col.names = TRUE,
       row.names = FALSE
     )
   }
