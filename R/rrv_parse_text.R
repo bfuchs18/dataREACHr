@@ -24,6 +24,19 @@
 
 rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE, return_data = TRUE) {
 
+  #### create empty dataframe to save data to ####
+
+  ## created vector with column names
+  columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total time",	"schedule",	"time block",	"responses",	"reinforcers", 	"total", "responses",	"total reinforcers",	"average responses",	"average reinforcers")
+
+  ## pass this vector length to ncol parameter
+  game_df = data.frame(matrix(nrow = 0, ncol = length(columns)))
+
+  ## assign column names to game_df
+  colnames(game_df) = columns
+
+  #### parse text file ####
+
   # read in lines from text file
   file_lines <- readLines(file_name)
 
@@ -80,6 +93,21 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE, return_data = TRUE)
     # extract data within timeblocks
     for (timeblock in 1:n_timeblocks) {
 
+      # get timeblocks start
+      tb_start_line = timeblock_start_lines[timeblock]
+
+      # get session end
+      if (timeblock < n_timeblocks) {
+        tb_end_line = timeblock_start_lines[timeblock+1]-2
+      } else {
+        tb_end_line = length(session_lines) - 1
+      }
+
+      # extract timeblock lines
+      timeblock_lines = session_lines[tb_start_line:tb_end_line]
+
+      # append to timeblock data
+      timeblock_list <- append(timeblock_list, list(timeblock_lines))
     }
   }
 
