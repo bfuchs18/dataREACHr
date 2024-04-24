@@ -52,10 +52,43 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   }
 
   bids_wd <- paste0(base_wd, slash, "bids", slash)
+  untouchedRaw_wd <- paste0(base_wd, slash, "untouchedRaw", slash)
   sourcedata_wd <- paste0(base_wd, slash, "bids", slash, "sourcedata", slash)
   raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
 
-  ####Copy data into to sourcedata ####
+  #### Parse RRV files in untouchedRaw ####
+
+  ## get list of subject directories in untouchedRaw/rrv_task/
+  rrv_subdirs <- list.dirs(paste0(untouchedRaw_wd, "rrv_task/"), recursive = FALSE, full.names = TRUE)
+
+  ## for each subdir
+  for (subdir in rrv_subdirs) {
+
+    subdir_files <- list.files(subdir, recursive = FALSE,  full.names = TRUE)
+
+    # if list of files does not contain "game" or "summary"
+    if (!any(grepl("game", subdir_files)) & !any(grepl("summary", subdir_files))) {
+
+      # if there is a text file
+      if (any(grepl("\\.txt$", subdir_files))) {
+        # Find indices of strings that contain ".txt"
+        txt_indice <- grep("\\.txt$", subdir_files)
+
+        # Subset the original list using the indices
+        txt_file <- subdir_files[txt_indice]
+
+        print(txt_file)
+
+        # apply text parser
+        rrv_parse_text(rrv_file = txt_file, overwrite = overwrite, return_data = FALSE)
+      }
+
+    }
+
+  }
+
+
+  #### Copy data into to sourcedata ####
 
   # copy task data from untouchedRaw in to sourcedata
   util_task_untouched_to_source(base_wd, overwrite = FALSE)
