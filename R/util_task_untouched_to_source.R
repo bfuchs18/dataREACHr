@@ -47,13 +47,13 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   #### Define copy_to_source() ####
   copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite = overwrite) {
 
-    #' A function to copy a file into sourcedata
-    #'
-    #' @param file path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)
-    #' @param sub_str bids-formatted subject string. e.g., "sub-001" (string)
-    #' @param ses_str bids-formatted session string. e.g., "ses-1" (string)
-    #' @param sourcefile_prefix (optional) string to prefix filename with in sourcedata (string)
-    #' @param overwrite logical indicating whether file should be overwritten in sourcedata (logical)
+    # A function to copy a file into sourcedata
+    #
+    # @param file path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)
+    # @param sub_str bids-formatted subject string. e.g., "sub-001" (string)
+    # @param ses_str bids-formatted session string. e.g., "ses-1" (string)
+    # @param sourcefile_prefix (optional) string to prefix filename with in sourcedata (string)
+    # @param overwrite logical indicating whether file should be overwritten in sourcedata (logical)
 
     # check for sourcefile_prefix arg
     prefix_arg <- methods::hasArg(sourcefile_prefix)
