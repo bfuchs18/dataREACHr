@@ -3,7 +3,6 @@
 #' This function exports game.csv and summary.csv files from the RRV .txt file. This is for use when game.csv and summary.csv were not automatically generated. CSV files will export into the directory with the .txt file
 #' Function will also return game.csv and summary.csv in dataframes
 #'
-#' @param sub subject label used in sub-label. Leading zeros not required
 #' @param rrv_file string with full path to rrv file
 #' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
 #' @param return_data logical indicating if data should be returned. Default = FALSE
@@ -21,7 +20,7 @@
 #'
 #' @export
 
-rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
+rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -58,7 +57,11 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
   #### parse text file ####
 
   # read in lines from text file
-  file_lines <- readLines(file_name)
+  file_lines <- readLines(rrv_file)
+
+  # get subject label used in data collection
+  report_line <- file_lines[1]
+  sub <- unlist(strsplit(report_line, ":"))[2]
 
   # Use grep to find lines containing the string "Report"
   session_start_lines <- grep("Chronological Report", file_lines)
@@ -97,9 +100,6 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
     TimeTaken1 = ifelse(is.null(TimeTaken1), "", TimeTaken1)
     TimeTaken2 = ifelse(is.null(TimeTaken2), "", TimeTaken2)
 
-    print(paste0("session ", session_number))
-    print(TimeTaken1)
-    print(TimeTaken2)
     #### Extract Total Responses By Screen ####
 
     total_response_start_line <- grep("Total Responses", session_lines)
@@ -257,7 +257,6 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
 
     # create summary dataframe
     for (screen_number in c("1", "2")) {
-      print(paste0("session ", session_number, "screen ", screen_number))
 
       # create row for summary.csv
       summary_data_row <-
@@ -287,11 +286,11 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
   ##### Export CSVs ####
 
   # get data to export into
-  export_dir <- dirname(file_name)
+  export_dir <- dirname(rrv_file)
 
   # set export file paths
-  game_path <- paste0(export_dir, slash, "game.csv")
-  summary_path <- paste0(export_dir, slash, "summary.csv")
+  game_path <- paste0(export_dir, slash, "game_parsed.csv")
+  summary_path <- paste0(export_dir, slash, "summary_parsed.csv")
 
   if ( isTRUE(overwrite) | !file.exists(game_path) ) {
     write.csv(
@@ -311,5 +310,9 @@ rrv_parse_text <- function(sub, rrv_file, overwrite = FALSE) {
     )
   }
   ##### Return dataframes ####
-  return(list(game_df = game_df, summary_df = summary_df))
+
+  if (isTRUE(return_data)){
+    return(list(game_df = game_df, summary_df = summary_df))
+  }
+
 }
