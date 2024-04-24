@@ -11,7 +11,7 @@
 #' @param base_wd full path to directory that contains untouchedRaw/ and bids/ (string)
 #' @param reparse_rrv Re-generate CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)
 #' @param overwrite_sourcedata overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)
-#' @param overwrite_rawdata_list names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: c("sst", "foodview", "all_tasks"). (vector of characters)
+#' @param overwrite_rawdata_vector names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "all_tasks". Default is empty vector. (vector of characters)
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return phenotype to console (default = FLASE) (logical)
@@ -132,7 +132,7 @@ proc_task <- function(base_wd, reparse_rrv = FALSE, overwrite_sourcedata = FALSE
   print("Processing Food View Task Data")
 
   ## get foodview overwrite arg
-  overwrite_fv <- "foodview" %in% overwrite_rawdata_list | "all_tasks" %in% overwrite_rawdata_list
+  overwrite_fv <- "foodview" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
 
   ## get list of foodview files in sourcedata
   foodview_source_files <- list.files(sourcedata_wd, pattern = "foodview", recursive = TRUE)
@@ -163,7 +163,7 @@ proc_task <- function(base_wd, reparse_rrv = FALSE, overwrite_sourcedata = FALSE
   print("Processing SST Data")
 
   ## get SST overwrite arg
-  overwrite_sst <- "sst" %in% overwrite_rawdata_list | "all_tasks" %in% overwrite_rawdata_list
+  overwrite_sst <- "sst" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
 
   ## get list of foodview files in sourcedata
   sst_source_files <- list.files(sourcedata_wd, pattern = "stop", recursive = TRUE)
