@@ -9,7 +9,7 @@
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
 #' @param base_wd full path to directory that contains untouchedRaw/ and bids/ (string)
-#' @param reparse_rrv Re-generate CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)
+#' @param overwrite_parsed_rrv overwrite CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)
 #' @param overwrite_sourcedata overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)
 #' @param overwrite_rawdata_vector names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "all_tasks". Default is empty vector. (vector of characters)
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
@@ -37,7 +37,7 @@
 #' @importFrom utils tail write.csv read.csv
 #' @export
 
-proc_task <- function(base_wd, reparse_rrv = FALSE, overwrite_sourcedata = FALSE, overwrite_rawdata_tasks = c(), overwrite_jsons = FALSE, return_data = FALSE) {
+proc_task <- function(base_wd, overwrite_parsed_rrv = FALSE, overwrite_sourcedata = FALSE, overwrite_rawdata_tasks = c(), overwrite_jsons = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -75,8 +75,8 @@ proc_task <- function(base_wd, reparse_rrv = FALSE, overwrite_sourcedata = FALSE
   ## get list of subject directories in untouchedRaw/rrv_task/
   rrv_subdirs <- list.dirs(paste0(untouchedRaw_wd, "rrv_task/"), recursive = FALSE, full.names = TRUE)
 
-  # remove previously parsed files if reparse_rrv = TRUE
-  if (isTRUE(reparse_rrv)) {
+  # remove previously parsed files if overwrite_parsed_rrv = TRUE
+  if (isTRUE(overwrite_parsed_rrv)) {
 
     # get a list of files in rrv_subdirs
     file_list <- list.files(rrv_subdirs, recursive = FALSE,  full.names = TRUE)
