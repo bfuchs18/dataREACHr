@@ -59,6 +59,12 @@ rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
   # read in lines from text file
   file_lines <- readLines(rrv_file)
 
+  # abort function if "Chronological Report" is not contained within the text file -- suggests this is not an RRV output text file
+  if (!any(grepl("Chronological Report", file_lines))) {
+    print(paste(rrv_file, "does not contain information needed to parse. Aborting rrv_parse_text()"))
+    return()
+  }
+
   # get subject label used in data collection
   report_line <- file_lines[1]
   sub <- unlist(strsplit(report_line, ":"))[2]
