@@ -2,39 +2,60 @@
 % Please edit documentation in R/proc_task.R
 \name{proc_task}
 \alias{proc_task}
-\title{proc_task: Process task data in untouchedRaw into bids}
+\title{proc_task: Process task data from untouchedRaw to bids/rawdata}
 \usage{
-proc_task(base_wd, overwrite = FALSE, return_data = FALSE)
+proc_task(
+  base_wd,
+  overwrite_parsed_rrv = FALSE,
+  overwrite_sourcedata = FALSE,
+  overwrite_rawdata_tasks = c(),
+  overwrite_jsons = FALSE,
+  return_data = FALSE
+)
 }
 \arguments{
-\item{base_wd}{full path to directory that contains untouchedRaw/ and bids/}
+\item{base_wd}{full path to directory that contains untouchedRaw/ and bids/ (string)}
 
-\item{overwrite}{overwrite existing files (default = FALSE)}
+\item{overwrite_parsed_rrv}{overwrite CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)}
 
-\item{return_data}{return phenotype to console (default = FLASE)}
+\item{overwrite_sourcedata}{overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)}
+
+\item{overwrite_jsons}{overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)}
+
+\item{return_data}{return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)}
+
+\item{overwrite_rawdata_vector}{names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "all_tasks". Default is empty vector. (vector of characters)}
 }
 \value{
 If return_data is set to TRUE, will return a list including:
 \enumerate{
 \item clean datasets for each task
-\item meta-data/.json inforamtion for each task
+\item meta-data information for each task stored in JSON format
 }
 }
 \description{
 This function:
 \enumerate{
-\item copies task data from untouchedRaw into sourcedata
-\item cleans sourcedata to save in BIDS format in rawdata. Produces the following files:
-*
-\item calls functions to create .json files for task data
+\item generates CSVs from txt files in untouchedRaw/rrv_task if CSVs don't exist, using rrv_parse_text()
+\item copies task data from untouchedRaw into bids/sourcedata, using util_task_untouched_to_source()
+\item processes task sourcedata into BIDS and exports into bids/rawdata for the following tasks: sst (beh and func), foodview, using task-specific util_task_{task-name} functions
+\item creates .json files for task data, using write_task_jsons()
 }
 }
 \details{
-To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
+To use this function, the correct path to the directory containing untouchedRaw/ and bids/ must be supplied to base_wd
 }
 \examples{
 \dontrun{
+
+# process task data without overwriting any existing files and return processed data
 task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
+
+# overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
+proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_list = c("foodview", "sst"))
+
+# overwrite all task data in rawdata
+proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_list = c("all_tasks"))
 
 }
 

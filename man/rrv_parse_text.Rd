@@ -4,11 +4,9 @@
 \alias{rrv_parse_text}
 \title{rrv_parse_text: Parse RRV txt files when csv not available}
 \usage{
-rrv_parse_text(sub, rrv_file, overwrite = FALSE)
+rrv_parse_text(rrv_file, overwrite = FALSE, return_data = FALSE)
 }
 \arguments{
-\item{sub}{subject label used in sub-label. Leading zeros not required}
-
 \item{rrv_file}{string with full path to rrv file}
 
 \item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
