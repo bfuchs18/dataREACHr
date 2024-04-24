@@ -45,7 +45,18 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   }
 
   #### Define copy_to_source() ####
-  copy_to_source <- function(file, sub_str, ses_str, overwrite = overwrite) {
+  copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite = overwrite) {
+
+    #' A function to copy a file into sourcedata
+    #'
+    #' @param file path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)
+    #' @param sub_str bids-formatted subject string. e.g., "sub-001" (string)
+    #' @param ses_str bids-formatted session string. e.g., "ses-1" (string)
+    #' @param sourcefile_prefix (optional) string to prefix filename with in sourcedata (string)
+    #' @param overwrite logical indicating whether file should be overwritten in sourcedata (logical)
+
+    # check for sourcefile_prefix arg
+    prefix_arg <- methods::hasArg(sourcefile_prefix)
 
     # set sourcedata directory for task files
     sub_task_source_dir <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, "beh")
@@ -54,7 +65,12 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
     filename <- basename(file)
 
     # set sourcedata file
-    sub_task_source_file <- paste0(sub_task_source_dir, slash, filename)
+    if (isTRUE(prefix_arg)) {
+      sub_task_source_file <- paste0(sub_task_source_dir, slash, sourcefile_prefix, filename)
+
+    } else {
+      sub_task_source_file <- paste0(sub_task_source_dir, slash, filename)
+    }
 
     # create sub_task_source_dir if it doesnt exist
     if (!dir.exists(sub_task_source_dir)) {
@@ -132,6 +148,33 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
       sub_str <- sub("REACH_", "", dirname)
 
       # determine session? -- right now only ses-1 data is uploaded
+    }
+  }
+
+
+  #### RRV ####
+  rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')
+  rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
+
+  for (sub_dir in rrv_sub_dirs) {
+
+    # extract directory name
+    dirname <- basename(sub_dir)
+
+    # if directory starts with "REACH"
+    if (grepl("^REACH", dirname)) {
+
+      # extract subject ID
+      sub <- gsub("REACH_|_csv", "", dirname)
+      sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+      # get list of files in sub_dir (but not directories)
+      rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+
+      # copy files to sourcedata
+      for (file in rrv_sub_files) {
+        copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite)
+      }
     }
   }
 

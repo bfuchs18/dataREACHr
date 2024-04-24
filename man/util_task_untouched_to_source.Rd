@@ -9,7 +9,15 @@ util_task_untouched_to_source(base_wd, overwrite = FALSE)
 \arguments{
 \item{base_wd}{string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/}
 
-\item{overwrite}{logical indicating if data should be overwritten in /sourcedata Default = FALSE}
+\item{overwrite}{logical indicating whether file should be overwritten in sourcedata (logical)}
+
+\item{file}{path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)}
+
+\item{sub_str}{bids-formatted subject string. e.g., "sub-001" (string)}
+
+\item{ses_str}{bids-formatted session string. e.g., "ses-1" (string)}
+
+\item{sourcefile_prefix}{(optional) string to prefix filename with in sourcedata (string)}
 }
 \description{
 This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task
