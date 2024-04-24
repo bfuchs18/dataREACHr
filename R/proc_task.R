@@ -8,9 +8,13 @@
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
-#' @param base_wd full path to directory that contains untouchedRaw/ and bids/
-#' @param overwrite overwrite existing files (default = FALSE)
-#' @param return_data return phenotype to console (default = FLASE)
+#' @param base_wd full path to directory that contains untouchedRaw/ and bids/ (string)
+#' @param reparse_rrv Re-generate CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)
+#' @param overwrite_sourcedata overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)
+#' @param overwrite_rawdata_list names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview"). (vector of characters)
+#' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
+
+#' @param return_data return phenotype to console (default = FLASE) (logical)
 #'
 #' @return If return_data is set to TRUE, will return a list including:
 #'  1) clean datasets for each task
@@ -18,14 +22,19 @@
 #'
 #' @examples
 #' \dontrun{
+#'
+#' # process task data without overwriting any existing files
 #' task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
+#'
+#' # reparse RRV text files, overwrite sourcedata, and overwrite foodview and sst rawdata
+#' task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_list = c("foodview", "sst"))
 #'
 #' }
 #'
 #' @importFrom utils tail write.csv read.csv
 #' @export
 
-proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
+proc_task <- function(base_wd, reparse_rrv = FALSE, overwrite_sourcedata = FALSE, overwrite_rawdata_tasks = c(), overwrite_jsons = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -58,8 +67,27 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
   #### Parse RRV files in untouchedRaw ####
 
+  print("Checking for RRV text files to parse")
+
   ## get list of subject directories in untouchedRaw/rrv_task/
   rrv_subdirs <- list.dirs(paste0(untouchedRaw_wd, "rrv_task/"), recursive = FALSE, full.names = TRUE)
+
+  # remove previously parsed files if reparse_rrv = TRUE
+  if (isTRUE(reparse_rrv)) {
+
+    # get a list of files in rrv_subdirs
+    file_list <- list.files(rrv_subdirs, recursive = FALSE,  full.names = TRUE)
+
+    # identify files containing the substring "parsed"
+    parsed_files <- grepl("parsed", file_list)
+
+    # get the filenames of parsed files
+    parsed_files_names <- file_list[parsed_files]
+
+    # Remove parsed files
+    file.remove(parsed_files_names, quiet = TRUE)
+  }
+
 
   ## for each subdir
   for (subdir in rrv_subdirs) {
@@ -77,10 +105,8 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
         # Subset the original list using the indices
         txt_file <- subdir_files[txt_indice]
 
-        print(txt_file)
-
-        # apply text parser
-        rrv_parse_text(rrv_file = txt_file, overwrite = overwrite, return_data = FALSE)
+        # apply text parser to generate CSVs
+        rrv_parse_text(rrv_file = txt_file, return_data = FALSE)
       }
 
     }
@@ -90,13 +116,20 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
   #### Copy data into to sourcedata ####
 
+  print("Copying task data from untouchedRaw in to sourcedata")
+
   # copy task data from untouchedRaw in to sourcedata
-  util_task_untouched_to_source(base_wd, overwrite = FALSE)
+  util_task_untouched_to_source(base_wd, overwrite = overwrite_sourcedata)
 
   #### To do ####
   # reduce repetition in processing tasks by looping?
 
   #### Process food view data ####
+
+  print("Processing Food View Task Data")
+
+  ## get foodview overwrite arg
+  overwrite_fv <- "foodview" %in% overwrite_rawdata_list
 
   ## get list of foodview files in sourcedata
   foodview_source_files <- list.files(sourcedata_wd, pattern = "foodview", recursive = TRUE)
@@ -114,7 +147,7 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
     sub <- as.numeric(gsub("sub-","", sub_str))
 
     # process
-    sub_foodview_data <- util_task_foodview(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
+    sub_foodview_data <- util_task_foodview(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_fv, return_data = TRUE)
 
     # append sub_foodview_data to foodview_data
     sub_label <- paste0("sub-", sub)
@@ -123,6 +156,11 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   }
 
   #### Process SST data ####
+
+  print("Processing SST Data")
+
+  ## get SST overwrite arg
+  overwrite_sst <- "sst" %in% overwrite_rawdata_list
 
   ## get list of foodview files in sourcedata
   sst_source_files <- list.files(sourcedata_wd, pattern = "stop", recursive = TRUE)
@@ -140,7 +178,7 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
     sub <- as.numeric(gsub("sub-","", sub_str))
 
     # process
-    sub_sst_data <- util_task_sst(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite, return_data = TRUE)
+    sub_sst_data <- util_task_sst(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_sst, return_data = TRUE)
 
     # append sub_sst_data to sst_data
     sst_data[[sub_str]] <- sub_sst_data
@@ -154,8 +192,7 @@ proc_task <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
 
   # Export meta-data
-  # make separate overwrite args -- 1 for dataframes and 1 for jsons?
-  meta_data = write_task_jsons(export_dir = raw_wd, overwrite = overwrite)
+  meta_data = write_task_jsons(export_dir = raw_wd, overwrite = overwrite_jsons)
 
   #### Return data ####
   if (isTRUE(return_data)){
