@@ -290,12 +290,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # Merge double entered anthro_data with stacked_parent2_anthro
   merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
 
-  # Define parental BMI values
+  # Define parental BMI values and method
   ## parent1_sex is the parent with measured anthro -- is there ever a scenario where parent1 with anthro measurements is not the same parent that completed the demo form? -- if so, need to also reference who was completing the demo form
-  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 0, "measured", "reported")
-  merged_anthro$maternal_bmi <- ifelse(merged_anthro$parent1_sex == 0, merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
-  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == 1, "measured", "reported")
-  merged_anthro$paternal_bmi <- ifelse(merged_anthro$parent1_sex == 1, merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
+  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured", "reported")
+  merged_anthro$maternal_bmi <- ifelse(merged_anthro$parent1_sex == "female", merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
+  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured", "reported")
+  merged_anthro$paternal_bmi <- ifelse(merged_anthro$parent1_sex == "male", merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
 
   #### Add to participants_data ####
 

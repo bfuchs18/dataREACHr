@@ -78,6 +78,9 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   # rename parent1 sex variable
   colnames(stacked_anthro) <- gsub("parent1_height_sex", "parent1_sex", colnames(stacked_anthro))
 
+  # re-label parent1 sex
+  stacked_anthro$parent1_sex <- ifelse(stacked_anthro$parent1_sex == 0, "female", ifelse(stacked_anthro$parent1_sex == 1, "male", NA))
+
   # calculate parent1 BMI
   stacked_anthro$parent1_bmi <- round(stacked_anthro$parent1_weight_average_kg / ((stacked_anthro$parent1_height_average_cm / 100) ^ 2), digits = 2)
 
