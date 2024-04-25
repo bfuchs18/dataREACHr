@@ -53,7 +53,17 @@ util_redcap_child_v3 <- function(data, return_data = TRUE) {
 
 
   ## sleep log ####
-  sleeplog_data <-data[, grep("participant_id|session_id|^date|^bedtime|^asleep|^times|^waso|^awake|^out_on|^rating|^comment", names(data))]
+  sleeplog_data <-data[, grep("participant_id|session_id|^date|^bedtime|^asleep|^attempt|^times|^waso|^awake|^out_on|^rating|^comment", names(data))]
+
+  names(sleeplog_data) <- gsub('_mon', '_night1', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_tu|_tues', '_night2', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_wed', '_night3', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_th|_thur', '_night4', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_fri', '_night5', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_sat', '_night6', names(sleeplog_data))
+  names(sleeplog_data) <- gsub('_sun', '_night7', names(sleeplog_data))
+
+  sleeplog_data <- sleeplog_data %>% dplyr::relocate("session_id", .after = 1)
 
   ## return data ####
   if (isTRUE(return_data)){
