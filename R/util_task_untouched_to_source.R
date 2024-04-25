@@ -47,7 +47,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   #### Define copy_to_source() ####
   copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite = overwrite) {
 
-    # A function to copy a file into sourcedata
+    # copy_to_source: A function to copy a file into sourcedata
     #
     # @param file path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)
     # @param sub_str bids-formatted subject string. e.g., "sub-001" (string)
@@ -187,7 +187,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
     if (ses_str == "ses-1") {
       pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task')
     } else {
-      pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5 PIT')
+      pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5_PIT')
     }
 
     # get list of files in pit_dir (but not directories)

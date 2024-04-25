@@ -12,6 +12,6 @@ write_phenotype_jsons(export_dir, overwrite)
 \item{overwrite}{logical (TRUE/FALSE) to indicate if json files should be overwritten}
 }
 \description{
-This function exports json meta-data files for phenotype data
+This function exports json meta-data files for phenotype data (participants.json not exported, as this goes into bids/)
 This function is not currently called as part of proc_redcap() as write_phenotype_data() is called instead to export both .tsv and associated meta-data
 }
