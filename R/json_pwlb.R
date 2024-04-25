@@ -185,8 +185,13 @@ json_pwlb <- function() {
                                   '2' =	'2 to 3 times',
                                   '3'	= '4 to 10 times',
                                   '4'	= 'I am on a diet almost all the time')),
-    pwlb_score = list( Description = '',
-                                Derivative = TRUE))
+    pwlb_healthy = list( Description = 'Healthy Weight Control score: sum of responses to healthy weight control items ("pwlb1", "pwlb2", "pwlb3", "pwlb4", "pwlb5", "pwlb6", "pwlb7", "pwlb8", "pwlb10", "pwlb14"). Raw responses were scaled 1-5 prior to summing.',
+                                Derivative = TRUE),
+    pwlb_unhealthy = list( Description = 'Unhealthy Weight Control score: sum of responses to healthy weight control items ("pwlb9", "pwlb11", "pwlb12", "pwlb13", "pwlb16", "pwlb17", "pwlb19", "pwlb20", "pwlb23"). Raw responses were scaled 1-5 prior to summing.',
+                         Derivative = TRUE),
+    pwlb_total = list( Description = 'Total weight control score: sum of responses to all weight control items (pwlb1 - pwlb24)',
+                         Derivative = TRUE)
+    )
 
 
   # convert formatting to JSON

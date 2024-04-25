@@ -2,14 +2,13 @@
 % Please edit documentation in R/json_sleeplog.R
 \name{json_sleeplog}
 \alias{json_sleeplog}
-\title{json_sleeplog: Generates a json file for the External Food Cue Responsiveness Scale}
+\title{json_sleeplog: Generates a json file for the Sleep Log}
 \usage{
 json_sleeplog()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the External Food Cue Responsiveness Scale
+A string with data stored in JSON format containing meta-data for the Sleep Log
 }
 \description{
-This function generates a json file for the scored External Food Cue Responsiveness Scale and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_sleeplog function in dataprepr and is only accurate for data collected in Study REACH
+This function generates a json file for the Sleep Log
 }
