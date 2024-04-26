@@ -282,20 +282,32 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   stacked_parent2_anthro <-
     dplyr::bind_rows(parent_v1_data$household_data[, c("participant_id",
                                                        "parent2_reported_bmi",
-                                                       "session_id")],
+                                                       "session_id",
+                                                       "demo_child_relationship")],
                      parent_v5_data$household_data[, c("participant_id",
                                                        "parent2_reported_bmi",
-                                                       "session_id")])
+                                                       "session_id",
+                                                       "demo_child_relationship")])
 
   # Merge double entered anthro_data with stacked_parent2_anthro
   merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
 
   # Define parental BMI values and method
-  ## parent1_sex is the parent with measured anthro -- is there ever a scenario where parent1 with anthro measurements is not the same parent that completed the demo form? -- if so, need to also reference who was completing the demo form
-  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured", "reported")
-  merged_anthro$maternal_bmi <- ifelse(merged_anthro$parent1_sex == "female", merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
-  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured", "reported")
-  merged_anthro$paternal_bmi <- ifelse(merged_anthro$parent1_sex == "male", merged_anthro$parent1_bmi, merged_anthro$parent2_reported_bmi)
+
+  ## parent1_sex ("female" or "male") indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form
+  ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
+
+  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
+                                                 elseif(merged_anthro$demo_child_relationship == 1, "reported", NA))
+
+  merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+                                       elseif(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+
+  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
+                                                 elseif(merged_anthro$demo_child_relationship == 0, "reported", NA))
+
+  merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+                                       elseif(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
 
   #### Add to participants_data ####
 
