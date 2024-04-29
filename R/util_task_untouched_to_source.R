@@ -1,6 +1,6 @@
 #' util_task_untouched_to_source: Move task data from untouchedRaw into bids/sourcedata
 #'
-#' This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task
+#' This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task, nih toolbix
 #'
 #'
 #' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
@@ -135,22 +135,40 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
 
   #### NIH toolbox ####
 
-  toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox')
-  toolbox_sub_dirs <- list.dirs(toolbox_dir, full.names = TRUE, recursive = FALSE)
+  # for each session
+  for (ses_str in c("ses-1", 'ses-2')) {
 
-  for (sub_dir in toolbox_sub_dirs) {
-    # extract directory name
-    dirname <- basename(sub_dir)
+    # define directory with data
+    if (ses_str == "ses-1") {
+      toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V1')
+    } else {
+      toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V5')
+    }
 
-    # if directory starts with "REACH"
-    if (grepl("^REACH", dirname)) {
-      # extract subject ID
-      sub_str <- sub("REACH_", "", dirname)
+    # get list of subject directories
+    toolbox_sub_dirs <- list.dirs(toolbox_dir, full.names = TRUE, recursive = FALSE)
 
-      # determine session? -- right now only ses-1 data is uploaded
+    for (sub_dir in toolbox_sub_dirs) {
+      # extract directory name
+      dirname <- basename(sub_dir)
+
+      # if directory starts with "REACH"
+      if (grepl("^REACH", dirname)) {
+
+        # extract subject ID
+        sub <- sub("REACH_", "", dirname)
+        sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+        # get list of files
+        toolbox_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+
+        # copy files to sourcedata
+        for (file in toolbox_sub_files) {
+          copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite)
+        }
+      }
     }
   }
-
 
   #### RRV ####
   rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')

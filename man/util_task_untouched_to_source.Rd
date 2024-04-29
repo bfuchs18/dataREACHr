@@ -12,7 +12,7 @@ util_task_untouched_to_source(base_wd, overwrite = FALSE)
 \item{overwrite}{logical indicating if data should be overwritten in /sourcedata Default = FALSE}
 }
 \description{
-This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task
+This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task, nih toolbix
 }
 \examples{
 
