@@ -45,7 +45,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   }
 
   #### Define copy_to_source() ####
-  copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite = overwrite) {
+  copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite) {
 
     # copy_to_source: A function to copy a file into sourcedata
     #
@@ -83,6 +83,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   }
 
   #### FoodView task ####
+  print("-- copying Food View")
 
   foodview_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'foodview_task')
   foodview_files <- list.files(foodview_dir, pattern = 'foodview', full.names = TRUE)
@@ -95,10 +96,11 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
     sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
     # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite)
+    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
   }
 
   #### Stop Signal Task ####
+  print("-- copying SST")
 
   sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
   sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
@@ -111,10 +113,11 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
     sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
     # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite)
+    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
   }
 
   #### Space Game ####
+  print("-- copying Space Game")
 
   space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game')
   space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = TRUE)
@@ -130,10 +133,11 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
     sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
     # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite)
+    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
   }
 
   #### NIH toolbox ####
+  print("-- copying NIH toolbox")
 
   # for each session
   for (ses_str in c("ses-1", 'ses-2')) {
@@ -164,13 +168,15 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
 
         # copy files to sourcedata
         for (file in toolbox_sub_files) {
-          copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite)
+          copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
         }
       }
     }
   }
 
   #### RRV ####
+  print("-- copying RRV")
+
   rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')
   rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
 
@@ -191,12 +197,13 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
 
       # copy files to sourcedata
       for (file in rrv_sub_files) {
-        copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite)
+        copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite = overwrite)
       }
     }
   }
 
   #### PIT ####
+  print("-- copying PIT task")
 
   # for each session
   for (ses_str in c("ses-1", 'ses-2')) {
@@ -233,7 +240,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
 
       # copy files to sourcedata
       for (file in sub_files) {
-        copy_to_source(file, sub_str, ses_str, overwrite)
+        copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
       }
     }
   }

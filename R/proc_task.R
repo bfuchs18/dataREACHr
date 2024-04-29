@@ -37,7 +37,7 @@
 #' @importFrom utils tail write.csv read.csv
 #' @export
 
-proc_task <- function(base_wd, overwrite_parsed_rrv = FALSE, overwrite_sourcedata = FALSE, overwrite_rawdata_tasks = c(), overwrite_jsons = FALSE, return_data = FALSE) {
+proc_task <- function(base_wd, overwrite_parsed_rrv = FALSE, overwrite_sourcedata = FALSE, overwrite_rawdata_vector = c(), overwrite_jsons = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
