@@ -24,6 +24,8 @@ Imports:
     methods,
     RJSONIO,
     rlang,
+    stringr,
+    tidyr,
     tools,
     utils,
     varhandle
