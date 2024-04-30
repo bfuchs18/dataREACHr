@@ -56,8 +56,7 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
   sub_str <- sprintf("sub-%03d", sub_num)
   ses_str <- paste0("ses-", ses)
 
-  print(sub_str)
-  print(ses_str)
+
   # get directory paths
   source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
   score_source_file <- list.files(source_beh_wd, pattern = "Assessment Scores", full.names = TRUE)
@@ -146,8 +145,6 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
     } else {
 
       # add row for subject
-      print(colnames(phenotype_dat))
-      print(colnames(scores_dat_wide))
       phenotype_dat <- dplyr::bind_rows(phenotype_dat, scores_dat_wide)
 
       # export file
