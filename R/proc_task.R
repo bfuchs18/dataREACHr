@@ -11,7 +11,7 @@
 #' @param base_wd full path to directory that contains untouchedRaw/ and bids/ (string)
 #' @param overwrite_parsed_rrv overwrite CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)
 #' @param overwrite_sourcedata overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)
-#' @param overwrite_rawdata_vector names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "all_tasks". Default is empty vector. (vector of characters)
+#' @param overwrite_rawdata_vector names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "nih_toolbox", all_tasks". Default is empty vector. (vector of characters)
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)
@@ -191,7 +191,41 @@ proc_task <- function(base_wd, overwrite_parsed_rrv = FALSE, overwrite_sourcedat
   #### Process Space Game data ####
 
 
-  #### Process NIH data ####
+  #### Process NIH toolbox data ####
+
+  print("Processing NIH toolbox Data")
+
+  ## get toolbox overwrite arg
+  overwrite_toolbox <- "nih_toolbox" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
+
+  # list all toolbox files (ses-1 and ses-2) with full path
+  toolbox_source_files <- list.files(sourcedata_wd, pattern = "toolbox", recursive = TRUE, full.names = TRUE)
+
+  for (session in c(1,2)) {
+
+    ses_str <- paste0("ses-", session)
+
+    # Filter toolbox_source_files by session
+    toolbox_session_source_files <- toolbox_source_files[grepl(ses_str, toolbox_source_files)]
+
+    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include "sub-" and the next 3 characters)
+    toolbox_subs <- unique(stringr::str_extract(toolbox_session_source_files, "sub-..."))
+
+    # process sst task data and organize into bids/rawdata for each subject
+    for (sub_str in toolbox_subs) {
+
+      # get sub number from sub_str
+      sub <- as.numeric(gsub("sub-","", sub_str))
+
+      # process assessment (response data)
+      # sub_toolbox_assessment_data <- util_task_toolbox(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_toolbox, return_data = TRUE)
+
+      # process score by adding it to phenotype/toolbox.csv
+      sub_toolbox_score_data <- util_phenotype_toolbox(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_toolbox, return_data = TRUE)
+
+    }
+  }
+
 
 
   # Export meta-data

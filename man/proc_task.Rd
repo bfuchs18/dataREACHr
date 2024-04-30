@@ -8,7 +8,7 @@ proc_task(
   base_wd,
   overwrite_parsed_rrv = FALSE,
   overwrite_sourcedata = FALSE,
-  overwrite_rawdata_tasks = c(),
+  overwrite_rawdata_vector = c(),
   overwrite_jsons = FALSE,
   return_data = FALSE
 )
@@ -20,11 +20,11 @@ proc_task(
 
 \item{overwrite_sourcedata}{overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)}
 
+\item{overwrite_rawdata_vector}{names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "nih_toolbox", all_tasks". Default is empty vector. (vector of characters)}
+
 \item{overwrite_jsons}{overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)}
 
 \item{return_data}{return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)}
-
-\item{overwrite_rawdata_vector}{names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "all_tasks". Default is empty vector. (vector of characters)}
 }
 \value{
 If return_data is set to TRUE, will return a list including:
