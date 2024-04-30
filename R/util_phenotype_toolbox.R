@@ -1,0 +1,165 @@
+#' util_phenotype_toolbox: Clean and organize NIH toolbox score data into phenotype/toolbox.tsv
+#'
+#' This function formats and adds NIH toolbox scored data from bids/sourcedata into phenotype/toolbox.tsv for a given subject
+#'
+#'
+#' @param sub subject label used in sub-label. Leading zeros not required (integer)
+#' @param ses session label used in ses-label (integer)
+#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
+#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
+#' @param return_data logical indicating if data should be returned. Default = FALSE
+#'
+#' @return If return_data is set to TRUE, will return a dataframe with NIH toolbox score variables for given subject
+#'
+#' @examples
+#'
+#' \dontrun{
+#' # process score data for the NIH toolbox
+#' sub001_toolbox_scores <- util_phenotype_toolbox(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#'
+#' }
+#'
+#' @importFrom utils read.csv
+#' @export
+
+util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TRUE) {
+
+  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+
+  #### Set up/initial checks #####
+
+  # check that audit_data exist and is a data.frame
+  data_arg <- methods::hasArg(bids_wd)
+
+  if (isTRUE(data_arg)) {
+    if (!is.character(bids_wd)) {
+      stop("bids_wd must be entered as a string")
+    } else if (!file.exists(bids_wd)) {
+      stop("bids_wd entered, but file does not exist. Check bids_wd string.")
+    }
+  } else if (isFALSE(data_arg)) {
+    stop("bids_wd must be entered as a string")
+  }
+
+  #### IO setup ####
+  if (.Platform$OS.type == "unix") {
+    slash <- '/'
+  } else {
+    slash <- "\\"
+    print('util_task_foodview.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+  }
+
+  # Get subject number without leading zeros
+  sub_num <- as.numeric(sub)
+
+  # Set sub and ses strings
+  sub_str <- sprintf("sub-%03d", sub_num)
+  ses_str <- paste0("ses-", ses)
+
+  # get directory paths
+  source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
+  score_source_file <- list.files(source_beh_wd, pattern = "Assessment Scores", full.names = TRUE)
+  phenotype_dir <- paste0(bids_wd, slash, 'phenotype', slash)
+
+  #### Process Scored Data #####
+
+  # load data, abort processing if file does not exist
+
+  if (file.exists(score_source_file)) {
+    scores_dat <- read.csv(score_source_file, header = TRUE)
+  } else {
+    print(paste(sub_str, "has no NIH toolbox scores data. Aborting task processing for this sub."))
+    return()
+  }
+
+  # add subject column
+  scores_dat$participant_id <- sub_str
+  scores_dat <- scores_dat %>% dplyr::relocate("participant_id") # move to first column
+
+  # Separate the 'Inst' column into 'Test' and 'Ages' columns
+  scores_dat <- tidyr::separate(scores_dat, Inst, into = c("Test", "Test_Ages"), sep = "Test", remove = FALSE)
+
+  # Replace values in the 'Test' column
+  scores_dat <- scores_dat %>%
+    dplyr::mutate(Test = dplyr::case_when(
+      stringr::str_detect(Test, "Flanker") ~ "FLANKER",
+      stringr::str_detect(Test, "Card Sort ") ~ "CARDSORT",
+      stringr::str_detect(Test, "List Sorting Working Memory") ~ "LISTSORT",
+      TRUE ~ "other"  # Default case
+    ))
+
+  #make data wide
+  wide_cols <- c("Test_Ages", "RawScore", "Theta", "TScore", "SE", "ItmCnt", "DateFinished", "Computed.Score", "Uncorrected.Standard.Score", "Age.Corrected.Standard.Score", "National.Percentile..age.adjusted.", "Fully.Corrected.T.score")
+  scores_dat_wide <- tidyr::pivot_wider(scores_dat, id_cols = participant_id, names_from = Test, values_from = wide_cols, names_sep = "_" , names_glue = "{Test}_{.value}")
+
+  # add session column
+  scores_dat_wide$session_id <- ses_str
+  scores_dat_wide <- scores_dat_wide %>% dplyr::relocate("session_id", .after = 1) # move after 1st column
+
+  #### Write to phenotype/toolbox.tsv #####
+
+  toolbox_phenotype_file <- paste0(phenotype_dir, 'toolbox.tsv')
+
+  # if phenotype/toolbox.tsv exists
+
+  if (file.exists(toolbox_phenotype_file)) {
+
+    # load data
+    phenotype_dat <- read.delim(toolbox_phenotype_file)
+
+    # if subject already in phenotype data
+    if (sub_str %in% phenotype_dat$participant_id) {
+
+      # if overwrite is TRUE
+      if (isTRUE(overwrite)) {
+
+        # remove previous row for subject
+        phenotype_dat <- phenotype_dat[!(phenotype_dat$participant_id %in% sub_str),]
+
+        # add new row for subject
+        phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
+
+        # export file
+        utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+
+        # if overwrite is not TRUE
+      } else {
+        print(paste("Data for", sub_str, "already in phenotype/toolbox.tsv. Use overwrite = TRUE to write new data."))
+      }
+
+      # if sub not already in phenotype data
+    } else {
+
+      # add row for subject
+      phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
+
+      # export file
+      utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+
+    }
+
+    # if phenotype/toolbox.tsv does not exist
+  } else {
+
+    # create phenotype_dat from scores_dat_wide
+    phenotype_dat <- scores_dat_wide
+
+    # create bids/phenotype directory if it doesn't exist
+    phenotype_dir <- paste0(bids_wd, slash, 'phenotype', slash)
+    if (!dir.exists(phenotype_dir)) {
+      dir.create(phenotype_dir, recursive = TRUE)
+    }
+
+    # export file
+    utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+
+  }
+
+
+  #### Return data #####
+  if (isTRUE(return_data)){
+    return(scores_data = scores_dat_wide
+    )
+  }
+}
+
