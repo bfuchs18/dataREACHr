@@ -56,6 +56,8 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
   sub_str <- sprintf("sub-%03d", sub_num)
   ses_str <- paste0("ses-", ses)
 
+  print(sub_str)
+  print(ses_str)
   # get directory paths
   source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
   score_source_file <- list.files(source_beh_wd, pattern = "Assessment Scores", full.names = TRUE)
@@ -68,10 +70,10 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
   if (length(score_source_file) == 1) {
     scores_dat <- read.csv(score_source_file, header = TRUE)
   } else if ( length(score_source_file) == 0) {
-    print(paste(sub_str, "has no NIH toolbox scores data. Aborting task processing for this sub."))
+    print(paste(sub_str, ses_str, "has no NIH toolbox scores data. Aborting task processing for this sub."))
     return()
   } else if (length(score_source_file) > 1) {
-    print(paste(sub_str, "has more than 1 NIH toolbox scores data. Should only have 1. Aborting task processing for this sub."))
+    print(paste(sub_str, ses_str, "has more than 1 NIH toolbox scores data. Should only have 1. Aborting task processing for this sub."))
     return()
   }
 
@@ -85,11 +87,14 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
   # Replace values in the 'Test' column
   scores_dat <- scores_dat %>%
     dplyr::mutate(Test = dplyr::case_when(
-      stringr::str_detect(Test, "Flanker") ~ "FLANKER",
-      stringr::str_detect(Test, "Card Sort ") ~ "CARDSORT",
+      stringr::str_detect(Test, "Flanker Inhibitory Control") ~ "FLANKER",
+      stringr::str_detect(Test, "Dimensional Change Card Sort") ~ "CARDSORT",
       stringr::str_detect(Test, "List Sorting Working Memory") ~ "LISTSORT",
       TRUE ~ "other"  # Default case
     ))
+
+  # remove columns where Test = other
+  scores_dat <- scores_dat[!(scores_dat$Test %in% "other"),]
 
   #make data wide
   wide_cols <- c("Test_Ages", "RawScore", "Theta", "TScore", "SE", "ItmCnt", "DateFinished", "Computed.Score", "Uncorrected.Standard.Score", "Age.Corrected.Standard.Score", "National.Percentile..age.adjusted.", "Fully.Corrected.T.score")
@@ -108,10 +113,10 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
   if (file.exists(toolbox_phenotype_file)) {
 
     # load data
-    phenotype_dat <- read.delim(toolbox_phenotype_file)
+    phenotype_dat <- read.delim(toolbox_phenotype_file, na.strings = "n/a")
 
-    # if subject already in phenotype data
-    if (sub_str %in% phenotype_dat$participant_id) {
+    # if there is a row with sub and ses in phenotype_dat
+    if (any(phenotype_dat$participant_id == sub_str & phenotype_dat$session_id == ses_str)) {
 
       # if overwrite is TRUE
       if (isTRUE(overwrite)) {
@@ -120,7 +125,7 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
         phenotype_dat <- subset(phenotype_dat, !(participant_id == sub_str & session_id == ses_str))
 
         # add new row for subject and session
-        phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
+        phenotype_dat <- dplyr::bind_rows(phenotype_dat, scores_dat_wide)
 
         # export file
         utils::write.table(
@@ -134,14 +139,16 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
 
         # if overwrite is not TRUE
       } else {
-        print(paste("Data for", sub_str, "already in phenotype/toolbox.tsv. Use overwrite = TRUE to write new data."))
+        print(paste("Data for", sub_str, ses_str, "already in phenotype/toolbox.tsv. Use overwrite = TRUE to write new data."))
       }
 
       # if sub and session not already in phenotype data
     } else {
 
       # add row for subject
-      phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
+      print(colnames(phenotype_dat))
+      print(colnames(scores_dat_wide))
+      phenotype_dat <- dplyr::bind_rows(phenotype_dat, scores_dat_wide)
 
       # export file
       utils::write.table(
