@@ -121,7 +121,14 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {
-    utils::write.table(assessment_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+    utils::write.table(
+      assessment_dat,
+      outfile,
+      sep = '\t',
+      quote = FALSE,
+      row.names = FALSE,
+      na = "n/a" # use 'n/a' for missing values for BIDS compliance
+    )
   }
 
 

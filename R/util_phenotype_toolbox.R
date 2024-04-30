@@ -123,7 +123,14 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
         phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
 
         # export file
-        utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+        utils::write.table(
+          phenotype_dat,
+          toolbox_phenotype_file,
+          sep = '\t',
+          quote = FALSE,
+          row.names = FALSE,
+          na = "n/a" # use 'n/a' for missing values for BIDS compliance
+        )
 
         # if overwrite is not TRUE
       } else {
@@ -137,7 +144,14 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
       phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
 
       # export file
-      utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+      utils::write.table(
+        phenotype_dat,
+        toolbox_phenotype_file,
+        sep = '\t',
+        quote = FALSE,
+        row.names = FALSE,
+        na = "n/a" # use 'n/a' for missing values for BIDS compliance
+      )
 
     }
 
@@ -154,7 +168,14 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
     }
 
     # export file
-    utils::write.table(phenotype_dat, toolbox_phenotype_file, sep = '\t', quote = FALSE, row.names = FALSE )
+    utils::write.table(
+      phenotype_dat,
+      toolbox_phenotype_file,
+      sep = '\t',
+      quote = FALSE,
+      row.names = FALSE,
+      na = "n/a" # use 'n/a' for missing values for BIDS compliance
+    )
 
   }
 
