@@ -113,10 +113,10 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
       # if overwrite is TRUE
       if (isTRUE(overwrite)) {
 
-        # remove previous row for subject
-        phenotype_dat <- phenotype_dat[!(phenotype_dat$participant_id %in% sub_str),]
+        # remove previous row for subject and session
+        phenotype_dat <- subset(phenotype_dat, !(participant_id == sub_str & session_id == ses_str))
 
-        # add new row for subject
+        # add new row for subject and session
         phenotype_dat <- rbind(phenotype_dat, scores_dat_wide)
 
         # export file
@@ -127,7 +127,7 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
         print(paste("Data for", sub_str, "already in phenotype/toolbox.tsv. Use overwrite = TRUE to write new data."))
       }
 
-      # if sub not already in phenotype data
+      # if sub and session not already in phenotype data
     } else {
 
       # add row for subject
