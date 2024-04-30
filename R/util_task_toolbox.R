@@ -56,7 +56,6 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   sub_str <- sprintf("sub-%03d", sub_num)
   ses_str <- paste0("ses-", ses)
 
-  print(sub_str)
   # get directory paths
   source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
   raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
@@ -103,8 +102,12 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   # names(onset_dat)[names(onset_dat) == "commercial_condfood_cond"] <- "commercial_cond"
 
   # add subject column
-  assessment_dat$sub <- sub_str
-  assessment_dat <- assessment_dat %>% dplyr::relocate("sub") # move sub to first column
+  assessment_dat$participant_id <- sub_str
+  assessment_dat <- assessment_dat %>% dplyr::relocate("participant_id") # move sub to first column
+
+  # add session column
+  assessment_dat$session_id <- ses_str
+  assessment_dat <- assessment_dat %>% dplyr::relocate("session_id", .after = 1) # after col 1
 
   #### Save in rawdata #####
 
