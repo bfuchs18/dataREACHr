@@ -63,12 +63,15 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
 
   #### Process Scored Data #####
 
-  # load data, abort processing if file does not exist
+  # load data, abort processing no file or >1 file matches pattern
 
-  if (file.exists(score_source_file)) {
+  if (length(score_source_file) == 1) {
     scores_dat <- read.csv(score_source_file, header = TRUE)
-  } else {
+  } else if ( length(score_source_file) == 0) {
     print(paste(sub_str, "has no NIH toolbox scores data. Aborting task processing for this sub."))
+    return()
+  } else if (length(score_source_file) > 1) {
+    print(paste(sub_str, "has more than 1 NIH toolbox scores data. Should only have 1. Aborting task processing for this sub."))
     return()
   }
 

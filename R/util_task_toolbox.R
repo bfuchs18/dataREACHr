@@ -56,6 +56,7 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   sub_str <- sprintf("sub-%03d", sub_num)
   ses_str <- paste0("ses-", ses)
 
+  print(sub_str)
   # get directory paths
   source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
   raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
@@ -64,19 +65,25 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
 
   #### Generate file for rawdata #####
 
-  # load data, abort processing if file does not exist
+  # load data, abort processing no file or >1 file matches pattern
 
-  if (file.exists(assessment_source_file)) {
+  if (length(assessment_source_file) == 1) {
     assessment_dat <- read.csv(assessment_source_file, header = TRUE)
-  } else {
+  } else if ( length(assessment_source_file) == 0) {
     print(paste(sub_str, "has no NIH toolbox assessment data. Aborting task processing for this sub."))
+    return()
+  } else if (length(assessment_source_file) > 1) {
+    print(paste(sub_str, "has more than 1 NIH toolbox assessment data. Should only have 1. Aborting task processing for this sub."))
     return()
   }
 
-  if (file.exists(registration_source_file)) {
+  if (length(registration_source_file) == 1) {
     registrant_dat <- read.csv(registration_source_file, header = TRUE)
-  } else {
+  } else if ( length(registration_source_file) == 0) {
     print(paste(sub_str, "has no NIH toolbox registration data. Aborting task processing for this sub."))
+    return()
+  } else if (length(registration_source_file) > 1) {
+    print(paste(sub_str, "has more than 1 NIH toolbox registration data. Should only have 1. Aborting task processing for this sub."))
     return()
   }
 
