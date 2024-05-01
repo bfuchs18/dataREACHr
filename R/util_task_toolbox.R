@@ -96,10 +96,20 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   assessment_dat$registration_ethnicity <- registrant_dat$Ethnicity
 
   # make separate columns for task (e.g., "Flanker Inhibitory Control") and test ages (e.g., "Ages 8-11 v2.1") from Inst (e.g., "NIH Toolbox Flanker Inhibitory Control and Attention Test Ages 8-11 v2.1") ??
+  # Separate the 'Inst' column into 'Test' and 'Ages' columns
+  assessment_dat <- tidyr::separate(assessment_dat, Inst, into = c("Test", "Test_Ages"), sep = "Test", remove = FALSE)
 
-  # # update columns names
-  # names(resp_dat)[names(resp_dat) == "stimName"] <- "stim"
-  # names(onset_dat)[names(onset_dat) == "commercial_condfood_cond"] <- "commercial_cond"
+  # Replace values in the 'Test' column
+  assessment_dat <- assessment_dat %>%
+    dplyr::mutate(Test = dplyr::case_when(
+      stringr::str_detect(Test, "Flanker Inhibitory Control") ~ "FLANKER",
+      stringr::str_detect(Test, "Dimensional Change Card Sort") ~ "CARDSORT",
+      stringr::str_detect(Test, "List Sorting Working Memory") ~ "LISTSORT",
+      TRUE ~ "other"  # Default case
+    ))
+
+  # remove columns where Test = other
+  assessment_dat <- assessment_dat[!(assessment_dat$Test %in% "other"),]
 
   # add subject column
   assessment_dat$participant_id <- sub_str
