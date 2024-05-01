@@ -84,7 +84,7 @@ json_demographics <- function() {
                             Unit = 'kg/m^2'),
     maternal_anthro_method = list( Description = 'Method used to determine maternal_bmi. Can also be found in anthropometrics.tsv',
                                       Levels = list('measured' = 'BMI calculated from height and weight measurements',
-                                                    'reported' = 'BMI calculated from parent-reported height and weight values')),
+                                                    'reported' = 'BMI calculated from parent-reported height and weight values'))
 
   )
 

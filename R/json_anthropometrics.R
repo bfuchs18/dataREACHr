@@ -76,7 +76,7 @@ json_anthropometrics <- function() {
                                   Derivative = TRUE),
     paternal_bmi = list(Description = 'Paternal BMI. Equal to parent1_bmi if paternal_anthro_method == "measured" and equal to parent2_reported_bmi if paternal_anthro_method == "reported"',
                         Unit = "kg/(m^2)",
-                        Derivative = TRUE),
+                        Derivative = TRUE)
   )
 
   # convert formatting to JSON
