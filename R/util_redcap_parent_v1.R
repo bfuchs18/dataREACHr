@@ -33,8 +33,8 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
 
   ## demographics data ####
   # this data will be split into 3 dataframes:
-    # (1) participants_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into participants.tsv file
-    # (2) infancy_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will not go into participants.tsv file
+    # (1) demo_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into participants.tsv (or demographics.tsv) file
+    # (2) infancy_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into infancy.tsv file
     # (3) household_data: data collected as part of the "Parent Household Demographics" qualtrics form
 
   # select all demo variables
@@ -45,7 +45,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   demo_data_all$household_form_date <- lubridate::as_date(demo_data_all$parent_household_demographics_questionnaire_timestamp)
 
   # select columns for participants_data
-  participants_data <- demo_data_all[c("participant_id", "demo_ethnicity", "demo_race")]
+  demo_data <- demo_data_all[c("participant_id", "demo_ethnicity", "demo_race")]
 
   # select columns for infancy_data
   infancy_data <- demo_data_all[c("participant_id","session_id", "demo_form_date", "demo_birth_length", "demo_birthweight_pounds", "demo_birthweight_ounces", "demo_premature", "demo_premature_weeks", "demo_feeding", "demo_exclusive_feeding", "demo_tot_breastfeeding", "demo_solid_food")]
@@ -59,7 +59,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
                                                                     'parent_household_demographics_questionnaire_timestamp', 'demo_child_birthdate',
                                                                     'demo_missingcheck', 'demo_missingcheck_2', 'demo_missingcheck_3',
                                                                     'parent_household_demographics_questionnaire_complete',
-                                                                  names(participants_data[2:ncol(participants_data)]), names(infancy_data[3:ncol(infancy_data)])))]
+                                                                  names(demo_data[2:ncol(demo_data)]), names(infancy_data[3:ncol(infancy_data)])))]
 
   # process household data
   household_data <- util_format_household_data(household_data)
@@ -133,7 +133,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   ## return data ####
   if (isTRUE(return_data)){
     return(list(
-      participants_data = participants_data,
+      demo_data = demo_data,
       infancy_data = infancy_data,
       household_data = household_data,
       rank_data = rank_data,
