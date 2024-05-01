@@ -84,6 +84,11 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   # calculate parent1 BMI
   stacked_anthro$parent1_bmi <- round(stacked_anthro$parent1_weight_average_kg / ((stacked_anthro$parent1_height_average_cm / 100) ^ 2), digits = 2)
 
+  # calculate child BMI
+  stacked_anthro$child_bmi <- round(stacked_anthro$child_average_weight / ((stacked_anthro$child_height_average / 100) ^ 2), digits = 2)
+  stacked_anthro$child_bmi_z <- NA # calculate this
+  stacked_anthro$child_bmi_p <- NA # calculate this
+
   # # add sex and age to calculate BMI derivatives
   # anthro_data <- merge(anthro_data, agesex_data[c("participant_id", "sex", "v1_age", "v5_age")], by = "participant_id", all = TRUE)
 
