@@ -27,7 +27,7 @@ rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
     slash <- '/'
   } else {
     slash <- "\\"
-    print('The proc_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    print('rrv_parse_text.R has not been thoroughly tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   #### create empty dataframes to save data to ####
@@ -74,9 +74,6 @@ rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
 
   # count the number of sessions
   n_sessions <- length(session_start_lines)
-
-  # initialize list to append section lines to
-  section_list <- list()
 
   for (session_number in 1:n_sessions) {
 
