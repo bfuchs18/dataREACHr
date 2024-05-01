@@ -309,40 +309,78 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
                                        elseif(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
 
-  #### Add to participants_data ####
+  #### Generate compiled demographics database  ####
+
+  # combine demo data from demo_data and household form
+  demo_data <- merge(parent_v1_data$demo_data, stacked_household[c("session_id", "participant_id", "demo_education_mom", "demo_income")], by = "participant_id", all = TRUE)
+
+  # add dates and ages at start of sessions (V1 and V5) from date_data form
+
+  ## merge dates and ages from date_data
+  demo_data <- dplyr::left_join(demo_data, date_data[c("participant_id", "v1_date", "v5_date", "v1_age", "v5_age")], by = "participant_id") # merge dates and ages from date_data
+
+  ## create column 'date_session_start' based on dates at V1 and V5
+  demo_data <- demo_data %>%
+    dplyr::mutate(date_session_start = dplyr::case_when(
+      session_id == "ses-1" ~ v1_date,
+      session_id == "ses-2" ~ v5_date
+    )) %>%
+    dplyr::select(-v1_date, -v5_date) # drop date_v1 and date_v1 columns
+
+  ## create column 'child_age' based on ages at V1 and V5
+  demo_data <- demo_data %>%
+    dplyr::mutate(child_age = dplyr::case_when(
+      session_id == "ses-1" ~ v1_age,
+      session_id == "ses-2" ~ v5_age
+    )) %>%
+    dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
+
+  # add anthro data
+  demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
+
+  # add risk status - compute based on ses-1 maternal_bmi
+  ses_1_data <- subset(demo_data, session == "ses-1") # subset the dataset to include only session 1 data
+  ses_1_data$risk_status <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 25), "low-risk", ifelse(ses_1_data$maternal_bmi >= 30, "high-risk", NA)) # calculate risk
+  demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
+
+  # rename columns
+  names(demo_data)[names(demo_data) == "demo_ethnicity"] <- "ethnicity"
+  names(demo_data)[names(demo_data) == "demo_race"] <- "race"
+
+  # reorder columns
+
+  #### Generate participants_data ####
 
   # add date_data (visit dates, visit ages, child sex)
-  participants_data <- merge(parent_v1_data$participants_data, date_data, by = "participant_id", all = TRUE)
+  participants_data <- merge(parent_v1_data$demo_data, date_data, by = "participant_id", all = TRUE)
+#
+#   # add maternal edu and income from visit 1 and append "v1" to variable names
+#   participants_data <- merge(participants_data,
+#                              parent_v1_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
+#                              by = "participant_id",
+#                              all = TRUE) %>% dplyr::rename(demo_education_mom_v1 = .data$demo_education_mom, demo_income_v1 = .data$demo_income)
+#
+#   # add maternal edu and income from visit 5 and append "v5" to variable names
+#   participants_data <- merge(participants_data,
+#                              parent_v5_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
+#                              by = "participant_id",
+#                              all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = "demo_education_mom", demo_income_v5 = "demo_income")
+#
+#   # add maternal BMI
+#   participants_data <- merge(participants_data,
+#                              merged_anthro[merged_anthro$session_id == "ses-1", c("participant_id", "maternal_bmi", "maternal_anthro_method")],
+#                              by = "participant_id",
+#                              all = TRUE) %>% dplyr::rename(maternal_bmi_v1 = "maternal_bmi", maternal_anthro_method_v1 = "maternal_anthro_method")
 
-  # add maternal edu and income from visit 1 and append "v1" to variable names
-  participants_data <- merge(participants_data,
-                             parent_v1_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
-                             by = "participant_id",
-                             all = TRUE) %>% dplyr::rename(demo_education_mom_v1 = .data$demo_education_mom, demo_income_v1 = .data$demo_income)
-
-  # add maternal edu and income from visit 5 and append "v5" to variable names
-  participants_data <- merge(participants_data,
-                             parent_v5_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
-                             by = "participant_id",
-                             all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = "demo_education_mom", demo_income_v5 = "demo_income")
-
-  # add maternal BMI
-  participants_data <- merge(participants_data,
-                             merged_anthro[merged_anthro$session_id == "ses-1", c("participant_id", "maternal_bmi", "maternal_anthro_method")],
-                             by = "participant_id",
-                             all = TRUE) %>% dplyr::rename(maternal_bmi_v1 = "maternal_bmi", maternal_anthro_method_v1 = "maternal_anthro_method")
-
-  # add risk status
-  participants_data$risk_status <- ifelse(dplyr::between(participants_data$maternal_bmi_v1, 18.5, 25), "low-risk", ifelse(participants_data$maternal_bmi_v1 >= 30, "high-risk", NA))
-
-  ## add child bmi and bmi-z
+  # add risk status -- take from demographics.tsv
+  # participants_data$risk_status <-
 
   # remove birthday and other columns
   participants_data <- participants_data[, -grep("birthdate|timestamp|brief", names(participants_data))]
 
   # rename columns
-  names(participants_data)[names(participants_data) == "demo_ethnicity"] <- "ethnicity"
-  names(participants_data)[names(participants_data) == "demo_race"] <- "race"
+  # names(participants_data)[names(participants_data) == "demo_ethnicity"] <- "ethnicity"
+  # names(participants_data)[names(participants_data) == "demo_race"] <- "race"
 
   names(participants_data)[names(participants_data) == "v1_date"] <- "child_protocol_1_date"
   names(participants_data)[names(participants_data) == "v2_date"] <- "child_protocol_2_date"
