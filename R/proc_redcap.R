@@ -339,7 +339,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
 
   # add risk status - compute based on ses-1 maternal_bmi
-  ses_1_data <- subset(demo_data, session == "ses-1") # subset the dataset to include only session 1 data
+  ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
   ses_1_data$risk_status <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 25), "low-risk", ifelse(ses_1_data$maternal_bmi >= 30, "high-risk", NA)) # calculate risk
   demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
 
@@ -417,7 +417,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # reorder columns
   participants_data <-
-    participants_data %>% dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1
+    participants_data %>%
+    # dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
     dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
@@ -504,6 +505,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     list(stacked_loc, "loc"),
 
     # merged data
+    list(demo_data, "demographics"),
     list(merged_anthro, "anthropometrics"),
     list(merged_intake, "intake"),
     list(merged_mri, "mri_visit"),
