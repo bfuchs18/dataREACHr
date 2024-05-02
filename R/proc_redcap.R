@@ -21,7 +21,7 @@
 #'
 #' \dontrun{
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-03-22_1446.csv"
+#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-02_1044.csv"
 #'
 #' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
@@ -145,6 +145,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # re-label sex var and save to sex
   date_data$sex <- ifelse(date_data$prs_sex == 0, "female", ifelse(date_data$prs_sex == 1, "male", NA))
+  date_data <- date_data[,!(names(date_data) %in% c("prs_sex"))] # remove prs_sex
 
   #update column names in date_data
   names(date_data)[names(date_data) == "record_id"] <- "participant_id"
@@ -351,36 +352,22 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Generate participants_data ####
 
-  # add date_data (visit dates, visit ages, child sex)
+  # add demo_data and date_data (visit dates, visit ages, child sex)
   participants_data <- merge(parent_v1_data$demo_data, date_data, by = "participant_id", all = TRUE)
-#
-#   # add maternal edu and income from visit 1 and append "v1" to variable names
-#   participants_data <- merge(participants_data,
-#                              parent_v1_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
-#                              by = "participant_id",
-#                              all = TRUE) %>% dplyr::rename(demo_education_mom_v1 = .data$demo_education_mom, demo_income_v1 = .data$demo_income)
-#
-#   # add maternal edu and income from visit 5 and append "v5" to variable names
-#   participants_data <- merge(participants_data,
-#                              parent_v5_data$household_data[, c("participant_id", "demo_education_mom", "demo_income")],
-#                              by = "participant_id",
-#                              all = TRUE) %>% dplyr::rename(demo_education_mom_v5 = "demo_education_mom", demo_income_v5 = "demo_income")
-#
-#   # add maternal BMI
-#   participants_data <- merge(participants_data,
-#                              merged_anthro[merged_anthro$session_id == "ses-1", c("participant_id", "maternal_bmi", "maternal_anthro_method")],
-#                              by = "participant_id",
-#                              all = TRUE) %>% dplyr::rename(maternal_bmi_v1 = "maternal_bmi", maternal_anthro_method_v1 = "maternal_anthro_method")
 
-  # add risk status -- take from demographics.tsv
-  # participants_data$risk_status <-
+  # add risk status -- take from demo_data
+  participants_data <- merge(participants_data,
+                                         demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status")],
+                                         by = "participant_id",
+                                         all = TRUE)
+
 
   # remove birthday and other columns
   participants_data <- participants_data[, -grep("birthdate|timestamp|brief", names(participants_data))]
 
   # rename columns
-  # names(participants_data)[names(participants_data) == "demo_ethnicity"] <- "ethnicity"
-  # names(participants_data)[names(participants_data) == "demo_race"] <- "race"
+  names(participants_data)[names(participants_data) == "demo_ethnicity"] <- "ethnicity"
+  names(participants_data)[names(participants_data) == "demo_race"] <- "race"
 
   names(participants_data)[names(participants_data) == "v1_date"] <- "child_protocol_1_date"
   names(participants_data)[names(participants_data) == "v2_date"] <- "child_protocol_2_date"
@@ -393,32 +380,31 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(participants_data)[names(participants_data) == "v4_age"] <- "child_protocol_4_age"
   names(participants_data)[names(participants_data) == "v5_age"] <- "child_protocol_5_age"
 
-  # make column child_protocol_order (e.g., 13425) based on order of child protocol dates - only include visits have dates (i.e., occured)
-  participants_data <- participants_data %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(child_protocol_order = {
+  # make column child_protocol_order (e.g., 13425) based on order of child protocol dates - only include visits have dates (i.e., occurred)
 
-      # define date columns
-      dates <- c("child_protocol_1_date", "child_protocol_2_date", "child_protocol_3_date", "child_protocol_4_date", "child_protocol_5_date")
+  ## define function to get order of dates for each row
+  get_order <- function(row) {
 
-      # order visit number characters in a vector based on order of dates, visits with no dates will be ordered last (na.last = TRUE)
-      # note: vector will have length of 5, as values have not been collapsed yet
-      order_chars <- c('1', '2', '3', '4', '5')[order(dates, na.last = TRUE)]
+    # specify date columns
+    date_cols <- c("child_protocol_1_date", "child_protocol_2_date", "child_protocol_3_date", "child_protocol_4_date", "child_protocol_5_date")
 
-      # get number of NA dates
-      n_na <- sum(is.na(dates))
+    # get number of missing visits (date cols with NA)
+    n_na <- sum(is.na(row[date_cols]))
 
-      # remove the number of NA values from the end order_chars
-      order_chars <- head(order_chars, -n_na)
+    # get order of dates w/ missing visits at end, collapse integers into single string
+    order_all_visits <- paste0(order(row[date_cols], na.last = TRUE), collapse = '')
 
-      # collapse into 1 string
-      paste0(order_chars, collapse = '')
-    })
+    # remove last n_na characters from order_all_visits, will yeild a string with length = number of visits attended
+    stringr::str_sub(order_all_visits, end=-(n_na + 1))
+  }
+
+  ## apply function to get visit order
+  participants_data$visit_protocol_order <- apply(participants_data, 1, get_order)
 
   # reorder columns
   participants_data <-
     participants_data %>%
-    # dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
+    dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
     dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
