@@ -97,7 +97,21 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
 
   #make data wide
   wide_cols <- c("Test_Ages", "RawScore", "Theta", "TScore", "SE", "ItmCnt", "DateFinished", "Computed.Score", "Uncorrected.Standard.Score", "Age.Corrected.Standard.Score", "National.Percentile..age.adjusted.", "Fully.Corrected.T.score")
-  scores_dat_wide <- tidyr::pivot_wider(scores_dat, id_cols = participant_id, names_from = Test, values_from = wide_cols, names_sep = "_" , names_glue = "{Test}_{.value}")
+
+  # check for multiple rows per task -- dataset should only have 1 row per task
+  if (sum(scores_dat$Test == "FLANKER") > 1 | sum(scores_dat$Test == "CARDSORT") > 1 | sum(scores_dat$Test == "LISTSORT") > 1) {
+    return(print(paste(sub_str, ses_str, "NIH toolbox score data contains >1 row per task. Aborting processing. Data should only have 1 row per task. Check sourcedata")))
+  } else {
+    scores_dat_wide <-
+      tidyr::pivot_wider(
+        scores_dat,
+        id_cols = participant_id,
+        names_from = Test,
+        values_from = wide_cols,
+        names_sep = "_" ,
+        names_glue = "{Test}_{.value}"
+      )
+  }
 
   # add session column
   scores_dat_wide$session_id <- ses_str
@@ -105,7 +119,7 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
 
   #### Write to phenotype/toolbox.tsv #####
 
-  toolbox_phenotype_file <- paste0(phenotype_dir, 'toolbox.tsv')
+  toolbox_phenotype_file <- paste0(phenotype_dir, 'toolbox_scores.tsv')
 
   # if phenotype/toolbox.tsv exists
 
