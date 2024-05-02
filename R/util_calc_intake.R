@@ -70,7 +70,7 @@ util_calc_intake <- function(stacked_intake) {
 
   # sum across meal_foods_g_vars columns
   stacked_intake$meal_grams_consumed <- stacked_intake %>%
-    dplyr::select(dplyr::all_of(meal_foods_g_vars_)) %>%
+    dplyr::select(dplyr::all_of(meal_foods_g_vars)) %>%
     rowSums(na.rm = FALSE)
 
   # sum across meal_items_g_vars columns
