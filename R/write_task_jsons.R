@@ -1,11 +1,11 @@
 #' write_task_jsons: Write meta-data for tasks created with json functions (called within proc_task.R)
 #'
 #' This function exports json meta-data files for task data
-#' @param export_dir string with absolute path to export directory (typically bids rawdata directory)
+#' @param bids_wd string with absolute path to bids directory (contains rawdata/ and phenotype/)
 #' @param overwrite logical (TRUE/FALSE) to indicate if json files should be overwritten
 
 
-write_task_jsons <- function(export_dir, overwrite) {
+write_task_jsons <- function(bids_wd, overwrite) {
 
   #### Set up/initial checks #####
 
@@ -20,22 +20,37 @@ write_task_jsons <- function(export_dir, overwrite) {
     }
   }
 
-  # check that export_dir argument exists and is a string
-  export_dir_arg <- methods::hasArg(export_dir)
+  # check that bids_wd argument exists and is a string
+  bids_wd_arg <- methods::hasArg(bids_wd)
 
-  if (isFALSE(export_dir_arg)) {
-    stop("must enter export_dir argument")
+  if (isFALSE(bids_wd_arg)) {
+    stop("must enter bids_wd argument")
   } else {
-    if (is.character(export_dir)) {
-
-      # generate export_dir if it doesn't exist
-      if (!file.exists(export_dir)){
-        dir.create(file.path(export_dir))
-      }
-
-    } else {
-      stop("export_dir argument must be string")
+    if (!is.character(bids_wd)) {
+      stop("bids_wd argument must be string")
     }
+  }
+
+  #### IO setup ####
+  if (.Platform$OS.type == "unix") {
+    slash <- '/'
+  } else {
+    slash <- "\\"
+    print('write_task_jsons.R has not been thoroughly tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
+  }
+
+  #### Define paths for export ####
+  phenotype_wd <- paste0(base_wd, slash, "bids", slash, "phenotype", slash)
+  raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
+
+  # generate phenotype_wd if it doesn't exist
+  if (!file.exists(phenotype_wd)){
+    dir.create(file.path(phenotype_wd))
+  }
+
+  # generate raw_wd if it doesn't exist
+  if (!file.exists(raw_wd)){
+    dir.create(file.path(raw_wd))
   }
 
   #### Export meta-data #####
@@ -45,7 +60,9 @@ write_task_jsons <- function(export_dir, overwrite) {
 
     json_sst_beh = "task-sst_beh.json",
     json_sst_bold = "task-sst_bold.json",
-    json_foodview = "task-foodview_bold.json"
+    json_foodview = "task-foodview_bold.json",
+    json_toolbox_beh = "task-toolbox_beh.json",
+    json_toolbox_phenotype = "toolbox_scores.json"
 
   )
 
@@ -64,8 +81,16 @@ write_task_jsons <- function(export_dir, overwrite) {
     # Append JSON to a list
     json_list[[func_name]] <- json
 
-    # define filename for export
-    filename <- paste0(export_dir, json_functions[[func_name]])
+    if (func_name == "json_toolbox_phenotype") {
+
+      # define filename for export in phenotype_wd
+      filename <- paste0(phenotype_wd, json_functions[[func_name]])
+
+    } else {
+
+      # define filename for export in raw_wd
+      filename <- paste0(raw_wd, json_functions[[func_name]])
+    }
 
     # If overwrite is false
     if (isFALSE(overwrite)) {
