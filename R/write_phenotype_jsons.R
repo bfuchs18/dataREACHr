@@ -58,6 +58,7 @@ write_phenotype_jsons <- function(export_dir, overwrite) {
     json_chaos = "chaos.json",
     json_class = "class.json",
     json_cshq = "cshq.json",
+    json_demographics = "demographics.json",
     json_debq = "debq.json",
     json_dexa = "dexa.json",
     json_efcr = "efcr.json",
