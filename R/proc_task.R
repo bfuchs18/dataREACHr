@@ -229,7 +229,7 @@ proc_task <- function(base_wd, overwrite_parsed_rrv = FALSE, overwrite_sourcedat
 
 
   # Export meta-data
-  meta_data = write_task_jsons(export_dir = raw_wd, overwrite = overwrite_jsons)
+  meta_data = write_task_jsons(bids_wd = bids_wd, overwrite = overwrite_jsons)
 
   #### Return data ####
   if (isTRUE(return_data)){

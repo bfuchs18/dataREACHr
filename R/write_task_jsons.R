@@ -40,8 +40,8 @@ write_task_jsons <- function(bids_wd, overwrite) {
   }
 
   #### Define paths for export ####
-  phenotype_wd <- paste0(base_wd, slash, "bids", slash, "phenotype", slash)
-  raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
+  phenotype_wd <- paste0(bids_wd, slash, "phenotype", slash)
+  raw_wd <- paste0(bids_wd, slash, "rawdata", slash)
 
   # generate phenotype_wd if it doesn't exist
   if (!file.exists(phenotype_wd)){
