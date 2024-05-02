@@ -58,13 +58,24 @@ util_calc_intake <- function(stacked_intake) {
 
   ## meal
 
-  # make lists of meal item consumption variables
-  meal_g_vars <- paste0(foods[1:8], "_grams_consumed")
-  meal_kcal_vars <- paste0(foods[1:8], "_kcal_consumed")
 
-  # sum across meal_g_vars columns
+  # define vectors of meal foods and items (foods + water)
+  meal_foods <- c("grilled_cheese", "tender", "carrot", "chips", "fruit", "ranch", "ketchup")
+  meal_items <- c(meal_foods, "water")
+
+  # define names for consumption variables
+  meal_foods_g_vars <- paste0(meal_foods, "_grams_consumed")
+  meal_items_g_vars <- paste0(meal_items, "_grams_consumed")
+  meal_kcal_vars <- paste0(meal_foods, "_kcal_consumed")
+
+  # sum across meal_foods_g_vars columns
   stacked_intake$meal_grams_consumed <- stacked_intake %>%
-    dplyr::select(dplyr::all_of(meal_g_vars)) %>%
+    dplyr::select(dplyr::all_of(meal_foods_g_vars_)) %>%
+    rowSums(na.rm = FALSE)
+
+  # sum across meal_items_g_vars columns
+  stacked_intake$meal_grams_consumed_inc_water <- stacked_intake %>%
+    dplyr::select(dplyr::all_of(meal_items_g_vars)) %>%
     rowSums(na.rm = FALSE)
 
   # sum across meal_kcal_vars columns
@@ -74,13 +85,23 @@ util_calc_intake <- function(stacked_intake) {
 
   ## EAH
 
-  # make lists of eah item consumption variables
-  eah_g_vars <- paste0(foods[9:18], "_grams_consumed")
-  eah_kcal_vars <- paste0(foods[9:18], "_kcal_consumed")
+  # define vectors of eah foods and items (foods + water)
+  eah_foods <- c("brownie", "corn_chip", "ice_cream", "oreo", "popcorn", "pretzel", "skittle", "starburst")
+  eah_items <- c(eah_foods, "water_eah")
 
-  # sum across eah_g_vars columns
+  # make lists of eah item consumption variables
+  eah_foods_g_vars <- paste0(eah_foods, "_grams_consumed")
+  eah_items_g_vars <- paste0(eah_items, "_grams_consumed")
+  eah_kcal_vars <- paste0(eah_foods, "_kcal_consumed")
+
+  # sum across meal_foods_g_vars columns
   stacked_intake$eah_grams_consumed <- stacked_intake %>%
-    dplyr::select(dplyr::all_of(eah_g_vars)) %>%
+    dplyr::select(dplyr::all_of(eah_foods_g_vars)) %>%
+    rowSums(na.rm = FALSE)
+
+  # sum across eah_items_g_vars columns
+  stacked_intake$eah_grams_consumed_inc_water <- stacked_intake %>%
+    dplyr::select(dplyr::all_of(eah_items_g_vars)) %>%
     rowSums(na.rm = FALSE)
 
   # sum across eah_kcal_vars columns
@@ -93,6 +114,11 @@ util_calc_intake <- function(stacked_intake) {
   # sum across meal and eah grams_consumed
   stacked_intake$total_grams_consumed <- stacked_intake %>%
     dplyr::select(c("meal_grams_consumed", "eah_grams_consumed")) %>%
+    rowSums(na.rm = FALSE)
+
+  # sum across meal and eah grams_consumed
+  stacked_intake$total_grams_consumed_inc_water <- stacked_intake %>%
+    dplyr::select(c("meal_grams_consumed_inc_water", "eah_grams_consumed_inc_water")) %>%
     rowSums(na.rm = FALSE)
 
   # sum across meal and eah kcal_consumed
