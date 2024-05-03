@@ -10,5 +10,5 @@ util_format_cshq_data(cshq_data)
 \item{cshq_data}{cshq extracted from data from REDCap events util_redcap_parent_v2 and util_redcap_parent_v5}
 }
 \description{
-This function process cshq data
+This function prepares cshq data for scoring with dataprepr::score_cshq by re-leveling scored items to have numeric values 1-3: (3 - Usually, 2 - Sometimes, 1 - Rarely or 1 - not sleepy, 2 - very sleepy, 3 - falls asleep)
 }

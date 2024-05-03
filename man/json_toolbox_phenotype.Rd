@@ -2,7 +2,7 @@
 % Please edit documentation in R/json_toolbox_phenotype.R
 \name{json_toolbox_phenotype}
 \alias{json_toolbox_phenotype}
-\title{json_toolbox_phenotype: Generates a json file for the NIH toolbox behavioral score data (saved in bids/phenotype/toolbox.tsv)}
+\title{json_toolbox_phenotype: Generates a json file for the NIH toolbox behavioral score data (saved in bids/phenotype/toolbox_scores.tsv)}
 \usage{
 json_toolbox_phenotype()
 }

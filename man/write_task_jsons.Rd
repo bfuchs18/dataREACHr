@@ -4,10 +4,10 @@
 \alias{write_task_jsons}
 \title{write_task_jsons: Write meta-data for tasks created with json functions (called within proc_task.R)}
 \usage{
-write_task_jsons(export_dir, overwrite)
+write_task_jsons(bids_wd, overwrite)
 }
 \arguments{
-\item{export_dir}{string with absolute path to export directory (typically bids rawdata directory)}
+\item{bids_wd}{string with absolute path to bids directory (contains rawdata/ and phenotype/)}
 
 \item{overwrite}{logical (TRUE/FALSE) to indicate if json files should be overwritten}
 }

@@ -24,7 +24,7 @@ proc_redcap(
 If return_data is set to TRUE, will return a list including:
 \enumerate{
 \item clean raw phenotype datasets for each task
-\item meta-data/.json inforamtion for each task
+\item meta-data/.json information for each task
 }
 }
 \description{
@@ -50,7 +50,7 @@ To use this function, the correct path must be used. The path must be the full p
 
 \dontrun{
 data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-02_1044.csv"
+visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-03_1132.csv"
 
 phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 
