@@ -30,10 +30,17 @@ If return_data is set to TRUE, will return a list including:
 \description{
 This function:
 \enumerate{
-\item reads REDCap data from sourcedata
-\item cleans data to save in BIDS format in phenotype. Produces the following files:
-*
-\item calls functions to create .json files for each phenotype/x.tsv file
+\item Reads REDCap data (visit and double-entry) from bids/sourcedata
+\item Calls util_ functions to clean and compile data in dataframes
+\item Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
+\item Exports the following BIDS-compliant .tsv files into bids/phenotype:
+\itemize{
+\item questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty
+\item questionnaire data - raw only: chaos, infancy, household, fsq, hfias, sic, fhfi, cshq, pstca, pmum, rank, loc
+\item compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
+}
+\item Exports bids/participants.tsv
+\item Exports a .json file with meta-data for each .tsv
 }
 }
 \details{
@@ -43,7 +50,7 @@ To use this function, the correct path must be used. The path must be the full p
 
 \dontrun{
 data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-03-22_1446.csv"
+visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-02_1044.csv"
 
 phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 

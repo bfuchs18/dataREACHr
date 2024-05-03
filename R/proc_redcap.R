@@ -1,10 +1,15 @@
 #' proc_redcap: Process raw data downloaded from Study REACH REDCap
 #'
 #' This function:
-#' 1) reads REDCap data from sourcedata
-#' 2) cleans data to save in BIDS format in phenotype. Produces the following files:
-#'    *
-#' 3) calls functions to create .json files for each phenotype/x.tsv file
+#' 1) Reads REDCap data (visit and double-entry) from bids/sourcedata
+#' 2) Calls util_ functions to clean and compile data in dataframes
+#' 3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
+#' 4) Exports the following BIDS-compliant .tsv files into bids/phenotype:
+#'    * questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty
+#'    * questionnaire data - raw only: chaos, infancy, household, fsq, hfias, sic, fhfi, cshq, pstca, pmum, rank, loc
+#'    * compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
+#' 5) Exports bids/participants.tsv
+#' 6) Exports a .json file with meta-data for each .tsv
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
@@ -87,9 +92,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
   }
 
+  #### Load data ####
+  redcap_visit_data <- read.csv(visit_data_path, header = TRUE) # visit data
+  redcap_de_data <- read.csv(data_de_path, header = TRUE) # double entry data
 
-  #### Load and organize visit data ####
-  redcap_visit_data <- read.csv(visit_data_path, header = TRUE)
+  #### Extract visit data ####
 
   # Make ID column bids compliant: Convert record_id to strings padded with zeros and add "sub_"
   redcap_visit_data$record_id <- sprintf("sub-%03d", redcap_visit_data$record_id)
@@ -106,7 +113,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     return(sub_dat)
   }
 
-  # Extract visit data ####
+  # Extract visit data
   child_visit_1_arm_1 <- redcap_long_wide('child_visit_1_arm_1', redcap_visit_data)
   parent_visit_1_arm_1 <- redcap_long_wide('parent_visit_1_arm_1', redcap_visit_data)
   child_visit_2_arm_1 <- redcap_long_wide('child_visit_2_arm_1', redcap_visit_data)
@@ -117,6 +124,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   parent_visit_4_arm_1 <- redcap_long_wide('parent_visit_4_arm_1', redcap_visit_data)
   child_visit_5_arm_1 <- redcap_long_wide('child_visit_5_arm_1', redcap_visit_data)
   parent_visit_5_arm_1 <- redcap_long_wide('parent_visit_5_arm_1', redcap_visit_data)
+
+  #### Generate date_data with visit dates/ages and sex ####
 
   # Make dataframe of visit dates and ages
   date_data <- merge(child_visit_1_arm_1[, c("record_id", "v1_date")], child_visit_2_arm_1[, c("record_id", "v2_date")], by = "record_id", all = TRUE)
@@ -150,7 +159,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #update column names in date_data
   names(date_data)[names(date_data) == "record_id"] <- "participant_id"
 
-  # # # organize event data
+  #### Process visit data ####
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
@@ -162,11 +171,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
   parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
 
-  #### Load and organize double-entry data ####
-  redcap_de_data <- read.csv(data_de_path, header = TRUE)
+  ####  Process double-entry data ####
   processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
 
-  #### Stack visit data collected on 2 visits ####
+  #### Compile (merge and stack) data ####
+
+  ### Stack visit data collected on 2 visits
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
   stacked_stq <-
@@ -262,22 +272,18 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   )
 
 
-  #### Merge visit intake (meal, EAH, vas) data ####
+  # Merge visit and double entry intake data (meal, EAH, vas)
   merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit_protocol"), all = TRUE)
   merged_intake <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit_protocol", "session_id", "advertisement_condition"), all = TRUE)
   merged_intake <- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
-
-  #### Merge visit data and double entry (de) data ####
-
-  # merge intake data
   merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
 
-  # merge notes/visit data? update data?
+  ## merge notes/visit data? update data?
 
-  # merge MRI visit data double entry CAMS / MRI freddies
+  # merge visit data and double entry MRI data (CAMS/freddies)
   merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
-  #### Process anthro data ####
+  #### Additional processing: anthro data ####
 
   # Extract parent 2 BMI from household_data
   stacked_parent2_anthro <-
@@ -310,7 +316,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
                                        elseif(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
 
-  #### Generate compiled demographics database  ####
+  #### Generate demographics dataframe  ####
 
   # combine demo data from demo_data and household form
   demo_data <- merge(parent_v1_data$demo_data, stacked_household[c("session_id", "participant_id", "demo_education_mom", "demo_income")], by = "participant_id", all = TRUE)
@@ -350,7 +356,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # reorder columns
 
-  #### Generate participants_data ####
+  #### Generate participants dataframe ####
 
   # add demo_data and date_data (visit dates, visit ages, child sex)
   participants_data <- merge(parent_v1_data$demo_data, date_data, by = "participant_id", all = TRUE)
