@@ -20,13 +20,13 @@
 #'
 #' @return If return_data is set to TRUE, will return a list including:
 #'  1) clean raw phenotype datasets for each task
-#'  2) meta-data/.json inforamtion for each task
+#'  2) meta-data/.json information for each task
 #'
 #' @examples
 #'
 #' \dontrun{
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-02_1044.csv"
+#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-03_1132.csv"
 #'
 #' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
@@ -204,8 +204,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                      parent_v5_data$cbq_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
-  stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data, parent_v5_data$cshq_data)
-  # stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
+  stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
   stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data, parent_v5_data$pstca_data)

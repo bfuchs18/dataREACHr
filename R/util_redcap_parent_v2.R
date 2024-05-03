@@ -60,11 +60,8 @@ util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
   cshq_data <- cshq_data[, -grep("missingcheck|timestamp", names(cshq_data))] # remove extra columns
   cshq_data <- cshq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  names(cshq_data) <- gsub('_a', '_prob', names(cshq_data))
-
-  # update values for scoring (3 - Usually, 2 - Sometimes, 1 - Rarely)
-
-  # cshq_scored <- dataprepr::score_cshq(cshq_data, score_base = TRUE, reverse_score = FALSE, id = 'participant_id', extra_scale_cols = c("cshq_form_date"))
+  cshq_data <- util_format_cshq_data(cshq_data)
+  cshq_scored <- dataprepr::score_cshq(cshq_data_for_scoring, score_base = FALSE, reverse_score = FALSE, id = 'participant_id')
 
 
   ## BES Data ####
