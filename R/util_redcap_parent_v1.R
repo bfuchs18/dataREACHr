@@ -79,7 +79,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   puberty_data <- puberty_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   puberty_data_for_scoring <- util_format_puberty_data(puberty_data, respondent = "parent")
-  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, score_base = FALSE, respondent = 'parent', male = "male", female = "female", id = 'participant_id')
+  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, base_zero = FALSE, respondent = 'parent', male = "male", female = "female", id = 'participant_id')
 
   ## CFQ Data ####
   cfq_data <- data[, grepl('participant_id|session_id|cfq|child_feeding_questionnaire_timestamp', names(data))]
@@ -87,7 +87,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   cfq_data <- cfq_data[, -grep("missingcheck|timestamp", names(cfq_data))] # remove extra columns
   cfq_data <- cfq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cfq_scored <- dataprepr::score_cfq(cfq_data, score_base = TRUE, restriction_split = FALSE, id = 'participant_id', extra_scale_cols = c("cfq_form_date") )
+  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id', extra_scale_cols = c("cfq_form_date") )
 
   ## CEBQ Data ####
   cebq_data <- data[, grepl('participant_id|session_id|cebq|child_eating_behavior_questionnaire_timestamp', names(data))]
@@ -95,7 +95,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   cebq_data <- cebq_data[, -grep("missingcheck|timestamp", names(cebq_data))] # remove extra columns
   cebq_data <- cebq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cebq_scored <- dataprepr::score_cebq(cebq_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("cebq_form_date"))
+  cebq_scored <- dataprepr::score_cebq(cebq_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("cebq_form_date"))
 
   ## EFCR Data ####
   efcr_data <- data[, grepl('participant_id|session_id|efcr|external_food_cues_responsiveness_timestamp', names(data))]
@@ -103,7 +103,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   efcr_data <- efcr_data[, -grep("missingcheck|timestamp", names(efcr_data))] # remove extra columns
   efcr_data <- efcr_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  efcr_scored <- dataprepr::score_efcr(efcr_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("efcr_form_date"))
+  efcr_scored <- dataprepr::score_efcr(efcr_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("efcr_form_date"))
 
   ## CHAOS Data  ####
   chaos_data <- data[, grepl('participant_id|session_id|chaos', names(data))]
@@ -112,6 +112,8 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   chaos_data <- chaos_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   # need to develop score script
+  chaos_scored <- dataprepr::score_chaos(chaos_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("chaos_form_date"))
+
 
   ## PSS Data  (percieved stress scale) ####
   pss_data <- data[, grepl('participant_id|session_id|pss|perceived_stress_scale_timestamp', names(data))]
@@ -119,7 +121,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   pss_data <- pss_data[, -grep("missingcheck|timestamp", names(pss_data))] # remove extra columns
   pss_data <- pss_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  pss_scored <- dataprepr::score_pss(pss_data, score_base = TRUE, id = "participant_id", extra_scale_cols = c("pss_form_date"))
+  pss_scored <- dataprepr::score_pss(pss_data, base_zero = TRUE, id = "participant_id", extra_scale_cols = c("pss_form_date"))
 
   ## LBC Data  ####
   lbc_data <- data[, grepl('participant_id|session_id|lbc|lifestyle_behavior_checklist_timestamp', names(data))]
@@ -128,7 +130,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   lbc_data <- lbc_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
   names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
-  # lbc_scored <- dataprepr::score_lbc(lbc_data, score_base = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date")) # need to debug
+  # lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date")) # need to debug
 
   ## return data ####
   if (isTRUE(return_data)){
@@ -141,8 +143,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
       cfq_data = cfq_scored,
       cebq_data = cebq_scored,
       efcr_data = efcr_scored,
-#      chaos_data = chaos_scored, #score script to be developed
-      chaos_data = chaos_data,
+      chaos_data = chaos_scored,
       pss_data = pss_scored,
       # lbc_data = lbc_scored))
       lbc_data = lbc_data))

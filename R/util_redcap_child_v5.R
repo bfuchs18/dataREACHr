@@ -64,7 +64,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   puberty_data <- data[, grep("participant_id|session_id|^tanner|^childrep", names(data))]
   puberty_data_for_scoring <- util_format_puberty_data(puberty_data, respondent = "child")
   # score
-  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, respondent = "child", score_base = FALSE, male = "male", female = "female", id = "participant_id")
+  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, respondent = "child", base_zero = FALSE, male = "male", female = "female", id = "participant_id")
 
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]

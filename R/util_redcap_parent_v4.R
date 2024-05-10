@@ -42,7 +42,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   hfssm_data <- hfssm_data[, -grep("missingcheck|timestamp", names(hfssm_data))] # remove extra columns
   hfssm_data <- hfssm_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  hfssm_scored <- dataprepr::score_hfssm(hfssm_data, score_base = TRUE, id = "participant_id")
+  hfssm_scored <- dataprepr::score_hfssm(hfssm_data, base_zero = TRUE, id = "participant_id")
 
   ## HFIAS Data ####
   # this refers to the household_food_insecurity_access_scale (HFIAS)
@@ -54,7 +54,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   names(hfias_data) <- gsub('hfi', 'hfias', names(hfias_data))
 
-  #hfias_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id')
+  #hfias_scored <- dataprepr::score_hfi(hfi_data, base_zero = TRUE, id = 'participant_id')
 
   ## PMUM Data ####
   pmum_data <- data[, grepl('participant_id|session_id|pmum|problematic_media_use_measure_timestamp', names(data))]
@@ -90,7 +90,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   # fhfi_data <- util_format_fhfi_data(fhfi_data) # need to deal with visible_27 and visible_28 before this function is ready
 
-  # fhfi_scored <- dataprepr::score_hfi(hfi_data, score_base = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
+  # fhfi_scored <- dataprepr::score_hfi(hfi_data, base_zero = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
 
   ## CFPQ Data ####
   cfpq_data <- data[, grepl('participant_id|session_id|cfpq|comprehensive_feeding_practices_questionnaire_timestamp', names(data))]
@@ -98,7 +98,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   cfpq_data <- cfpq_data[, -grep("missingcheck|timestamp", names(cfpq_data))] # remove extra columns
   cfpq_data <- cfpq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cfpq_scored <- dataprepr::score_cfpq(cfpq_data, score_base = TRUE, id = 'participant_id')
+  cfpq_scored <- dataprepr::score_cfpq(cfpq_data, base_zero = TRUE, id = 'participant_id')
 
   ## return data ####
 
