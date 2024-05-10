@@ -35,8 +35,8 @@ This function:
 \item Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
 \item Exports the following BIDS-compliant .tsv files into bids/phenotype:
 \itemize{
-\item questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty
-\item questionnaire data - raw only: chaos, infancy, household, fsq, hfias, sic, fhfi, cshq, pstca, pmum, rank, loc
+\item questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty, cshq, chaos
+\item questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc
 \item compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
 }
 \item Exports bids/participants.tsv

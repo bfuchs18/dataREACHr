@@ -5,8 +5,8 @@
 #' 2) Calls util_ functions to clean and compile data in dataframes
 #' 3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
 #' 4) Exports the following BIDS-compliant .tsv files into bids/phenotype:
-#'    * questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty
-#'    * questionnaire data - raw only: chaos, infancy, household, fsq, hfias, sic, fhfi, cshq, pstca, pmum, rank, loc
+#'    * questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty, cshq, chaos
+#'    * questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc
 #'    * compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
 #' 5) Exports bids/participants.tsv
 #' 6) Exports a .json file with meta-data for each .tsv
@@ -203,8 +203,11 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dplyr::bind_rows(parent_v2_data$cbq_data$bids_phenotype,
                      parent_v5_data$cbq_data$bids_phenotype)
 
-  # not scored/in bids_phenotype yet
-  stacked_cshq <- dplyr::bind_rows(parent_v2_data$cshq_data$bids_phenotype, parent_v5_data$cshq_data$bids_phenotype)
+  stacked_cshq <-
+    dplyr::bind_rows(
+      parent_v2_data$cshq_data$bids_phenotype,
+      parent_v5_data$cshq_data$bids_phenotype
+    )
 
   # not scored/in bids_phenotype yet
   stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data, parent_v5_data$pstca_data)
@@ -456,7 +459,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
     list(parent_v1_data$pss_data$bids_phenotype, "pss"),
-    list(parent_v1_data$chaos_data, "chaos"), # not in bids_phenotype yet
+    list(parent_v1_data$chaos_data$bids_phenotype, "chaos"),
 
     list(parent_v2_data$brief_data$bids_phenotype, "brief2"),
     list(parent_v2_data$bes_data$bids_phenotype, "bes"),
