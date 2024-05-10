@@ -57,6 +57,12 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   eah_vas_data <- data[, grepl('participant_id|session_id|vas_brownie|vas_corn_chip|vas_chocolate|vas_icecream|vas_cookie|vas_popcorn|vas_pretzel|vas_skittle|vas_starburst', names(data))]
   names(eah_vas_data) <- gsub('cookie', 'oreo', names(eah_vas_data))
 
+  ## intake_data (meal and eah) -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
+  intake_data <- data[, grep("participant_id|session_id|meal|eah_notes|advertisement_condition|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
+  intake_data <- intake_data[, -grep("complete|intake_eah_visit_number|check|consumed|hrt", names(intake_data))]
+  colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
+  colnames(intake_data) <- gsub('intake_notes', 'prep_notes', names(intake_data))
+
   ## hrt ####
   hrt_data <- data[, grep("participant_id|session_id|hrt|food_|^q.*score", names(data))]
 
@@ -87,6 +93,27 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   ## tictoc data ####
   tictoc_data <-data[, grep("participant_id|tictoc", names(data))]
 
+  ## anthro data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
+  anthro_data <- data[, grep("participant_id|session|parent_height|child_height|parent_weight|child_weight|child_average_weight", names(data))]
+  anthro_data <- anthro_data[, -grep("complete|self_report", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
+
+  # Update columns names
+  colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
+
+  # rename parent1 sex variable
+  colnames(anthro_data) <- gsub("parent1_height_sex", "parent1_sex", colnames(anthro_data))
+
+  # re-label parent1 sex
+  anthro_data$parent1_sex <- ifelse(anthro_data$parent1_sex == 0, "female", ifelse(anthro_data$parent1_sex == 1, "male", NA))
+
+  # calculate parent1 BMI
+  anthro_data$parent1_bmi <- round(anthro_data$parent1_weight_average_kg / ((anthro_data$parent1_height_average_cm / 100) ^ 2), digits = 2)
+
+  # calculate child BMI
+  anthro_data$child_bmi <- round(anthro_data$child_average_weight / ((anthro_data$child_height_average / 100) ^ 2), digits = 2)
+  anthro_data$child_bmi_z <- NA # calculate this
+  anthro_data$child_bmi_p <- NA # calculate this
+
   ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
@@ -94,12 +121,14 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
                 meal_vas_data = meal_vas_data,
                 eah_data = eah_data,
                 eah_vas_data = eah_vas_data,
+                intake_data = intake_data,
                 hrt_data = hrt_data,
                 puberty_data = puberty_scored,
                 loc_data = loc_data,
                 kbas_data = kbas_data,
                 stq_data = stq_data,
-                tictoc_data = tictoc_data))
+                tictoc_data = tictoc_data,
+                anthro_data = anthro_data))
   }
 
 }

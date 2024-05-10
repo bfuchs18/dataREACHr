@@ -50,6 +50,12 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   names(eah_data) <- gsub('intake_notes', 'prep_notes', names(eah_data))
   names(eah_data) <- gsub('eah_notes', 'eah_protocol_notes', names(eah_data))
 
+  ## intake_data (meal and eah) -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
+  intake_data <- data[, grep("participant_id|session_id|meal|eah_notes|advertisement_condition|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
+  intake_data <- intake_data[, -grep("complete|intake_eah_visit_number|check|consumed", names(intake_data))]
+  colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
+  colnames(intake_data) <- gsub('intake_notes', 'prep_notes', names(intake_data))
+
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]
   loc_data <- loc_data[, -grep("share_info_parent", names(loc_data))] # remove extra columns
@@ -75,6 +81,7 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
     return(list(visit_data_child = visit_data_child,
                 meal_data = meal_data,
                 eah_data = eah_data,
+                intake_data = intake_data,
                 loc_data = loc_data,
                 pptq_data = pptq_scored,
                 sic_data = sic_data))

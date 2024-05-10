@@ -171,7 +171,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
   parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
 
-  ####  Process double-entry data ####
+
+  #### Process double-entry data ####
   processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
 
   #### Compile (merge and stack) data ####
@@ -325,8 +326,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # add dates and ages at start of sessions (V1 and V5) from date_data form
 
-  ## merge dates and ages from date_data
-  demo_data <- dplyr::left_join(demo_data, date_data[c("participant_id", "v1_date", "v5_date", "v1_age", "v5_age")], by = "participant_id") # merge dates and ages from date_data
+  ## merge dates, ages, and sex from date_data
+  demo_data <- dplyr::left_join(demo_data, date_data[c("participant_id", "v1_date", "v5_date", "v1_age", "v5_age", "sex")], by = "participant_id") # merge dates and ages from date_data
 
   ## create column 'date_session_start' based on dates at V1 and V5
   demo_data <- demo_data %>%
@@ -417,6 +418,34 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
 
+
+  ####  Get prelim intake -- will be obsolete with double-entry data is available ####
+  prelim_intake_data <- dplyr::bind_rows(
+    transform(child_v1_data$intake_data, visit_protocol = "1"),
+    transform(child_v3_data$intake_data, visit_protocol = "3"),
+    transform(child_v4_data$intake_data, visit_protocol = "4"),
+    transform(child_v5_data$intake_data, visit_protocol = "5")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  prelim_intake_data <- prelim_intake_data[, -grep("fullness_time", names(prelim_intake_data))] # remove extra columns
+
+  # compute intake variables
+  prelim_intake_data <- util_calc_intake(prelim_intake_data)
+
+  ####  Get prelim anthro -- will be obsolete with double-entry data is available ####
+  prelim_anthro_data <- dplyr::bind_rows(
+    transform(child_v1_data$anthro_data, visit_protocol = "1"),
+    transform(child_v5_data$anthro_data, visit_protocol = "5")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  # add ages and sex
+  prelim_anthro_data <- merge(prelim_anthro_data, demo_data[c("participant_id", "session_id", "child_age", "sex")], by=c("participant_id", "session_id"), all = TRUE)
+
+  # compute bmi variables
+  prelim_anthro_data$child_bmi_z <- round(childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = "male", female = "female"), digits = 2)
+  prelim_anthro_data$child_bmi_p <- round((childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = "male", female = "female")) * 100, digits = 2)
+
+
   #### Export Data ####
 
   # write participant.tsv
@@ -475,7 +504,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     list(parent_v4_data$hfssm_data$bids_phenotype, "hfssm"),
     list(parent_v4_data$cchip_data$bids_phenotype, "cchip"),
-    list(parent_v4_data$hfias_data, "hfias"),
+    list(parent_v4_data$hfias_data$bids_phenotype, "hfias"),
     list(parent_v4_data$fhfi_data, "fhfi"), # not in bids_phenotype yet
 
     list(child_v3_data$sleeplog_data, "sleeplog"),
@@ -551,6 +580,36 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     }
   }
 
+  #### Export prelim data ####
+  # write prelim intake data (not double entered )
+  prelim_intake_tsv <- paste0(phenotype_wd, slash, "intake_not_doubleentered.tsv")
+  prelim_anthro_tsv <- paste0(phenotype_wd, slash, "anthro_not_doubleentered.tsv")
+
+  # write tsv
+  if ( isTRUE(overwrite) | !file.exists(prelim_intake_tsv) ) {
+    write.table(
+      prelim_intake_data,
+      prelim_intake_tsv,
+      quote = FALSE,
+      sep = '\t',
+      col.names = TRUE,
+      row.names = FALSE,
+      na = "n/a" # use 'n/a' for missing values for BIDS compliance
+    )
+  }
+
+  # write tsv
+  if ( isTRUE(overwrite) | !file.exists(prelim_anthro_tsv) ) {
+    write.table(
+      prelim_anthro_data,
+      prelim_anthro_tsv,
+      quote = FALSE,
+      sep = '\t',
+      col.names = TRUE,
+      row.names = FALSE,
+      na = "n/a" # use 'n/a' for missing values for BIDS compliance
+    )
+  }
   #### Return Data ####
   if (isTRUE(return_data)){
     return(list( child_v1_data = child_v1_data,

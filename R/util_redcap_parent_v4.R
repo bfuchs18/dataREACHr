@@ -46,15 +46,13 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   ## HFIAS Data ####
   # this refers to the household_food_insecurity_access_scale (HFIAS)
-  #hfias_data <-
   hfias_data <- data[, grepl('participant_id|session_id|^hfi|household_food_insecurity_access_scale_timestamp', names(data))]
-  hfias_data$hfssm_form_date <- lubridate::as_date(hfias_data$household_food_insecurity_access_scale_timestamp) # add form date column
+  hfias_data$hfias_form_date <- lubridate::as_date(hfias_data$household_food_insecurity_access_scale_timestamp) # add form date column
   hfias_data <- hfias_data[, -grep("missingcheck|timestamp", names(hfias_data))] # remove extra columns
   hfias_data <- hfias_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
-
   names(hfias_data) <- gsub('hfi', 'hfias', names(hfias_data))
 
-  #hfias_scored <- dataprepr::score_hfi(hfi_data, base_zero = TRUE, id = 'participant_id')
+  hfias_scored <- dataprepr::score_hfias(hfias_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("hfias_form_date"))
 
   ## PMUM Data ####
   pmum_data <- data[, grepl('participant_id|session_id|pmum|problematic_media_use_measure_timestamp', names(data))]
@@ -105,8 +103,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   if (isTRUE(return_data)){
     return(list(
       visit_data_parent = visit_data_parent,
-      # hfias_data = hfias_scored,
-      hfias_data = hfias_data,
+      hfias_data = hfias_scored,
       hfssm_data = hfssm_scored,
       pmum_data = pmum_data,
       # pmum_data = pmum_scored,
