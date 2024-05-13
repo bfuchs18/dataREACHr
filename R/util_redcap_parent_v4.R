@@ -42,6 +42,21 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   hfssm_data <- hfssm_data[, -grep("missingcheck|timestamp", names(hfssm_data))] # remove extra columns
   hfssm_data <- hfssm_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
+  # prep hfssm_data for scoring
+
+  ## make list of columns to re-level so yes == 0 (instead of 1) and no == 1 (instead of 0))
+  ## NOTE: ad_ variables and ch_ variables were leveled differently in REDCap -- the ch variables are already yes == 0 (instead of 1) and no == 1
+  col_list <- c("hfssm_ad1", "hfssm_ad2", "hfssm_ad3", "hfssm_ad4", "hfssm_ad5")
+
+  ## define function to re-level data in a givencolumn
+  hfssm_relevel_column <- function(x) {
+    ifelse(is.na(x), NA, ifelse(x == 0, 1, ifelse(x == 1, 0, ifelse(x == 2, 2, NA))))
+  }
+
+  ## apply hfssm_relevel to columns in col_list
+  hfssm_data[, col_list] <- lapply(hfssm_data[, col_list], hfssm_relevel_column)
+
+  # score
   hfssm_scored <- dataprepr::score_hfssm(hfssm_data, base_zero = TRUE, id = "participant_id")
 
   ## HFIAS Data ####
