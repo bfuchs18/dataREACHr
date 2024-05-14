@@ -87,7 +87,8 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   cfq_data <- cfq_data[, -grep("missingcheck|timestamp", names(cfq_data))] # remove extra columns
   cfq_data <- cfq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id', extra_scale_cols = c("cfq_form_date") )
+  # need to deal with cfq items 8-11: these had a "N/A" coded as 5. Need to change this to NA or modify score script
+#  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id', extra_scale_cols = c("cfq_form_date") )
 
   ## CEBQ Data ####
   cebq_data <- data[, grepl('participant_id|session_id|cebq|child_eating_behavior_questionnaire_timestamp', names(data))]
@@ -140,7 +141,8 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
       household_data = household_data,
       rank_data = rank_data,
       puberty_data = puberty_scored,
-      cfq_data = cfq_scored,
+      cfq_data = cfq_data,
+      # cfq_data = cfq_scored,
       cebq_data = cebq_scored,
       efcr_data = efcr_scored,
       chaos_data = chaos_scored,
