@@ -117,7 +117,7 @@ util_redcap_parent_v5 <- function(data, return_data = TRUE) {
   audit_data <- audit_data[, -grep("missingcheck|timestamp", names(audit_data))] # remove extra columns
   audit_data <- audit_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id')
+  audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id', extra_scale_cols = c("audit_form_date"), base_zero = TRUE)
 
   ## CFPQ Data ####
   cfpq_data <- data[, grepl('participant_id|session_id|cfpq|comprehensive_feeding_practices_questionnaire_timestamp', names(data))]
