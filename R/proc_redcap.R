@@ -5,8 +5,8 @@
 #' 2) Calls util_ functions to clean and compile data in dataframes
 #' 3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
 #' 4) Exports the following BIDS-compliant .tsv files into bids/phenotype:
-#'    * questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty, cshq, chaos
-#'    * questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc
+#'    * questionnaire data - raw and scores: efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, audit, cfpq, puberty, cshq, chaos
+#'    * questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc, cbq, cfq
 #'    * compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
 #' 5) Exports bids/participants.tsv
 #' 6) Exports a .json file with meta-data for each .tsv
@@ -484,7 +484,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     # single visit data
     list(parent_v1_data$infancy_data, "infancy"),
-    list(parent_v1_data$cfq_data$bids_phenotype, "cfq"),
+    list(parent_v1_data$cfq_data, "cfq"),
+    # list(parent_v1_data$cfq_data$bids_phenotype, "cfq"), # # not in bids_phenotype yet
     list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
     list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
     list(parent_v1_data$pss_data$bids_phenotype, "pss"),
