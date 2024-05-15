@@ -448,105 +448,71 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Export Data ####
 
-  # write participant.tsv
-  participants_tsv <- paste0(bids_wd, slash, "participants.tsv")
-
-  if ( isTRUE(overwrite) | !file.exists(participants_tsv) ) {
-    # write tsv
-    write.table(
-      participants_data,
-      participants_tsv,
-      quote = FALSE,
-      sep = '\t',
-      col.names = TRUE,
-      row.names = FALSE,
-      na = "n/a" # use 'n/a' for missing values for BIDS compliance
-    )
-  }
-
-  # write participant.json
-  participants_json <- paste0(bids_wd, slash, "participants.json")
-
-  if ( isTRUE(overwrite) | !file.exists(participants_json) ) {
-    # write json
-    write(json_participants(), participants_json)
-  }
-
-  # write phenotype data (tsv and json files)
-
-  # generate phenotype_wd if it doesnt exist
-  if (!file.exists(phenotype_wd)){
-    dir.create(file.path(phenotype_wd))
-  }
-
-  # make a list of lists including dataframe, and export name (without extension; also json function names without json_)
+  # make a list dataframes to export, where the name is the corresponding json function without json_)
   data_to_export <- list(
 
-    # single visit data
-    list(parent_v1_data$infancy_data, "infancy"),
-    list(parent_v1_data$cfq_data, "cfq"),
-    # list(parent_v1_data$cfq_data$bids_phenotype, "cfq"), # # not in bids_phenotype yet
-    list(parent_v1_data$efcr_data$bids_phenotype, "efcr"),
-    list(parent_v1_data$lbc_data$bids_phenotype, "lbc"),
-    list(parent_v1_data$pss_data$bids_phenotype, "pss"),
-    list(parent_v1_data$chaos_data$bids_phenotype, "chaos"),
+    participants = participants_data,
 
-    list(parent_v2_data$brief_data$bids_phenotype, "brief2"),
-    list(parent_v2_data$bes_data$bids_phenotype, "bes"),
-    list(parent_v2_data$ffbs_data$bids_phenotype, "ffbs"),
-    list(parent_v2_data$fsq_data, "fsq"), # not in bids_phenotype yet
+    # single visit questionnaires
+    infancy = parent_v1_data$infancy_data,
+    cfq = parent_v1_data$cfq_data,
+    # cfq = parent_v1_data$cfq_data$bids_phenotype, # not in bids_phenotype yet
+    efcr = parent_v1_data$efcr_data$bids_phenotype,
+    # lbc = parent_v1_data$lbc_data$bids_phenotype,
+    lbc = parent_v1_data$lbc_data,
+    pss = parent_v1_data$pss_data$bids_phenotype,
+    chaos = parent_v1_data$chaos_data$bids_phenotype,
+    brief2 = parent_v2_data$brief_data$bids_phenotype,
+    bes = parent_v2_data$bes_data$bids_phenotype,
+    ffbs = parent_v2_data$ffbs_data$bids_phenotype,
+    # list(parent_v2_data$fsq_data, "fsq"), # not in bids_phenotype yet
+    spsrq = parent_v3_data$spsrq_data$bids_phenotype,
+    pwlb = parent_v3_data$pwlb_data$bids_phenotype,
+    tfeq = parent_v3_data$tfeq_data$bids_phenotype,
+    bisbas = parent_v3_data$bisbas_data$bids_phenotype,
+    debq = parent_v3_data$debq_data$bids_phenotype,
+    scpf = parent_v3_data$scpf_data$bids_phenotype,
+    hfssm = parent_v4_data$hfssm_data$bids_phenotype,
+    cchip = parent_v4_data$cchip_data$bids_phenotype,
+    hfias = parent_v4_data$hfias_data$bids_phenotype,
+    fhfi = parent_v4_data$fhfi_data, # not in bids_phenotype yet
+    sleeplog = child_v3_data$sleeplog_data, # not in bids_phenotype yet
+    pptq = child_v4_data$pptq_data$bids_phenotype,
+    sic = child_v4_data$sic_data,
 
-    list(parent_v3_data$spsrq_data$bids_phenotype, "spsrq"),
-    list(parent_v3_data$pwlb_data$bids_phenotype, "pwlb"),
-    list(parent_v3_data$tfeq_data$bids_phenotype, "tfeq"),
-    list(parent_v3_data$bisbas_data$bids_phenotype, "bisbas"),
-    list(parent_v3_data$debq_data$bids_phenotype, "debq"),
-    list(parent_v3_data$scpf_data$bids_phenotype, "scpf"),
+    # stacked questionnaires
+    stq = stacked_stq,
+    kbas = stacked_kbas,
+    household = stacked_household,
+    cebq = stacked_cebq,
+    cbq = stacked_cbq,
+    stq = stacked_stq,
+    cshq = stacked_cshq,
+    pstca = stacked_pstca,
+    audit = stacked_audit,
+    pmum = stacked_pmum,
+    cfpq = stacked_cfpq,
+    rank = stacked_rank,
+    puberty = stacked_puberty,
+    loc = stacked_loc,
 
-    list(parent_v4_data$hfssm_data$bids_phenotype, "hfssm"),
-    list(parent_v4_data$cchip_data$bids_phenotype, "cchip"),
-    list(parent_v4_data$hfias_data$bids_phenotype, "hfias"),
-    list(parent_v4_data$fhfi_data, "fhfi"), # not in bids_phenotype yet
-
-    list(child_v3_data$sleeplog_data, "sleeplog"),
-    list(child_v4_data$pptq_data$bids_phenotype, "pptq"),
-    list(child_v4_data$sic_data, "sic"), # not in bids_phenotype yet
-
-    # stacked visit data
-    list(stacked_stq, "stq"),
-    list(stacked_kbas, "kbas"),
-    list(stacked_household, "household"),
-    list(stacked_cebq, "cebq"),
-    list(stacked_cbq, "cbq"),
-    list(stacked_stq, "stq"),
-    list(stacked_cshq, "cshq"),
-    list(stacked_pstca, "pstca"),
-    list(stacked_audit, "audit"),
-    list(stacked_pmum, "pmum"),
-    list(stacked_cfpq, "cfpq"),
-    list(stacked_rank, "rank"),
-    list(stacked_puberty, "puberty"),
-    list(stacked_loc, "loc"),
-
-    # merged data
-    list(demo_data, "demographics"),
-    list(merged_anthro, "anthropometrics"),
-    list(merged_intake, "intake"),
-    list(merged_mri, "mri_visit"),
-
-    # non-merged double-entry data
-    list(processed_de_data$dexa_data, "dexa")
+    # non-questionnaire data
+    demographics = demo_data,
+    anthropometrics = merged_anthro,
+    intake = merged_intake,
+    mri_visit = merged_mri,
+    dexa = processed_de_data$dexa_data
 
   )
 
-
+  # loop through data_to_export and export data and meta-data
   for (i in 1:length(data_to_export)) {
 
     # Get the dataframe
-    df <- data_to_export[[i]][[1]]
+    df <- data_to_export[[i]]
 
     # get the phenotype name
-    phenotype_name <- data_to_export[[i]][[2]]
+    phenotype_name <- names(data_to_export)[i]
 
     # define json function name
     json_func_name = paste0("json_", phenotype_name)
@@ -558,8 +524,15 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     json <- json_func()
 
     # add extensions to phenotype_name
-    filename_tsv <- paste0(phenotype_wd, slash, phenotype_name, ".tsv")
-    filename_json <- paste0(phenotype_wd, slash, phenotype_name, ".json")
+    if (phenotype_name == "participants") {
+      # export participants into bids_wd
+      filename_tsv <- paste0(bids_wd, slash, "participants.tsv")
+      filename_json <- paste0(bids_wd, slash, "participants.json")
+    } else {
+      # export phenotype data into phenotype_wd
+      filename_tsv <- paste0(phenotype_wd, slash, phenotype_name, ".tsv")
+      filename_json <- paste0(phenotype_wd, slash, phenotype_name, ".json")
+    }
 
     # write tsv
     if ( isTRUE(overwrite) | !file.exists(filename_tsv) ) {
@@ -573,7 +546,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
         na = "n/a" # use 'n/a' for missing values for BIDS compliance
       )
     }
-
 
     # write json
     if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
@@ -612,19 +584,24 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     )
   }
   #### Return Data ####
-  if (isTRUE(return_data)){
-    return(list( child_v1_data = child_v1_data,
-                 child_v2_data = child_v2_data,
-                 child_v3_data = child_v3_data,
-                 child_v4_data = child_v4_data,
-                 child_v5_data = child_v5_data,
-                 parent_v1_data = parent_v1_data,
-                 parent_v2_data = parent_v2_data,
-                 parent_v3_data = parent_v3_data,
-                 parent_v4_data = parent_v4_data,
-                 parent_v5_data = parent_v5_data,
-                 processed_de_data = processed_de_data
-                 ))
+  if (isTRUE(return_data)) {
+    return(list(
+      visit_data = list(
+        child_v1_data = child_v1_data,
+        child_v2_data = child_v2_data,
+        child_v3_data = child_v3_data,
+        child_v4_data = child_v4_data,
+        child_v5_data = child_v5_data,
+        parent_v1_data = parent_v1_data,
+        parent_v2_data = parent_v2_data,
+        parent_v3_data = parent_v3_data,
+        parent_v4_data = parent_v4_data,
+        parent_v5_data = parent_v5_data
+      ),
+      double_entry_data = processed_de_data,
+      phenotype_data = data_to_export
+    ))
   }
+
 }
 
