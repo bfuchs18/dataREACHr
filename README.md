@@ -11,13 +11,19 @@ Penn State. This includes organizing multi-visit survey (REDCap),
 behavioral (e.g., cognitive task), and fmri-related data into the Brain
 Imaging Data Structure and generating meta-data (jsons).
 
-dataREACHr functions can: - copy behavioral data from untouchedRaw to
-bids/sourcedata - parse text files from the RRV task into CSVs -
-generate group-level dataframes containing questionnaire, demographic,
-intake, and anthropometric data - generate subject-specific dataframes
-containing cleaned behavioral data - export bids-compliant TSVs and
-JSONS for behavioral data into bids/rawdata/ and survey data into
-bids/phenotype
+dataREACHr functions can:
+
+- copy behavioral data from untouchedRaw to bids/sourcedata/
+
+- parse text files from the RRV task into CSVs
+
+- generate group-level dataframes containing questionnaire, demographic,
+  intake, and anthropometric data
+
+- generate subject-specific dataframes containing cleaned behavioral
+  data
+
+- export bids-compliant TSVs and JSONS for survey and behavioral data
 
 ## Installation
 
@@ -34,9 +40,19 @@ devtools::install_github("bfuchs18/dataREACHr")
 The two primary functions to process survey (redcap) and behavioral data
 are proc_redcap() and proc_task(), respectively.
 
-Using these functions requires a directory structure of: - base_dir
-(user defined) - **untouchedRaw** - **bids** - **sourcedata** -
-**rawdata** - **phenotype**
+Using these functions requires a directory structure of:
+
+base_dir/ (user defined)
+
+├── untouchedRaw/
+
+├── bids/
+
+│ ├── phenotype/
+
+│ ├── sourcedata/
+
+│ ├── rawdata/
 
 Below is a basic example of how to process survey and task data:
 
@@ -71,5 +87,5 @@ proc_task(
 )
 ```
 
-This .md file was generated from
+This README was generated from
 README.Rmd`using`devtools::build_readme()\`
