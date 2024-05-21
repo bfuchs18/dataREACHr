@@ -12,7 +12,7 @@ json_bes <- function() {
 
   bes_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Binge Eating Scale. Participants were provided the following instructions: "Below are groups of statements. Read all of the statements in each group and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior."',
+      Description = 'Binge Eating Scale. Participants (parents) were provided the following instructions: "Below are groups of statements. Read all of the statements in each group and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior."',
       Reference = 'Gormally, J., Black, S., Daston, S., & Rardin, D. (1982). The assessment of binge eating severity among obese persons. Addictive Behaviors, 7(1). https://doi.org/10.1016/0306-4603(82)90024-7',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/7080884/'),
     participant_id = list( Description = 'participant id number'),
@@ -40,9 +40,9 @@ json_bes <- function() {
                                 '999' = 'Don\'t want to answer')),
     bes4 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
                  Levels = list ('0' = 'My child doesn\'t have the habit of eating when he/she is bored.',
-                                '0' = 'My child sometimes eats when he/she is bored, but often he/she is able to "get busy" and get their mind off food.',
-                                '0' = 'My child has a regular habit of eating when he/she is bored, but occasionally, he/she can use some other activity to get their mind off eating.',
-                                '2' = 'My child has a strong habit of eating when he/she is bored. Nothing seems to help my child break the habit.',
+                                '1' = 'My child sometimes eats when he/she is bored, but often he/she is able to "get busy" and get their mind off food.',
+                                '2' = 'My child has a regular habit of eating when he/she is bored, but occasionally, he/she can use some other activity to get their mind off eating.',
+                                '3' = 'My child has a strong habit of eating when he/she is bored. Nothing seems to help my child break the habit.',
                                 '999' = 'Don\'t want to answer')),
     bes5 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
                  Levels = list ('0' = 'My child is usually physically hungry when he/she eats something',
