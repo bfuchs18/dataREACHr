@@ -26,7 +26,7 @@
 #'
 #' \dontrun{
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-03_1132.csv"
+#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-20_1520.csv"
 #'
 #' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
@@ -308,16 +308,16 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
 
   merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
-                                                 elseif(merged_anthro$demo_child_relationship == 1, "reported", NA))
+                                                 ifelse(merged_anthro$demo_child_relationship == 1, "reported", NA))
 
   merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-                                       elseif(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+                                       ifelse(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
 
   merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
-                                                 elseif(merged_anthro$demo_child_relationship == 0, "reported", NA))
+                                                 ifelse(merged_anthro$demo_child_relationship == 0, "reported", NA))
 
   merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-                                       elseif(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+                                       ifelse(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
 
   #### Generate demographics dataframe  ####
 
@@ -350,8 +350,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # add risk status - compute based on ses-1 maternal_bmi
   ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
-  ses_1_data$risk_status <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 25), "low-risk", ifelse(ses_1_data$maternal_bmi >= 30, "high-risk", NA)) # calculate risk
-  demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
+  ses_1_data$risk_status_maternal <- ifelse(ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
+#  ses_1_data$risk_status_both_parents <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 26), "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal and paternal
+
+  ses_1_data$child_bmi_criteria <- ifelse(is.na(ses_1_data$child_bmi_p), NA, ifelse(ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
+
+  demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
 
   # rename columns
   names(demo_data)[names(demo_data) == "demo_ethnicity"] <- "ethnicity"
@@ -366,7 +370,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   # add risk status -- take from demo_data
   participants_data <- merge(participants_data,
-                                         demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status")],
+                                         demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status_maternal")],
                                          by = "participant_id",
                                          all = TRUE)
 
@@ -413,7 +417,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # reorder columns
   participants_data <-
     participants_data %>%
-    dplyr::relocate("risk_status", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
+    dplyr::relocate("risk_status_maternal", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
     dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
@@ -441,10 +445,33 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # add ages and sex
   prelim_anthro_data <- merge(prelim_anthro_data, demo_data[c("participant_id", "session_id", "child_age", "sex")], by=c("participant_id", "session_id"), all = TRUE)
 
+  # add parent 2
+  prelim_anthro_data <- merge(prelim_anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+
   # compute bmi variables
   prelim_anthro_data$child_bmi_z <- round(childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = "male", female = "female"), digits = 2)
   prelim_anthro_data$child_bmi_p <- round((childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = "male", female = "female")) * 100, digits = 2)
 
+  prelim_anthro_data$maternal_anthro_method <- ifelse(prelim_anthro_data$parent1_sex == "female", "measured",
+                                                      ifelse(prelim_anthro_data$demo_child_relationship == 1, "reported", NA))
+
+  prelim_anthro_data$maternal_bmi <- ifelse(prelim_anthro_data$maternal_anthro_method == "measured", prelim_anthro_data$parent1_bmi,
+                                            ifelse(prelim_anthro_data$maternal_anthro_method == "reported", prelim_anthro_data$parent2_reported_bmi, NA))
+
+  prelim_anthro_data$paternal_anthro_method <- ifelse(prelim_anthro_data$parent1_sex == "male", "measured",
+                                                      ifelse(prelim_anthro_data$demo_child_relationship == 0, "reported", NA))
+
+  prelim_anthro_data$paternal_bmi <- ifelse(prelim_anthro_data$paternal_anthro_method == "measured", prelim_anthro_data$parent1_bmi,
+                                            ifelse(prelim_anthro_data$paternal_anthro_method == "reported", prelim_anthro_data$parent2_reported_bmi, NA))
+
+  prelim_ses_1_data <- subset(prelim_anthro_data, session_id == "ses-1") # subset the dataset to include only session 1 data
+  prelim_ses_1_data$risk_status_maternal <- ifelse(prelim_ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(prelim_ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
+
+  prelim_ses_1_data$child_bmi_criteria <- ifelse(is.na(prelim_ses_1_data$child_bmi_p), NA, ifelse(prelim_ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
+
+  prelim_anthro_data <- merge(prelim_anthro_data, prelim_ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
+
+  participants_data <- merge(participants_data, prelim_ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria", "child_bmi_p")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
 
   #### Export Data ####
 
