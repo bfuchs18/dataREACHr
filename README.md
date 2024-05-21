@@ -1,4 +1,75 @@
-This package contains tools to process data for Project REACH at Penn State. This includes organizing multi-visit survey (RedCap), cognitive task, and fmri-related data into the Brain Imaging Data Structure and generating meta-data (jsons).
 
-Functions that organize data assume a data directory structure of:
-{details}
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# dataREACHr
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+dataREACHr package contains tools to process data for Project REACH at
+Penn State. This includes organizing multi-visit survey (REDCap),
+behavioral (e.g., cognitive task), and fmri-related data into the Brain
+Imaging Data Structure and generating meta-data (jsons).
+
+dataREACHr functions can: - copy behavioral data from untouchedRaw to
+bids/sourcedata - parse text files from the RRV task into CSVs -
+generate group-level dataframes containing questionnaire, demographic,
+intake, and anthropometric data - generate subject-specific dataframes
+containing cleaned behavioral data - export bids-compliant TSVs and
+JSONS for behavioral data into bids/rawdata/ and survey data into
+bids/phenotype
+
+## Installation
+
+You can install the development version of dataREACHr from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("bfuchs18/dataREACHr")
+```
+
+## Processing data with dataREACHr
+
+The two primary functions to process survey (redcap) and behavioral data
+are proc_redcap() and proc_task(), respectively.
+
+Using these functions requires a directory structure of: - base_dir
+(user defined) - **untouchedRaw** - **bids** - **sourcedata** -
+**rawdata** - **phenotype**
+
+Below is a basic example of how to process survey and task data:
+
+``` r
+library(dataREACHr)
+
+# define path to the base_dir directory (contains untouchedRaw/ and bids/ sub-directories)
+base_dir = "/path/to/base_dir/"
+
+# define names of redcap files to process
+visit_file_name =  "visit_data.csv"
+double_entry_file_name = "double_entry_data.csv"
+
+#### process redcap data ####
+
+# assign paths to data downloaded from redcap
+visit_data_path = paste0(base_dir, "/bids/sourcedata/phenotype/", visit_file_name)
+data_de_path = paste0(base_dir, "/bids/sourcedata/phenotype/", double_entry_file_name)
+
+# process redcap data and export TSVs and JSONS into bids/; overwrite existing output
+proc_redcap(visit_data_path, data_de_path, overwrite = TRUE)
+
+#### process task data ####
+
+# process task data and export TSVs and JSONS into bids/; overwrite existing files in rawdata for all tasks
+proc_task(
+  base_wd = base_dir,
+  overwrite_parsed_rrv = FALSE,
+  overwrite_sourcedata = FALSE,
+  overwrite_rawdata_vector = c("all_tasks"),
+  overwrite_jsons = FALSE
+)
+```
+
+This .md file was generated from
+README.Rmd`using`devtools::build_readme()\`
