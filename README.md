@@ -59,6 +59,8 @@ Below is a basic example of how to process survey and task data:
 ``` r
 library(dataREACHr)
 
+#### Set up variables ####
+
 # define path to the base_dir directory (contains untouchedRaw/ and bids/ sub-directories)
 base_dir = "/path/to/base_dir/"
 
@@ -87,5 +89,5 @@ proc_task(
 )
 ```
 
-This README was generated from
-README.Rmd`using`devtools::build_readme()\`
+This README was generated from README.Rmd using
+`devtools::build_readme()\`
