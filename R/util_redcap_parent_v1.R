@@ -155,8 +155,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
       efcr_data = efcr_scored,
       chaos_data = chaos_scored,
       pss_data = pss_scored,
-      # lbc_data = lbc_scored))
-      lbc_data = lbc_data))
+      lbc_data = lbc_scored))
   }
 }
 
