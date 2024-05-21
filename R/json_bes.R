@@ -35,7 +35,7 @@ json_bes <- function() {
     bes3 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
                  Levels = list ('0' = 'My child feels capable to control his/her eating urges when he/she wants to.',
                                 '1' = 'My child feels like he/she has failed to control his/her eating more than the average person',
-                                '3' = 'My child feels utterly helpless when it comes to feeling in control of his/her eating urges',
+                                '2' = 'My child feels utterly helpless when it comes to feeling in control of his/her eating urges',
                                 '3' = 'Because my child feels so helpless about controlling his/her eating, he/she has become very desperate about trying to get in control.',
                                 '999' = 'Don\'t want to answer')),
     bes4 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
