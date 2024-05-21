@@ -126,12 +126,20 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
 
   ## LBC Data  ####
   lbc_data <- data[, grepl('participant_id|session_id|lbc|lifestyle_behavior_checklist_timestamp', names(data))]
+
+  # rename columns
+  names(lbc_data) <- gsub('lbc_', 'lbc', names(lbc_data))
+  names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
+
+  # add date column
   lbc_data$lbc_form_date <- lubridate::as_date(lbc_data$lifestyle_behavior_checklist_timestamp)
   lbc_data <- lbc_data[, -grep("missingcheck|timestamp", names(lbc_data))] # remove extra columns
   lbc_data <- lbc_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
-  # lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date")) # need to debug
+  # extract column names containing "conf" -- these will be included in extra_scale_cols
+  colnames_with_conf <- colnames(lbc_data)[grep("conf", colnames(lbc_data))]
+
+  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date", colnames_with_conf)) # need to debug
 
   ## return data ####
   if (isTRUE(return_data)){
