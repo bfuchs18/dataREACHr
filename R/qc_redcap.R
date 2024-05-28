@@ -4,10 +4,10 @@
 #' \itemize{
 #'  \item{Duplicate data:}
 #'  \itemize{
-#'     \item{Checks participant dataframe contains 1 row per subject}
-#'     \item{Checks intake dataframe contains 1 row per subject + visit combination}
-#'     \item{Checks puberty dataframe contains 1 row per subject + session + respondent combination}
-#'     \item{Checks all other dataframes contains 1 row per subject and session combination}
+#'     \item{Checks participant dataframe for duplicate subject IDs}
+#'     \item{Checks intake dataframe for duplicate subject + visit combinations}
+#'     \item{Checks puberty dataframe for duplicate subject + session + respondent combinations}
+#'     \item{Checks all other dataframes for duplicate subject and session combinations}
 #'  }
 #'  \item{Data types:}
 #'  \itemize{
