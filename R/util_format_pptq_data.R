@@ -7,10 +7,6 @@
 #'
 util_format_pptq_data <- function(pptq_data) {
 
-  # if scoring - update. for example, but this doesnt work, probably if not 0, then NA.
-  # pptq_data$pptq_1 <- ifelse(pptq_data$pptq_play_on_own == 0, 1, ifelse(pptq_data$pptq_play_depends == 0, 2, ifelse(pptq_data$pptq_play_with_others == 0, 3, NA)))
-  # instead: if sum of all three options > 1, NA, else ... 3 separate ifs (not ifelse )
-
   # update columns names
   # names(pptq_data)[names(pptq_data) == "pptq_rain_play_computer"] <- "pptq_example_left"
   # names(pptq_data)[names(pptq_data) == "pptq_rain_watch_tv"] <- "pptq_example_right"
@@ -79,7 +75,7 @@ util_format_pptq_data <- function(pptq_data) {
   }
 
   # return data
-  return(pptq_data[, (names(pptq_data) %in% c('participant_id', primary_qs))])
+  return(pptq_data[, (names(pptq_data) %in% c('participant_id', 'session_id', 'pptq_form_date', primary_qs))])
 
 }
 
