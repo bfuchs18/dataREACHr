@@ -26,9 +26,12 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
-  # all validated so can just take reviewer 1 data
-  data <- data[grepl('--1', data[['participant_id']]), ]
-  data$participant_id <- gsub("--1", "", data$participant_id)
+  # take merged data only (remove rows with "--")
+  rows_to_remove <- grepl("--", data$participant_id)
+  data <- data[!rows_to_remove, ]
+
+#  data <- data[grepl('--1', data[['participant_id']]), ]
+#  data$participant_id <- gsub("--1", "", data$participant_id)
 
   # Make ID column bids compliant: add "sub_"
   data$participant_id <- paste0("sub-", data$participant_id)
