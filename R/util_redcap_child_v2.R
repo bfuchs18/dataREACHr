@@ -38,12 +38,12 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
   ## MRI notes ####
   mri_notes <- data[, grepl('^mri_', names(data)) |
-                      names(data) %in% c('participant_id', 'mock_fmri_complete_check', 'mock_fmri_notes')]
+                      names(data) %in% c('participant_id', "session_id", 'mock_fmri_complete_check', 'mock_fmri_notes')]
   mri_notes <- mri_notes[, !(names(mri_notes) %in% c('mri_resting_complete_check', 'mri_resting_state_notes'))]
 
 
   ## MRI behavioral assessment ####
-  mri_assessment_data <- data[, grepl('participant_id|_familiarity|_recall|_liking|fmri_behavioral_assessment_timestamp', names(data))]
+  mri_assessment_data <- data[, grepl('participant_id|session_id|_familiarity|_recall|_liking|fmri_behavioral_assessment_timestamp', names(data))]
   mri_assessment_data$mri_assessment_form_date <- lubridate::as_date(mri_assessment_data$fmri_behavioral_assessment_timestamp) # add form date column
   mri_assessment_data <- mri_assessment_data[, -grep("missingcheck|timestamp", names(mri_assessment_data))] # remove extra columns
   # score this data?
