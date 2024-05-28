@@ -1,4 +1,4 @@
-#' qc_redcap: Check processed redcap data for quality issues
+#' qc_redcap: Check raw and processed redcap data for quality issues
 #'
 #' This function checks processed redcap data for the following qualities:
 #' \itemize{
@@ -11,13 +11,13 @@
 #'  }
 #'  \item{Data types:}
 #'  \itemize{
-#'     \item{Checks that intake data (pre and post-weights) are numerical}
+#'     \item{ ?? Checks that raw intake data (pre and post-weights) are numerical. These columns are converted to numeric in data processing pipeline and non-numeric data would be converted to NA}
 #'     \item{Checks LOC data: }
 #'   }
 #'  \item{Data values:}
 #'  \itemize{
-#'     \item{Checks child ages at V1 between >8 and <10}
-#'     \item{Checks intake consumption (g) <= amount served}
+#'     \item{Checks participant dataframe for child ages outside 7-9}
+#'     \item{Checks intake dataframe for negative consumption variables}
 #'   }
 #'  \item{Missing data:}
 #'  \itemize{
@@ -33,13 +33,12 @@
 #'
 #' # return data from proc_redcap()
 #' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
-#' phenotype_data <- redcap_data$phenotype_data
 #'
 #' # run QC on phenotype_data in redcap_data
-#' qc_redcap(phenotype_data)
+#' qc_redcap(redcap_data)
 #'
 #' }
-qc_redcap <- function(phenotype_data) {
+qc_redcap <- function(redcap_data) {
 
   #### Set up/initial checks #####
 
@@ -53,6 +52,10 @@ qc_redcap <- function(phenotype_data) {
   } else if (isFALSE(data_arg)) {
     stop("must specify phenotype_data arg")
   }
+
+  # extract data
+  phenotype_data <- redcap_data$phenotype_data
+  phenotype_data <- redcap_data$phenotype_data
 
   #### Quality check: duplicate data #####
 
@@ -68,7 +71,7 @@ qc_redcap <- function(phenotype_data) {
       duplicate_rows <- df[duplicated(df[c("participant_id")]), ]
 
       if (nrow(duplicate_rows) > 0) {
-        cat(paste0("Duplicate subject rows in ", df_name, " :\n"))
+        cat(paste0("Duplicate participant_id rows in ", df_name))
         print(duplicate_rows)
       }
 
@@ -79,7 +82,7 @@ qc_redcap <- function(phenotype_data) {
       duplicate_rows <- df[duplicated(df[c("participant_id", "visit_protocol")]), ]
 
       if (nrow(duplicate_rows) > 0) {
-        cat(paste0("Duplicate participant_id+visit_protocol rows in ", df_name, " :\n"))
+        cat(paste0("Duplicate participant_id+visit_protocol rows in ", df_name))
 
       }
 
@@ -90,7 +93,7 @@ qc_redcap <- function(phenotype_data) {
       duplicate_rows <- df[duplicated(df[c("participant_id", "session_id", "respondent")]), ]
 
       if (nrow(duplicate_rows) > 0) {
-        cat(paste0("Duplicate participant_id+session_id+respondent rows in ", df_name, " :\n"))
+        cat(paste0("Duplicate participant_id+session_id+respondent rows in ", df_name))
       }
 
       # check all other dataframes for duplicate sub + ses combinations
@@ -100,7 +103,7 @@ qc_redcap <- function(phenotype_data) {
       duplicate_rows <- df[duplicated(df[c("participant_id", "session_id")]), ]
 
       if (nrow(duplicate_rows) > 0) {
-        cat(paste0("Duplicate participant_id+session_id rows in ", df_name, " :\n"))
+        cat(paste0("Duplicate participant_id+session_id rows in ", df_name))
       }
 
     }
@@ -109,8 +112,81 @@ qc_redcap <- function(phenotype_data) {
 
   #### Quality check: data types #####
 
+  ### check input intake data
+
+  ## note: checking processed data doesnt make sense - these columns are converted to numeric during processing to enable computations
+  # if (!is.null(phenotype_data$intake)) {
+  #
+  #   # extract intake data
+  #   intake_data <- phenotype_data$intake
+  #
+  #   # define intake columns to check
+  #   intake_vars <- grep('post_w_plate|pre_w_o_plate|pre_w_plate', names(intake_data), value = TRUE)
+  #
+  #   # identify non-numeric columns
+  #   non_numeric_cols <- sapply(intake_data[c(intake_vars)], function(col) !is.numeric(col))
+  #
+  #
+  # } else {
+  #
+  #     cat("intake dataframe (phenotype_data$intake) not included in redcap_data")  #
+  # }
+
   #### Quality check: data values #####
 
+  # participants data
+  if (!is.null(phenotype_data$participants)) {
+
+    # extract data
+    participants_data <- phenotype_data$participants
+
+    # check age
+    if (min(participants_data$child_protocol_1_age, na.rm = TRUE) < 7) {
+      cat("minimum child_protocol_1_age in participants_data is below expected value (7). Check birthdates and visit dates")
+    }
+
+    if (max(participants_data$child_protocol_1_age, na.rm = TRUE) >= 10) {
+      cat("minimum child_protocol_1_age in participants_data is above expected value (>=10). Check birthdates and visit dates")
+    }
+
+  } else {
+
+    cat("Participant dataframe (phenotype_data$participants) not included in redcap_data")
+
+  }
+
+  # intake data
+  if (!is.null(phenotype_data$intake)) {
+
+    # extract data
+    intake_data <- phenotype_data$intake
+
+    # define consumption (g) vars
+    consumption_vars <- grep('grams_consumed', names(intake_data), value = TRUE)
+
+    var = "tender_grams_consumed"
+    for (var in consumption_vars) {
+
+      subset <- intake_data[c("participant_id", "visit_protocol", var)]
+
+      # extract rows with values below 0
+      negative_rows <- subset[!is.na(subset[[var]]) & subset[[var]] < 0, ]
+
+      if (nrow(negative_rows) > 0) {
+        cat(paste0("Negative consumption values in intake data variable: ", var, ". Check pre and post-weights. \n"))
+        print(negative_rows)
+      }
+
+    }
+
+
+  } else {
+
+    cat("Participant dataframe (phenotype_data$participants) not included in redcap_data")
+
+  }
   #### Quality check: missing data #####
+
+
 }
 
