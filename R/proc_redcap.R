@@ -490,7 +490,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     brief2 = parent_v2_data$brief_data$bids_phenotype,
     bes = parent_v2_data$bes_data$bids_phenotype,
     ffbs = parent_v2_data$ffbs_data$bids_phenotype,
-    # list(parent_v2_data$fsq_data, "fsq"), # not in bids_phenotype yet
+#    fsq = parent_v2_data$fsq_data$bids_phenotype, # not in bids_phenotype yet
+    fsq = parent_v2_data$fsq_data,
     spsrq = parent_v3_data$spsrq_data$bids_phenotype,
     pwlb = parent_v3_data$pwlb_data$bids_phenotype,
     tfeq = parent_v3_data$tfeq_data$bids_phenotype,
@@ -520,6 +521,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     rank = stacked_rank,
     puberty = stacked_puberty,
     loc = stacked_loc,
+    class = stacked_class,
 
     # non-questionnaire data
     demographics = demo_data,
