@@ -5,8 +5,8 @@
 #' 2) Calls util_ functions to clean and compile data in dataframes
 #' 3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
 #' 4) Exports the following BIDS-compliant .tsv files into bids/phenotype:
-#'    * questionnaire data - raw and scores: efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, audit, cfpq, puberty, cshq, chaos
-#'    * questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc, cbq, cfq
+#'    * questionnaire data - raw and scores: efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, audit, cfpq, puberty, cshq, chaos, cfq
+#'    * questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc, cbq
 #'    * compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
 #' 5) Exports bids/participants.tsv
 #' 6) Exports a .json file with meta-data for each .tsv
@@ -28,7 +28,7 @@
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
 #' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-20_1520.csv"
 #'
-#' phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
+#' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
 #' }
 #'
@@ -482,8 +482,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     # single visit questionnaires
     infancy = parent_v1_data$infancy_data,
-    cfq = parent_v1_data$cfq_data,
-    # cfq = parent_v1_data$cfq_data$bids_phenotype, # not in bids_phenotype yet
+    cfq = parent_v1_data$cfq_data$bids_phenotype,
     efcr = parent_v1_data$efcr_data$bids_phenotype,
     lbc = parent_v1_data$lbc_data$bids_phenotype,
     pss = parent_v1_data$pss_data$bids_phenotype,
@@ -612,6 +611,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Return Data ####
   if (isTRUE(return_data)) {
     return(list(
+      input_data = list(visit_data = redcap_visit_data,
+                        de_data = redcap_de_data),
       visit_data = list(
         child_v1_data = child_v1_data,
         child_v2_data = child_v2_data,

@@ -35,8 +35,8 @@ This function:
 \item Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
 \item Exports the following BIDS-compliant .tsv files into bids/phenotype:
 \itemize{
-\item questionnaire data - raw and scores: cfq, efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, cbq, audit, cfpq, puberty, cshq, chaos
-\item questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc
+\item questionnaire data - raw and scores: efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, audit, cfpq, puberty, cshq, chaos, cfq
+\item questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc, cbq
 \item compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
 }
 \item Exports bids/participants.tsv
@@ -50,9 +50,9 @@ To use this function, the correct path must be used. The path must be the full p
 
 \dontrun{
 data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-03_1132.csv"
+visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-20_1520.csv"
 
-phenotype_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
+redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 
 }
 
