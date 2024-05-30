@@ -5,11 +5,16 @@
 #'
 #' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
 #' @param overwrite logical indicating if data should be overwritten in /sourcedata Default = FALSE
+#' @param all_tasks logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_list
+#' @param task_list vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
 #'
 #' @examples
 #'
-#' # organize task data in untouchedRaw into sourcedata
-#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
+#' # organize task data for all tasks in untouchedRaw into sourcedata
+#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
+#'
+#' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
+#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_list = c("spacegame", "nih_toolbox")
 #'
 #' \dontrun{
 #' }
@@ -17,13 +22,13 @@
 #'
 #' @export
 
-util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
+util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_list) {
 
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
   #### Set up/initial checks #####
 
-  # check that audit_data exist and is a data.frame
+  # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
 
   if (isTRUE(data_arg)) {
@@ -35,6 +40,29 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   } else if (isFALSE(data_arg)) {
     stop("base_wd must be entered as a string")
   }
+
+  # check that task options correctly specified
+  task_list_arg <- methods::hasArg(task_list)
+
+  if (isFALSE(all_tasks) & isFALSE(task_list_arg)) {
+    stop("Tasks to process not specified: Specify tasks by setting all_tasks = TRUE or providing vector to task_list parameter")
+  }
+
+  if (isTRUE(all_tasks) & isTRUE(task_list_arg)) {
+    stop("all_tasks = TRUE and task_list parameter were provided. Use only 1 of these options")
+  }
+
+  if (isTRUE(task_list_arg)) {
+    if (!is.vector(task_list)) {
+    stop("Input to task_list must be vector (e.g., task_list = c('rrv')")
+    } else {
+    for (task in task_list) {
+      if (!task %in% c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")) {
+        stop(paste(task, "is not an option for task_list"))
+      }
+    }
+  }
+
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -83,76 +111,121 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
   }
 
   #### FoodView task ####
-  print("-- copying Food View")
 
-  foodview_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'foodview_task')
-  foodview_files <- list.files(foodview_dir, pattern = 'foodview', full.names = TRUE)
+  if (isTRUE(all_tasks) | "foodview" %in% task_list) {
+    print("-- copying Food View")
 
-  for (file in foodview_files) {
+    foodview_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'foodview_task')
+    foodview_files <- list.files(foodview_dir, pattern = 'foodview', full.names = TRUE)
 
-    # extract subject from file
-    temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
-    sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
-    sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+    for (file in foodview_files) {
 
-    # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+      # extract subject from file
+      temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
+      sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
+      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+
+      # copy to sourcedata
+      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+    }
   }
+
 
   #### Stop Signal Task ####
-  print("-- copying SST")
+  if (isTRUE(all_tasks) | "sst" %in% task_list) {
+    print("-- copying SST")
 
-  sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
-  sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
+    sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
+    sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
 
-  for (file in sst_files) {
+    for (file in sst_files) {
 
-    # extract subject from file
-    temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
-    sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
-    sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+      # extract subject from file
+      temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
+      sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
+      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
-    # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+      # copy to sourcedata
+      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+    }
   }
+
 
   #### Space Game ####
-  print("-- copying Space Game")
+  if (isTRUE(all_tasks) | "spacegame" %in% task_list) {
+    print("-- copying Space Game")
 
-  space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game')
-  space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = TRUE)
+    space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game')
+    space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = TRUE)
 
-  for (file in space_game_files) {
+    for (file in space_game_files) {
 
-    # extract file name
-    filename <- basename(file)
+      # extract file name
+      filename <- basename(file)
 
-    # extract subject from filename
-    temp <- sub("(^[^-]+)-.*", "\\1", filename) # extract characters before first "-"
-    sub_num <- sub('mbmfNovelStakes_', '', temp) # extract sub number (replace 'mbmfNovelStakes_' with "")
-    sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+      # extract subject from filename
+      temp <- sub("(^[^-]+)-.*", "\\1", filename) # extract characters before first "-"
+      sub_num <- sub('mbmfNovelStakes_', '', temp) # extract sub number (replace 'mbmfNovelStakes_' with "")
+      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
-    # copy to sourcedata
-    copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+      # copy to sourcedata
+      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+    }
   }
 
+
   #### NIH toolbox ####
-  print("-- copying NIH toolbox")
+  if (isTRUE(all_tasks) | "nih_toolbox" %in% task_list) {
 
-  # for each session
-  for (ses_str in c("ses-1", 'ses-2')) {
+    print("-- copying NIH toolbox")
 
-    # define directory with data
-    if (ses_str == "ses-1") {
-      toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V1')
-    } else {
-      toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V5')
+    # for each session
+    for (ses_str in c("ses-1", 'ses-2')) {
+
+      # define directory with data
+      if (ses_str == "ses-1") {
+        toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V1')
+      } else {
+        toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V5')
+      }
+
+      # get list of subject directories
+      toolbox_sub_dirs <- list.dirs(toolbox_dir, full.names = TRUE, recursive = FALSE)
+
+      for (sub_dir in toolbox_sub_dirs) {
+        # extract directory name
+        dirname <- basename(sub_dir)
+
+        # if directory starts with "REACH"
+        if (grepl("^REACH", dirname)) {
+
+          # extract subject ID
+          sub <- sub("REACH_", "", dirname)
+          sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+          # get list of files
+          toolbox_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+
+          # copy files to sourcedata
+          for (file in toolbox_sub_files) {
+            copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
+          }
+        }
+      }
     }
+  }
 
-    # get list of subject directories
-    toolbox_sub_dirs <- list.dirs(toolbox_dir, full.names = TRUE, recursive = FALSE)
 
-    for (sub_dir in toolbox_sub_dirs) {
+  #### RRV ####
+  if (isTRUE(all_tasks) | "rrv" %in% task_list) {
+
+    print("-- copying RRV")
+
+    rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')
+    rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
+
+    for (sub_dir in rrv_sub_dirs) {
+
       # extract directory name
       dirname <- basename(sub_dir)
 
@@ -160,88 +233,65 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE) {
       if (grepl("^REACH", dirname)) {
 
         # extract subject ID
-        sub <- sub("REACH_", "", dirname)
+        sub <- gsub("REACH_|_csv", "", dirname)
         sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
-        # get list of files
-        toolbox_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+        # get list of files in sub_dir (but not directories)
+        rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
 
         # copy files to sourcedata
-        for (file in toolbox_sub_files) {
-          copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
+        for (file in rrv_sub_files) {
+          copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite = overwrite)
         }
       }
     }
   }
 
-  #### RRV ####
-  print("-- copying RRV")
-
-  rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')
-  rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
-
-  for (sub_dir in rrv_sub_dirs) {
-
-    # extract directory name
-    dirname <- basename(sub_dir)
-
-    # if directory starts with "REACH"
-    if (grepl("^REACH", dirname)) {
-
-      # extract subject ID
-      sub <- gsub("REACH_|_csv", "", dirname)
-      sub_str <- sprintf("sub-%03d", as.numeric(sub))
-
-      # get list of files in sub_dir (but not directories)
-      rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
-
-      # copy files to sourcedata
-      for (file in rrv_sub_files) {
-        copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite = overwrite)
-      }
-    }
-  }
 
   #### PIT ####
-  print("-- copying PIT task")
+  if (isTRUE(all_tasks) | "pit" %in% task_list) {
+    print("-- copying PIT task")
 
-  # for each session
-  for (ses_str in c("ses-1", 'ses-2')) {
+    # for each session
+    for (ses_str in c("ses-1", 'ses-2')) {
 
-    # define directory with pit data
-    if (ses_str == "ses-1") {
-      pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task')
-    } else {
-      pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5_PIT')
-    }
-
-    # get list of files in pit_dir (but not directories)
-    pit_ses_files <- setdiff(list.files(pit_dir, full.names = TRUE), list.dirs(pit_dir, recursive = FALSE, full.names = TRUE))
-
-    # get list of subs: get file basename and extract characters before first "_"
-    ses_subs <- unique(sub("(^[^_]+)_.*", "\\1", basename(pit_ses_files)))
-
-    # for each sub
-    for (sub in ses_subs) {
-
-      # extract subject files
-      sub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = TRUE)
-
-      # extract file extensions
-      extensions <- tools::file_ext(sub_files)
-
-      # output warning if .csv not found
-      if ( !"csv" %in% extensions ) {
-        print(paste("warning: subject", sub, ses_str, "has PIT output files but no csv" ))
+      # define directory with pit data
+      if (ses_str == "ses-1") {
+        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task')
+      } else {
+        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5_PIT')
       }
 
-      # set subject string
-      sub_str <- sprintf("sub-%03d", as.numeric(sub))
+      # get list of files in pit_dir (but not directories)
+      pit_ses_files <- setdiff(list.files(pit_dir, full.names = TRUE), list.dirs(pit_dir, recursive = FALSE, full.names = TRUE))
 
-      # copy files to sourcedata
-      for (file in sub_files) {
-        copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
+      # get list of subs: get file basename and extract characters before first "_"
+      ses_subs <- unique(sub("(^[^_]+)_.*", "\\1", basename(pit_ses_files)))
+
+      # for each sub
+      for (sub in ses_subs) {
+
+        # extract subject files
+        sub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = TRUE)
+
+        # extract file extensions
+        extensions <- tools::file_ext(sub_files)
+
+        # output warning if .csv not found
+        if ( !"csv" %in% extensions ) {
+          print(paste("warning: subject", sub, ses_str, "has PIT output files but no csv" ))
+        }
+
+        # set subject string
+        sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+        # copy files to sourcedata
+        for (file in sub_files) {
+          copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
+        }
       }
     }
   }
+
+}
 }

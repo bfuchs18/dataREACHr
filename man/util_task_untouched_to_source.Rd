@@ -4,20 +4,32 @@
 \alias{util_task_untouched_to_source}
 \title{util_task_untouched_to_source: Move task data from untouchedRaw into bids/sourcedata}
 \usage{
-util_task_untouched_to_source(base_wd, overwrite = FALSE)
+util_task_untouched_to_source(
+  base_wd,
+  overwrite = FALSE,
+  all_tasks = FALSE,
+  task_list
+)
 }
 \arguments{
 \item{base_wd}{string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/}
 
 \item{overwrite}{logical indicating if data should be overwritten in /sourcedata Default = FALSE}
+
+\item{all_tasks}{logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_list}
+
+\item{task_list}{vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")}
 }
 \description{
 This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task, nih toolbix
 }
 \examples{
 
-# organize task data in untouchedRaw into sourcedata
-util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/")
+# organize task data for all tasks in untouchedRaw into sourcedata
+util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
+
+# organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
+util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_list = c("spacegame", "nih_toolbox")
 
 \dontrun{
 }
