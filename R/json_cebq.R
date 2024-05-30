@@ -1,9 +1,9 @@
-#' json_cebq: Generates a json file for the Children's Eating Behavior Questionnaire
+#' json_cebq: Generates a json file for the Children\'s Eating Behavior Questionnaire
 #'
-#' This function generates a json file for the scored Children's Eating Behavior Questionnaire and raw participant responses.
+#' This function generates a json file for the scored Children\'s Eating Behavior Questionnaire and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_cebq function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A string with data stored in JSON format containing meta-data for the Children's Eating Behavior Questionnaire
+#' @return A string with data stored in JSON format containing meta-data for the Children\'s Eating Behavior Questionnaire
 #'
 #'
 #' @export
@@ -13,7 +13,7 @@ json_cebq <- function() {
   cebq_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Children\'s Eating Behavior Questionnaire. Participants were provided the following instructions: "Please read the following statements and tick the boxes most appropriate to your child\'s eating behavior."',
-      Reference = 'Wardle, J., Guthrie, C. A., Sanderson, S., & Rapoport, L. (2001). Development of the children’s eating behaviour questionnaire. Journal of Child Psychology and Psychiatry, 42, 963–970. https://doi.org/10.1017/S0021963001007727',
+      Reference = 'Wardle, J., Guthrie, C. A., Sanderson, S., & Rapoport, L. (2001). Development of the children\'s eating behaviour questionnaire. Journal of Child Psychology and Psychiatry, 42, 963 to 970. https://doi.org/10.1017/S0021963001007727',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11693591/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
@@ -250,15 +250,15 @@ json_cebq <- function() {
                           Derivative = TRUE),
     cebq_avoid = list( Description = 'Food avoidance.',
                        Derivative = TRUE),
-    cebq_rbe = list( Description = 'Alternative 3-factor solution: Reward-based eating.',
+    cebq_rbe = list( Description = 'Reward-based eating.',
                      Derivative = TRUE,
-                     Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three‐factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'),
-    cebq_pe = list( Description = 'Alternative 3-factor solution: Picky eating.',
+                     Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'),
+    cebq_pe = list( Description = 'Picky eating.',
                     Derivative = TRUE,
-                    Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three‐factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'),
-    cebq_ee = list( Description = 'Alternative 3-factor solution: Emotional eating.',
+                    Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'),
+    cebq_ee = list( Description = 'Emotional eating.',
                     Derivative = TRUE,
-                    Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three‐factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'))
+                    Reference = 'Manzano MA, Strong DR, Kang Sim DE, Rhee KE, Boutelle KN. Psychometric properties of the Child Eating Behavior Questionnaire (CEBQ) in school age children with overweight and obesity: A proposed three factor structure. Pediatric Obesity. 2021;16(10):e12795. doi:10.1111/ijpo.12795'))
 
   # convert formatting to JSON
   cebq_json <- RJSONIO::toJSON(cebq_list, pretty = TRUE)

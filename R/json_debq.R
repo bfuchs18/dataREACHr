@@ -157,7 +157,7 @@ json_debq <- function() {
                                     '1' = 'Seldom',
                                     '3' = 'Often',
                                     '4' = 'Very Often')),
-    debq24 = list( Description = 'If you walk past a snack bar or a café, do you have the desire to buy something delicious?',
+    debq24 = list( Description = 'If you walk past a snack bar or a caf\u00E9, do you have the desire to buy something delicious?',
                      Levels = list ('0' = 'Never',
                                     '1' = 'Seldom',
                                     '2' = 'Sometimes',

@@ -1,6 +1,6 @@
-#' json_cbq: Generates a json file for the Child Behavior Questionnaire
+#' json_cbq: Generates a json file for the Children\'s Behavior Questionnaire
 #'
-#' This function generates a json file for the scored Child Behavior Questionnaire and raw participant responses.
+#' This function generates a json file for the scored Children\'s Behavior Questionnaire and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_cbq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Child Behavior Questionnaire
@@ -12,8 +12,8 @@ json_cbq <- function() {
 
   cbq_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Child Behavior Questionnaire. Participants were provided the following instructions: "Please read carefully before starting. You will see a set of statements that describe children\'s reactions to a number of situations. We would like you to tell us what your child\'s reaction is likely to be in those situations. There are of course no "correct" ways of reacting; children differ widely in their reactions, and it is these differences we are trying to learn about. Please read each statement and decide whether it is a "true" or "untrue" description of your child\'s reaction within the past six months. If you cannot answer one of the items because you have never seen the child in that situation, for example, if the statement is about the child\'s reaction to your singing and you have never sung to your child, then choose NA (not applicable). Please be sure to choose an answer or NA for every item."',
-      Reference = 'Putnam SP, Rothbart MK. Development of Short and Very Short Forms of the Children’s Behavior Questionnaire. Journal of Personality Assessment. 2006;87(1). doi:10.1207/s15327752jpa8701_09',
+      Description = 'Children\'s Behavior Questionnaire. Participants were provided the following instructions: "Please read carefully before starting. You will see a set of statements that describe children\'s reactions to a number of situations. We would like you to tell us what your child\'s reaction is likely to be in those situations. There are of course no "correct" ways of reacting; children differ widely in their reactions, and it is these differences we are trying to learn about. Please read each statement and decide whether it is a "true" or "untrue" description of your child\'s reaction within the past six months. If you cannot answer one of the items because you have never seen the child in that situation, for example, if the statement is about the child\'s reaction to your singing and you have never sung to your child, then choose NA (not applicable). Please be sure to choose an answer or NA for every item."',
+      Reference = 'Putnam SP, Rothbart MK. Development of Short and Very Short Forms of the Children\'s Behavior Questionnaire. Journal of Personality Assessment. 2006;87(1). doi:10.1207/s15327752jpa8701_09',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/16856791/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

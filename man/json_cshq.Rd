@@ -2,14 +2,14 @@
 % Please edit documentation in R/json_cshq.R
 \name{json_cshq}
 \alias{json_cshq}
-\title{json_cshq: Generates a json file for the Children's Sleep Habits Questionnaire}
+\title{json_cshq: Generates a json file for the Children\'s Sleep Habits Questionnaire}
 \usage{
 json_cshq()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the Children's Sleep Habits Questionnaire
+A string with data stored in JSON format containing meta-data for the Children\'s Sleep Habits Questionnaire
 }
 \description{
-This function generates a json file for the scored Children's Sleep Habits Questionnaire and raw participant responses.
+This function generates a json file for the scored Children\'s Sleep Habits Questionnaire and raw participant responses.
 This function provides accurate json files ONLY if data is processed using score_cshq function in dataprepr and is only accurate for data collected in Study REACH.
 }

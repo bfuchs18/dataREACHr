@@ -13,7 +13,7 @@ json_tfeq <- function() {
   tfeq_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Three-Factor Eating Questionnaire-R18. Participants were provided the following instructions: "For each item below, indicate how "true" or "false" the statement is by using the options below: Definitely False - Mostly False - Mostly True - Definitely True"',
-      Reference = 'Karlsson J, Persson LO, Sjöström L, Sullivan M. Psychometric properties and factor structure of the Three-Factor Eating Questionnaire (TFEQ) in obese men and women. Results from the Swedish Obese Subjects (SOS) study. Int J Obes Relat Metab Disord. 2000 Dec;24(12):1715-25. doi: 10.1038/sj.ijo.0801442. PMID: 11126230.',
+      Reference = 'Karlsson J, Persson LO, Sjostrom L, Sullivan M. Psychometric properties and factor structure of the Three-Factor Eating Questionnaire (TFEQ) in obese men and women. Results from the Swedish Obese Subjects (SOS) study. Int J Obes Relat Metab Disord. 2000 Dec;24(12):1715-25. doi: 10.1038/sj.ijo.0801442. PMID: 11126230.',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11126230/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

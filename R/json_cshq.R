@@ -1,9 +1,9 @@
-#' json_cshq: Generates a json file for the Children's Sleep Habits Questionnaire
+#' json_cshq: Generates a json file for the Children\'s Sleep Habits Questionnaire
 #'
-#' This function generates a json file for the scored Children's Sleep Habits Questionnaire and raw participant responses.
+#' This function generates a json file for the scored Children\'s Sleep Habits Questionnaire and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_cshq function in dataprepr and is only accurate for data collected in Study REACH.
 #'
-#' @return A string with data stored in JSON format containing meta-data for the Children's Sleep Habits Questionnaire
+#' @return A string with data stored in JSON format containing meta-data for the Children\'s Sleep Habits Questionnaire
 #'
 #'
 #' @export
@@ -12,8 +12,8 @@ json_cshq <- function() {
 
   cshq_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = 'Children\'s Sleep Habits Questionnaire. Participants were provided the following instructions: "The following statements are about your child’s sleep habits and possible difficulties with sleep. Think about the past week in your child’s life when answering the questions. If last week was unusual for a specific reason (such as your child had an ear infection and did not sleep well or the TV set was broken) choose the most recent typical week. Answer USUALLY if something occurs 5 or more times in a week. Answer SOMETIMES if it occurs 2-4 times in a week. Answer RARELY if something occurs never or 1 time during a week. Indicate whether or not the sleep habit is a problem by circling “Yes”, “No,” or “not applicable (N/A)”."',
-      Reference = 'Owens, J. A., Spirito, A., & McGuinn, M. (2000). The Children’s Sleep Habits Questionnaire (CSHQ): Psychometric Properties of A Survey Instrument for School-Aged Children. SLEEP, 23(8), 1043–1052',
+      Description = 'Children\'s Sleep Habits Questionnaire. Participants were provided the following instructions: "The following statements are about your child\'s sleep habits and possible difficulties with sleep. Think about the past week in your child\'s life when answering the questions. If last week was unusual for a specific reason (such as your child had an ear infection and did not sleep well or the TV set was broken) choose the most recent typical week. Answer USUALLY if something occurs 5 or more times in a week. Answer SOMETIMES if it occurs 2-4 times in a week. Answer RARELY if something occurs never or 1 time during a week. Indicate whether or not the sleep habit is a problem by circling "Yes", "No", or "not applicable (N/A)"."',
+      Reference = 'Owens, J. A., Spirito, A., & McGuinn, M. (2000). The Children\'s Sleep Habits Questionnaire (CSHQ): Psychometric Properties of A Survey Instrument for School-Aged Children. SLEEP, 23(8), 1043 to 1052',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11145319/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
@@ -290,7 +290,7 @@ json_cshq <- function() {
                          Levels = list ('0' = 'No',
                                         '1' = 'Yes',
                                         '2' = 'N/A')),
-    cshq_bedtime_resit = list( Description = 'Betime Resistance.',
+    cshq_bedtime_resit = list( Description = 'Bedtime Resistance.',
                                Derivative = TRUE),
     cshq_sleep_delay = list( Description = 'Sleep Onset Delay.',
                              Derivative = TRUE),

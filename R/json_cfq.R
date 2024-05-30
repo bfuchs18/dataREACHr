@@ -13,7 +13,7 @@ json_cfq <- function() {
   cfq_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Child Feeding Questionnaire. Participants were provided the following instructions: "Using the scale below, please choose one option for each question which best corresponds to your answer. Please answer about your child who is in our study."',
-      Reference = 'Birch, L. L., Fisher, J. O., Grimm-Thomas, K., Markey, C. N., Sawyer, R., & Johnson, S. L. (2001). Confirmatory factor analysis of the Child Feeng Questionnaire: A measure of parental attitudes, beliefs and practices about child feeng and obesity proneness. Appetite, 36(3), 201–210. https://doi.org/10.1006/appe.2001.0398',
+      Reference = 'Birch, L. L., Fisher, J. O., Grimm-Thomas, K., Markey, C. N., Sawyer, R., & Johnson, S. L. (2001). Confirmatory factor analysis of the Child Feeng Questionnaire: A measure of parental attitudes, beliefs and practices about child feeng and obesity proneness. Appetite, 36(3), 201 to 210. https://doi.org/10.1006/appe.2001.0398',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/11358344/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

@@ -11,13 +11,13 @@ json_loc <- function() {
   loc_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Loss of Control-Eating Questionniare. Participants were provided the following instructions: """OK, I am going to ask you questions about how you feel when you are eating. If you don\'t want to answer a question, that\'s fine. Just say "skip" and we can move on. For each question, you are going to answer "yes" if it applies to you and "no" if it doesn\'t. Are you ready?". Administration of the questionnaire stops after loc_1 if participants responds "No" or "skip".',
-      Reference = 'Tanofsky-Kraff, M., Marcus, M. D., Yanovski, S. Z., and Yanovski, J. A. (2008). Loss of control eating disorder in children age 12 years and younger: Proposed research criteria. Eating Behaviors 9, 360–365. doi: 10.1016/j.eatbeh.2008.03.002.',
+      Reference = 'Tanofsky-Kraff, M., Marcus, M. D., Yanovski, S. Z., and Yanovski, J. A. (2008). Loss of control eating disorder in children age 12 years and younger: Proposed research criteria. Eating Behaviors 9, 360 to 365. doi: 10.1016/j.eatbeh.2008.03.002.',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/18549996/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    loc_1 = list( Description = 'While you were eating ... During the past 3 months have you ever felt that you were not able to stop eating, or not able to control the type of food or amount of food that you ate?  For example, can you remember a time over the last 3 months that you were eating something so yummy that you couldn’t stop eating, even if you really wanted to?',
+    loc_1 = list( Description = 'While you were eating ... During the past 3 months have you ever felt that you were not able to stop eating, or not able to control the type of food or amount of food that you ate?  For example, can you remember a time over the last 3 months that you were eating something so yummy that you couldn\'t stop eating, even if you really wanted to?',
                   Levels = list ('0' = 'No',
                                  '1' = 'Yes',
                                  '2' = 'Skip')),

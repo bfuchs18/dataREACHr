@@ -13,7 +13,7 @@ json_cfpq <- function() {
   cfpq_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Comprehensive Feeding Practices Questionnaire. Participants were provided the following instructions: "Please answer the following questions about your child:"',
-      Reference = 'Musher-Eizenman, D., Holub. S., Comprehensive Feeding Practices Questionnaire: Validation of a New Measure of Parental Feeding Practices, Journal of Pediatric Psychology, 32, 8, September 2007, Pages 960–972',
+      Reference = 'Musher-Eizenman, D., Holub. S., Comprehensive Feeding Practices Questionnaire: Validation of a New Measure of Parental Feeding Practices, Journal of Pediatric Psychology, 32, 8, September 2007, Pages 960 to 972',
       TermURL = 'https://doi.org/10.1093/jpepsy/jsm037'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

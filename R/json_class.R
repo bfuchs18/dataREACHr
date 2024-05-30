@@ -1,9 +1,9 @@
-#' json_class_: Generates a json file for the Children's Leisure Activities Study Survey
+#' json_class_: Generates a json file for the Children\'s Leisure Activities Study Survey
 #'
-#' This function generates a json file for the scored? Children's Leisure Activities Study Survey and raw participant responses.
+#' This function generates a json file for the scored? Children\'s Leisure Activities Study Survey and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_class function in dataprepr and is only accurate for data collected in Study REACH
 #'
-#' @return A string with data stored in JSON format containing meta-data for the Children's Leisure Activities Study Survey
+#' @return A string with data stored in JSON format containing meta-data for the Children\'s Leisure Activities Study Survey
 #'
 #'
 #' @export
@@ -15,7 +15,7 @@ json_class <- function() {
       Description = 'Children\'s Leisure Activities Study Survey. Participants were provided the following instructions: "IMPORTANT: We are interested in what your child does in their leisure time during a typical week. There are no right and wrong answers - this is not a test. Please answer all the questions as honestly and accurately as you can - this is very important. Answer Yes or No to each activity. If your child completes that activity please indiciate how often they do so, in minutes";
                     Questions 1 through 32 were presented in a table with the heading: "Which of the following PHYSICAL activities does your child USUALLY do during a typical WEEK (from the start of the current school term, do NOT include school holidays)?".
                     Questions 33 through 47 were presented in a table with the heading: "During a typical WEEK what other leisure activities does your child usually do?"',
-      Reference = 'Telford, A., Salmon, J., Jolley, D., & Crawford, D. (2004). Reliability and Validity of Physical Activity Questionnaires for Children: The Children’s Leisure Activities Study Survey (CLASS). Pediatric Exercise Science, 16(1), 64-78.',
+      Reference = 'Telford, A., Salmon, J., Jolley, D., & Crawford, D. (2004). Reliability and Validity of Physical Activity Questionnaires for Children: The Children\'s Leisure Activities Study Survey (CLASS). Pediatric Exercise Science, 16(1), 64 to 78.',
       TermURL = 'https://journals.humankinetics.com/view/journals/pes/16/1/article-p64.xml'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

@@ -2,14 +2,14 @@
 % Please edit documentation in R/json_class.R
 \name{json_class}
 \alias{json_class}
-\title{json_class_: Generates a json file for the Children's Leisure Activities Study Survey}
+\title{json_class_: Generates a json file for the Children\'s Leisure Activities Study Survey}
 \usage{
 json_class()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the Children's Leisure Activities Study Survey
+A string with data stored in JSON format containing meta-data for the Children\'s Leisure Activities Study Survey
 }
 \description{
-This function generates a json file for the scored? Children's Leisure Activities Study Survey and raw participant responses.
+This function generates a json file for the scored? Children\'s Leisure Activities Study Survey and raw participant responses.
 This function provides accurate json files ONLY if data is processed using score_class function in dataprepr and is only accurate for data collected in Study REACH
 }

@@ -2,14 +2,14 @@
 % Please edit documentation in R/json_cebq.R
 \name{json_cebq}
 \alias{json_cebq}
-\title{json_cebq: Generates a json file for the Children's Eating Behavior Questionnaire}
+\title{json_cebq: Generates a json file for the Children\'s Eating Behavior Questionnaire}
 \usage{
 json_cebq()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the Children's Eating Behavior Questionnaire
+A string with data stored in JSON format containing meta-data for the Children\'s Eating Behavior Questionnaire
 }
 \description{
-This function generates a json file for the scored Children's Eating Behavior Questionnaire and raw participant responses.
+This function generates a json file for the scored Children\'s Eating Behavior Questionnaire and raw participant responses.
 This function provides accurate json files ONLY if data is processed using score_cebq function in dataprepr and is only accurate for data collected in Study REACH
 }

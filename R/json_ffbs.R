@@ -13,7 +13,7 @@ json_ffbs <- function() {
   ffbs_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Family Food Behavior Survey. Participants were provided the following instructions: "The Family Food Behavior Survey, or FFBS, is a 20 item questionnaire developed to observe family mealtime practices. Please answer each item with a 5-point Likert-Scale, from 0 (never true) to 4 (always true)"',
-      Reference = 'McCurdy, K., & Gorman, K. S. (2010). Measuring family food environments in diverse families with young children. Appetite, 54(3), 615–618. https://doi.org/10.1016/j.appet.2010.03.004',
+      Reference = 'McCurdy, K., & Gorman, K. S. (2010). Measuring family food environments in diverse families with young children. Appetite, 54(3), 615 to 618. https://doi.org/10.1016/j.appet.2010.03.004',
       TermURL = 'https://pubmed.ncbi.nlm.nih.gov/20227449/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

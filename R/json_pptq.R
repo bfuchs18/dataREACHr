@@ -13,7 +13,7 @@ json_pptq <- function() {
   pptq_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Pictorial Personality Traits Questionnaire for Children. Participants were provided the following instructions: "What kind of person are you? What do you usually do; On this survey, you\'ll find descriptions of different situations. Here is one example: "When it rains..." The situations are shown in pictures. In each picture, the leading character is wearing a striped scaft. Think about it, what do you do most often in such a situation? Are you more similar to the person with the scarf in the left or right picture? This is important! In every situation, you can only choose one small square.  If sometimes you behave in one way and other times in another way, mark the box in the middle ("It depends")."',
-      Reference = 'Maćkiewicz M, Cieciuch J. Pictorial Personality Traits Questionnaire for Children (PPTQ-C)-A New Measure of Children\'s Personality Traits. Front Psychol. 2016 Apr 14;7:498. doi: 10.3389/fpsyg.2016.00498. PMID: 27252661; PMCID: PMC4879772.',
+      Reference = 'Mackiewicz M, Cieciuch J. Pictorial Personality Traits Questionnaire for Children (PPTQ-C)-A New Measure of Children\'s Personality Traits. Front Psychol. 2016 Apr 14;7:498. doi: 10.3389/fpsyg.2016.00498. PMID: 27252661; PMCID: PMC4879772.',
       TermURL = 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4879772/'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',

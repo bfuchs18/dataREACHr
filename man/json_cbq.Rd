@@ -2,7 +2,7 @@
 % Please edit documentation in R/json_cbq.R
 \name{json_cbq}
 \alias{json_cbq}
-\title{json_cbq: Generates a json file for the Child Behavior Questionnaire}
+\title{json_cbq: Generates a json file for the Children\'s Behavior Questionnaire}
 \usage{
 json_cbq()
 }
@@ -10,6 +10,6 @@ json_cbq()
 A string with data stored in JSON format containing meta-data for the Child Behavior Questionnaire
 }
 \description{
-This function generates a json file for the scored Child Behavior Questionnaire and raw participant responses.
+This function generates a json file for the scored Children\'s Behavior Questionnaire and raw participant responses.
 This function provides accurate json files ONLY if data is processed using score_cbq function in dataprepr and is only accurate for data collected in Study REACH
 }
