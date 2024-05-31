@@ -1,4 +1,4 @@
-#' rrv_parse_text: Parse RRV txt files when csv not available
+#' rrv_parse_text: Generate tabular data from rrv text files
 #'
 #' This function generates and returns dataframes (game, summary) from rrv text file
 #'

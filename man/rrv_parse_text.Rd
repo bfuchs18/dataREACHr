@@ -2,7 +2,7 @@
 % Please edit documentation in R/rrv_parse_text.R
 \name{rrv_parse_text}
 \alias{rrv_parse_text}
-\title{rrv_parse_text: Parse RRV txt files when csv not available}
+\title{rrv_parse_text: Generate tabular data from rrv text files}
 \usage{
 rrv_parse_text(rrv_file)
 }
