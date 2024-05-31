@@ -26,7 +26,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
-  #### Set up/initial checks #####
+  #### Set up/initial checks ####
 
   # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
@@ -69,7 +69,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     slash <- '/'
   } else {
     slash <- "\\"
-    print('util_task_foodview_orgraw.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    print('util_task_untouched_to_source.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   #### Define copy_to_source() ####
@@ -233,16 +233,29 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
       if (grepl("^REACH", dirname)) {
 
         # extract subject ID
-        sub <- gsub("REACH_|_csv", "", dirname)
+        sub <- gsub("REACH_", "", dirname)
         sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
         # get list of files in sub_dir (but not directories)
         rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
 
-        # copy files to sourcedata
-        for (file in rrv_sub_files) {
-          copy_to_source(file, sub_str, ses_str = "ses-1", sourcefile_prefix = "rrv_", overwrite = overwrite)
+        # define expected name of text file to copy
+        rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
+
+        if (rrv_txt_file %in% rrv_sub_files) {
+
+          # copy rrv text file
+          copy_to_source(rrv_txt_file, sub_str, ses_str = "ses-1", overwrite = overwrite)
+
+        } else {
+          print(paste("RRV text file not found for", sub_str))
         }
+
+        # # copy files to sourcedata
+        # for (file in rrv_sub_files) {
+        #   copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
+        # }
+
       }
     }
   }
