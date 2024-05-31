@@ -4,18 +4,13 @@
 \alias{rrv_parse_text}
 \title{rrv_parse_text: Parse RRV txt files when csv not available}
 \usage{
-rrv_parse_text(rrv_file, overwrite = FALSE, return_data = FALSE)
+rrv_parse_text(rrv_file)
 }
 \arguments{
 \item{rrv_file}{string with full path to rrv file}
-
-\item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
-
-\item{return_data}{logical indicating if data should be returned. Default = FALSE}
 }
 \description{
-This function exports game.csv and summary.csv files from the RRV .txt file. This is for use when game.csv and summary.csv were not automatically generated. CSV files will export into the directory with the .txt file
-Function will also return game.csv and summary.csv in dataframes
+This function generates and returns dataframes (game, summary) from rrv text file
 }
 \examples{
 

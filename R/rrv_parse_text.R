@@ -1,11 +1,9 @@
 #' rrv_parse_text: Parse RRV txt files when csv not available
 #'
-#' This function exports game.csv and summary.csv files from the RRV .txt file. This is for use when game.csv and summary.csv were not automatically generated. CSV files will export into the directory with the .txt file
-#' Function will also return game.csv and summary.csv in dataframes
+#' This function generates and returns dataframes (game, summary) from rrv text file
+#'
 #'
 #' @param rrv_file string with full path to rrv file
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = FALSE
 #'
 #' @examples
 #'
@@ -20,7 +18,7 @@
 #'
 #' @export
 
-rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
+rrv_parse_text <- function(rrv_file) {
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -286,36 +284,8 @@ rrv_parse_text <- function(rrv_file, overwrite = FALSE, return_data = FALSE) {
   }
 
 
-  ##### Export CSVs ####
-
-  # get data to export into
-  export_dir <- dirname(rrv_file)
-
-  # set export file paths
-  game_path <- paste0(export_dir, slash, "game_parsed.csv")
-  summary_path <- paste0(export_dir, slash, "summary_parsed.csv")
-
-  if ( isTRUE(overwrite) | !file.exists(game_path) ) {
-    write.csv(
-      game_df,
-      game_path,
-      quote = FALSE,
-      row.names = FALSE
-    )
-  }
-
-  if ( isTRUE(overwrite) | !file.exists(summary_path) ) {
-    write.csv(
-      summary_df,
-      summary_path,
-      quote = FALSE,
-      row.names = FALSE
-    )
-  }
   ##### Return dataframes ####
 
-  if (isTRUE(return_data)){
-    return(list(game_df = game_df, summary_df = summary_df))
-  }
+  return(list(game_df = game_df, summary_df = summary_df))
 
 }
