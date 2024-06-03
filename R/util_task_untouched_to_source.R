@@ -242,19 +242,15 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
         # define expected name of text file to copy
         rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
 
-        if (rrv_txt_file %in% rrv_sub_files) {
-
-          # copy rrv text file
-          copy_to_source(rrv_txt_file, sub_str, ses_str = "ses-1", overwrite = overwrite)
-
-        } else {
+        # print message if text file not fount
+        if (!rrv_txt_file %in% rrv_sub_files) {
           print(paste("RRV text file not found for", sub_str))
         }
 
-        # # copy files to sourcedata
-        # for (file in rrv_sub_files) {
-        #   copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
-        # }
+        # copy all files to sourcedata
+        for (file in rrv_sub_files) {
+          copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
+        }
 
       }
     }
