@@ -1,6 +1,6 @@
 #' rrv_parse_text: Generate tabular data from rrv text files
 #'
-#' This function generates and returns dataframes (game, summary) from rrv text file
+#' This function generates and returns 1 dataframe with data from input RRV file
 #'
 #'
 #' @param rrv_file string with full path to rrv file
@@ -11,7 +11,7 @@
 #'
 #' # process task data for the Food View Task
 #' file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
-#' rrv_csv <- rrv_parse_text(sub = 60, rrv_file = file_name)
+#' rrv_csv <- rrv_parse_text(rrv_file = file_name)
 #'
 #' }
 #'
@@ -28,29 +28,16 @@ rrv_parse_text <- function(rrv_file) {
     print('rrv_parse_text.R has not been thoroughly tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
   }
 
-  #### create empty dataframes to save data to ####
-
-  ## for game.csv
+  #### create empty dataframe to save data to ####
 
   ## created vector with column names
-  game_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"time_block",	"responses",	"reinforcers", 	"total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+  rrv_data_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"time_block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
 
   ## pass this vector length to ncol parameter
-  game_df = data.frame(matrix(nrow = 0, ncol = length(game_columns)))
+  rrv_data = data.frame(matrix(nrow = 0, ncol = length(rrv_data_columns)))
 
-  ## assign column names to game_df
-  colnames(game_df) = game_columns
-
-  ## for summary.csv
-
-  ## created vector with column names
-  summary_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"total_time_blocks",	"total_non_response_time_blocks",	"total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
-
-  ## pass this vector length to ncol parameter
-  summary_df = data.frame(matrix(nrow = 0, ncol = length(summary_columns)))
-
-  ## assign column names to game_df
-  colnames(summary_df) = summary_columns
+  ## assign column names to rrv_data
+  colnames(rrv_data) = rrv_data_columns
 
   #### parse text file ####
 
@@ -134,8 +121,8 @@ rrv_parse_text <- function(rrv_file) {
 
     #### Extract Average Responses By Screen ####
 
-    timeblock1_start_line <- grep("Time Block : 1$", session_lines) # the $ means end of line, so that Time Block : 10, etc. does not count
-    avg_response_lines <- session_lines[(avg_response_start_line+1):(timeblock1_start_line-2)]
+    block1_start_line <- grep("Time Block : 1$", session_lines) # the $ means end of line, so that Time Block : 10, etc. does not count
+    avg_response_lines <- session_lines[(avg_response_start_line+1):(block1_start_line-2)]
 
     # set defaults to NA
     avg_resp_screen1 <- NA
@@ -165,45 +152,39 @@ rrv_parse_text <- function(rrv_file) {
     ### Extract info for each time block ###
 
     # Use grep to find lines containing the string "Time Block"
-    timeblock_start_lines <- grep("Time Block", session_lines)
+    block_start_lines <- grep("Time Block", session_lines)
 
-    # count the number of timeblocks
-    n_timeblocks <- length(timeblock_start_lines)
+    # count the number of blocks
+    n_blocks <- length(block_start_lines)
 
-    # initialize list to append timeblock lines to
-    timeblock_list <- list()
+    # initialize list to append block lines to
+    block_list <- list()
 
-    # set summary values to 0
-    total_timeblocks_screen1 <- 0
-    total_timeblocks_screen2 <- 0
-    total_nonresp_timeblocks_screen1 <- 0
-    total_nonresp_timeblocks_screen2 <- 0
-
-    # extract data within timeblocks
-    for (timeblock_number in 1:n_timeblocks) {
+    # extract data within blocks
+    for (block_number in 1:n_blocks) {
 
       # get line where time block data starts
-      tb_data_start_line = timeblock_start_lines[timeblock_number] + 2
+      tb_data_start_line = block_start_lines[block_number] + 2
 
       # get session end
-      if (timeblock_number < n_timeblocks) {
-        tb_end_line = timeblock_start_lines[timeblock_number+1]-2
+      if (block_number < n_blocks) {
+        tb_end_line = block_start_lines[block_number+1]-2
       } else {
         tb_end_line = length(session_lines) - 1
       }
 
-      # extract timeblock lines
-      timeblock_lines = session_lines[tb_data_start_line:tb_end_line]
+      # extract block lines
+      block_lines = session_lines[tb_data_start_line:tb_end_line]
 
       ### Extract info for each reinforcer ###
 
       # extract number of data lines -- this corresponds to the number of reinforcers selected
-      n_reinforcers = length(timeblock_lines)
+      n_reinforcers = length(block_lines)
 
       # for each reinforcer
       for (reinforcer_number in 1:n_reinforcers) {
 
-        reinforcer_string = timeblock_lines[[reinforcer_number]]
+        reinforcer_string = block_lines[[reinforcer_number]]
 
         # Split the string by whitespace
         parts <- strsplit(reinforcer_string, "\\s+")
@@ -214,24 +195,8 @@ rrv_parse_text <- function(rrv_file) {
         Screen = parts[[1]][3]
         reinforcer_cat = ifelse(Screen == "1", Goal1, ifelse(Screen == "2", Goal2, NA))
 
-        # Increment summary values
-        if (Screen == 1 ) {
-          total_timeblocks_screen1 = total_timeblocks_screen1 + 1
-
-          if (Responses == 0) {
-            total_nonresp_timeblocks_screen1 = total_nonresp_timeblocks_screen1 + 1
-          }
-
-        } else if (Screen == 2) {
-          total_timeblocks_screen2 = total_timeblocks_screen2 + 1
-
-          if (Responses == 0) {
-            total_nonresp_timeblocks_screen2 = total_nonresp_timeblocks_screen2 + 1
-          }
-        }
-
         # create row for game.csv
-        game_data_row <-
+        rrv_data_row <-
           data.frame(
             ID = sub, #task-level
             screen = Screen, #reinforcer-level
@@ -240,52 +205,49 @@ rrv_parse_text <- function(rrv_file) {
             session = session_number, #session-level
             total_time = ifelse(Screen == "1", TimeTaken1, ifelse(Screen == "2", TimeTaken2, NA)), #session x reinforcer level
             schedule = ifelse(Screen == "1", Screen1, ifelse(Screen == "2", Screen2, NA)), # session level
-            time_block = timeblock_number, #time-block level
-            resposes = Responses, #reinforcer-level
+            time_block = block_number, #time-block level
+            responses = Responses, #reinforcer-level
             reinforcers = Reinforcers,
+            total_blocks = NA,
+            total_nonresp_blocks = NA,
             total_responses = ifelse(Screen == "1", total_resp_screen1, ifelse(Screen == "2", total_resp_screen2, NA)), #session x reinforcer level
             total_reinforcers = ifelse(Screen == "1", total_reinforcers_screen1, ifelse(Screen == "2", total_reinforcers_screen2, NA)), #session x reinforcer level
             average_responses = ifelse(Screen == "1", avg_resp_screen1, ifelse(Screen == "2", avg_resp_screen2, NA)), #session x reinforcer level
             average_reinforcers = ifelse(Screen == "1", avg_reinforcers_screen1, ifelse(Screen == "2", avg_reinforcers_screen2, NA)) #session x reinforcer level
           )
 
-        # append row to game_df dataframe
-        game_df <- rbind(game_df, game_data_row)
+        # append row to rrv_data dataframe
+        rrv_data <- rbind(rrv_data, rrv_data_row)
 
       }
 
     }
 
-    # create summary dataframe
-    for (screen_number in c("1", "2")) {
+    # determine total_blocks and total_nonresp_blocks (summary values)
+    for (session in unique(rrv_data$session)){
 
-      # create row for summary.csv
-      summary_data_row <-
-        data.frame(
-          ID = sub, #task-level
-          screen = screen_number, #reinforcer-level
-          reinforcer = ifelse(screen_number == "1", Goal1, ifelse(screen_number == "2", Goal2, NA)), #reinforcer-level
-          type = ifelse(Type == "Slot Machine Game with Reinforcers", "slot machine", NA), #task-level
-          session = session_number, #session-level
-          total_time = ifelse(screen_number == "1", TimeTaken1, ifelse(screen_number == "2", TimeTaken2, NA)), #session x reinforcer level
-          schedule = ifelse(screen_number == "1", Screen1, ifelse(screen_number == "2", Screen2, NA)), # session level
-          total_time_blocks = ifelse(screen_number == "1", total_timeblocks_screen1, ifelse(screen_number == "2", total_timeblocks_screen2, NA)),
-          total_nonresp_timeblocks = ifelse(screen_number == "1", total_nonresp_timeblocks_screen1, ifelse(screen_number == "2", total_nonresp_timeblocks_screen2, NA)),
-          total_responses = ifelse(screen_number == "1", total_resp_screen1, ifelse(screen_number == "2", total_resp_screen2, NA)), #session x reinforcer level
-          total_reinforcers = ifelse(screen_number == "1", total_reinforcers_screen1, ifelse(screen_number == "2", total_reinforcers_screen2, NA)), #session x reinforcer level
-          average_responses = ifelse(screen_number == "1", avg_resp_screen1, ifelse(screen_number == "2", avg_resp_screen2, NA)), #session x reinforcer level
-          average_reinforcers = ifelse(screen_number == "1", avg_reinforcers_screen1, ifelse(screen_number == "2", avg_reinforcers_screen2, NA)) #session x reinforcer level
-        )
+      for (screen_number in c("1", "2")) {
 
-      # append row to game_df dataframe
-      summary_df <- rbind(summary_df, summary_data_row)
+        # subset rows for session and screen
+        subset <- rrv_data[rrv_data$session == session & rrv_data$screen == screen_number, ]
+
+        # determine number of blocks within session for given screen (number of rows)
+        total_blocks = nrow(subset)
+
+        # determine number of non-response blocks within session for given screen
+        total_nonresp_blocks = sum(subset$responses == 0)
+
+        #add values to dataframe
+        rrv_data$total_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- total_blocks
+        rrv_data$total_nonresp_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- total_nonresp_blocks
+      }
+
     }
-
   }
 
 
   ##### Return dataframes ####
 
-  return(list(game_df = game_df, summary_df = summary_df))
+  return(rrv_data)
 
 }

@@ -10,7 +10,7 @@ rrv_parse_text(rrv_file)
 \item{rrv_file}{string with full path to rrv file}
 }
 \description{
-This function generates and returns dataframes (game, summary) from rrv text file
+This function generates and returns 1 dataframe with data from input RRV file
 }
 \examples{
 
@@ -18,7 +18,7 @@ This function generates and returns dataframes (game, summary) from rrv text fil
 
 # process task data for the Food View Task
 file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
-rrv_csv <- rrv_parse_text(sub = 60, rrv_file = file_name)
+rrv_csv <- rrv_parse_text(rrv_file = file_name)
 
 }
 
