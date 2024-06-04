@@ -5,8 +5,8 @@
 #'
 #' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
 #' @param overwrite logical indicating if data should be overwritten in /sourcedata Default = FALSE
-#' @param all_tasks logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_list
-#' @param task_list vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
+#' @param all_tasks logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector
+#' @param task_vector vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
 #'
 #' @examples
 #'
@@ -14,7 +14,7 @@
 #' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
 #'
 #' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
-#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_list = c("spacegame", "nih_toolbox")
+#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_vector = c("spacegame", "nih_toolbox")
 #'
 #' \dontrun{
 #' }
@@ -22,7 +22,7 @@
 #'
 #' @export
 
-util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_list) {
+util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector) {
 
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
@@ -42,23 +42,23 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
   }
 
   # check that task options correctly specified
-  task_list_arg <- methods::hasArg(task_list)
+  task_vector_arg <- methods::hasArg(task_vector)
 
-  if (isFALSE(all_tasks) & isFALSE(task_list_arg)) {
-    stop("Tasks to process not specified: Specify tasks by setting all_tasks = TRUE or providing vector to task_list parameter")
+  if (isFALSE(all_tasks) & isFALSE(task_vector_arg)) {
+    stop("Tasks to process not specified: Specify tasks by setting all_tasks = TRUE or providing vector to task_vector parameter")
   }
 
-  if (isTRUE(all_tasks) & isTRUE(task_list_arg)) {
-    stop("all_tasks = TRUE and task_list parameter were provided. Use only 1 of these options")
+  if (isTRUE(all_tasks) & isTRUE(task_vector_arg)) {
+    stop("all_tasks = TRUE and task_vector parameter were provided. Use only 1 of these options")
   }
 
-  if (isTRUE(task_list_arg)) {
-    if (!is.vector(task_list)) {
-    stop("Input to task_list must be vector (e.g., task_list = c('rrv')")
+  if (isTRUE(task_vector_arg)) {
+    if (!is.vector(task_vector)) {
+    stop("Input to task_vector must be vector (e.g., task_vector = c('rrv')")
     } else {
-    for (task in task_list) {
+    for (task in task_vector) {
       if (!task %in% c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")) {
-        stop(paste(task, "is not an option for task_list"))
+        stop(paste(task, "is not an option for task_vector"))
       }
     }
   }
@@ -112,7 +112,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
   #### FoodView task ####
 
-  if (isTRUE(all_tasks) | "foodview" %in% task_list) {
+  if (isTRUE(all_tasks) | "foodview" %in% task_vector) {
     print("-- copying Food View")
 
     foodview_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'foodview_task')
@@ -132,7 +132,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### Stop Signal Task ####
-  if (isTRUE(all_tasks) | "sst" %in% task_list) {
+  if (isTRUE(all_tasks) | "sst" %in% task_vector) {
     print("-- copying SST")
 
     sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
@@ -152,7 +152,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### Space Game ####
-  if (isTRUE(all_tasks) | "spacegame" %in% task_list) {
+  if (isTRUE(all_tasks) | "spacegame" %in% task_vector) {
     print("-- copying Space Game")
 
     space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game')
@@ -175,7 +175,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### NIH toolbox ####
-  if (isTRUE(all_tasks) | "nih_toolbox" %in% task_list) {
+  if (isTRUE(all_tasks) | "nih_toolbox" %in% task_vector) {
 
     print("-- copying NIH toolbox")
 
@@ -217,7 +217,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### RRV ####
-  if (isTRUE(all_tasks) | "rrv" %in% task_list) {
+  if (isTRUE(all_tasks) | "rrv" %in% task_vector) {
 
     print("-- copying RRV")
 
@@ -242,7 +242,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
         # define expected name of text file to copy
         rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
 
-        # print message if text file not fount
+        # print message if text file not found
         if (!rrv_txt_file %in% rrv_sub_files) {
           print(paste("RRV text file not found for", sub_str))
         }
@@ -258,7 +258,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### PIT ####
-  if (isTRUE(all_tasks) | "pit" %in% task_list) {
+  if (isTRUE(all_tasks) | "pit" %in% task_vector) {
     print("-- copying PIT task")
 
     # for each session
