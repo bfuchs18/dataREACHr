@@ -84,9 +84,9 @@ rrv_parse_text <- function(rrv_file) {
     Goal2 = unlist(strsplit(session_lines[grep("Goal2", session_lines)], "\t"))[3]
     TimeTaken2 = unlist(strsplit(session_lines[grep("Time Taken2", session_lines)], "\t"))[3]
 
-    # format TimeTaken: replace null values with empty string, remove "seconds"
-    TimeTaken1 = ifelse(grepl("seconds", TimeTaken1), as.numeric(gsub(" seconds", "", TimeTaken1)), ifelse(is.null(TimeTaken1), NA))
-    TimeTaken2 = ifelse(grepl("seconds", TimeTaken2), as.numeric(gsub(" seconds", "", TimeTaken2)), ifelse(is.null(TimeTaken2), NA))
+    # format TimeTaken: replace null values with empty string, remove "seconds" or "second"
+    TimeTaken1 = ifelse(grepl("second", TimeTaken1), as.numeric(gsub(" seconds| second", "", TimeTaken1)), ifelse(is.null(TimeTaken1), NA, NA))
+    TimeTaken2 = ifelse(grepl("second", TimeTaken2), as.numeric(gsub(" seconds| second", "", TimeTaken2)), ifelse(is.null(TimeTaken2), NA, NA))
 
     #### Extract Total Responses By Screen ####
 
