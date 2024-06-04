@@ -31,7 +31,7 @@ rrv_parse_text <- function(rrv_file) {
   #### create empty dataframe to save data to ####
 
   ## created vector with column names
-  rrv_data_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"time_block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+  rrv_data_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
 
   ## pass this vector length to ncol parameter
   rrv_data = data.frame(matrix(nrow = 0, ncol = length(rrv_data_columns)))
@@ -84,9 +84,9 @@ rrv_parse_text <- function(rrv_file) {
     Goal2 = unlist(strsplit(session_lines[grep("Goal2", session_lines)], "\t"))[3]
     TimeTaken2 = unlist(strsplit(session_lines[grep("Time Taken2", session_lines)], "\t"))[3]
 
-    # replace null values with empty string
-    TimeTaken1 = ifelse(is.null(TimeTaken1), "", TimeTaken1)
-    TimeTaken2 = ifelse(is.null(TimeTaken2), "", TimeTaken2)
+    # format TimeTaken: replace null values with empty string, remove "seconds"
+    TimeTaken1 = ifelse(grepl("seconds", TimeTaken1), as.numeric(gsub(" seconds", "", TimeTaken1)), ifelse(is.null(TimeTaken1), NA))
+    TimeTaken2 = ifelse(grepl("seconds", TimeTaken2), as.numeric(gsub(" seconds", "", TimeTaken2)), ifelse(is.null(TimeTaken2), NA))
 
     #### Extract Total Responses By Screen ####
 
@@ -205,7 +205,7 @@ rrv_parse_text <- function(rrv_file) {
             session = session_number, #session-level
             total_time = ifelse(Screen == "1", TimeTaken1, ifelse(Screen == "2", TimeTaken2, NA)), #session x reinforcer level
             schedule = ifelse(Screen == "1", Screen1, ifelse(Screen == "2", Screen2, NA)), # session level
-            time_block = block_number, #time-block level
+            block = block_number, #time-block level
             responses = Responses, #reinforcer-level
             reinforcers = Reinforcers,
             total_blocks = NA,
