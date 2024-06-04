@@ -48,7 +48,7 @@ To use this function, the correct path to the directory containing untouchedRaw/
 task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
 
 # overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
-proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
+proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
 
 # overwrite all task data in rawdata
 proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_vector = c("all_tasks"))

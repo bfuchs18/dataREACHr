@@ -25,7 +25,7 @@
 #' task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
 #'
 #' # overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
-#' proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
+#' proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
 #'
 #' # overwrite all task data in rawdata
 #' proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_vector = c("all_tasks"))
@@ -61,11 +61,11 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
     print('The task_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
+  # define paths for processing
   bids_wd <- paste0(base_wd, slash, "bids", slash)
   untouchedRaw_wd <- paste0(base_wd, slash, "untouchedRaw", slash)
   sourcedata_wd <- paste0(base_wd, slash, "bids", slash, "sourcedata", slash)
   raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
-
 
   #### Copy data into to sourcedata ####
 
@@ -176,12 +176,6 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
     }
   }
 
-
-
-  # Export meta-data
-  meta_data = write_task_jsons(bids_wd = bids_wd, overwrite = overwrite_jsons)
-
-
   #### Process RRV data ####
 
   print("Processing RRV Data")
@@ -212,10 +206,16 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
 
   }
 
+
+  #### Export meta-data ####
+  meta_data = write_task_jsons(bids_wd = bids_wd, overwrite = overwrite_jsons)
+
+
   #### Return data ####
   if (isTRUE(return_data)){
     return(list(foodview_data = foodview_data,
                 sst_data = sst_data,
+                rrv_data = rrv_data,
                 meta_data = meta_data
     ))
   }
