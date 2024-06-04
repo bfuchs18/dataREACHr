@@ -199,21 +199,21 @@ rrv_parse_text <- function(rrv_file) {
         rrv_data_row <-
           data.frame(
             ID = sub, #task-level
-            screen = Screen, #reinforcer-level
+            screen = as.integer(Screen), #reinforcer-level
             reinforcer = reinforcer_cat, #reinforcer-level
             type = ifelse(Type == "Slot Machine Game with Reinforcers", "slot machine", NA), #task-level
             session = session_number, #session-level
             total_time = ifelse(Screen == "1", TimeTaken1, ifelse(Screen == "2", TimeTaken2, NA)), #session x reinforcer level
             schedule = ifelse(Screen == "1", Screen1, ifelse(Screen == "2", Screen2, NA)), # session level
             block = block_number, #time-block level
-            responses = Responses, #reinforcer-level
-            reinforcers = Reinforcers,
+            responses = as.integer(Responses), #reinforcer-level
+            reinforcers = as.integer(Reinforcers),
             total_blocks = NA,
             total_nonresp_blocks = NA,
-            total_responses = ifelse(Screen == "1", total_resp_screen1, ifelse(Screen == "2", total_resp_screen2, NA)), #session x reinforcer level
-            total_reinforcers = ifelse(Screen == "1", total_reinforcers_screen1, ifelse(Screen == "2", total_reinforcers_screen2, NA)), #session x reinforcer level
-            average_responses = ifelse(Screen == "1", avg_resp_screen1, ifelse(Screen == "2", avg_resp_screen2, NA)), #session x reinforcer level
-            average_reinforcers = ifelse(Screen == "1", avg_reinforcers_screen1, ifelse(Screen == "2", avg_reinforcers_screen2, NA)) #session x reinforcer level
+            total_responses = ifelse(Screen == "1", as.integer(total_resp_screen1), ifelse(Screen == "2", as.integer(total_resp_screen2), NA)), #session x reinforcer level
+            total_reinforcers = ifelse(Screen == "1", as.integer(total_reinforcers_screen1), ifelse(Screen == "2", as.integer(total_reinforcers_screen2), NA)), #session x reinforcer level
+            average_responses = ifelse(Screen == "1", as.numeric(avg_resp_screen1), ifelse(Screen == "2", as.numeric(avg_resp_screen2), NA)), #session x reinforcer level
+            average_reinforcers = ifelse(Screen == "1", as.numeric(avg_reinforcers_screen1), ifelse(Screen == "2", as.numeric(avg_reinforcers_screen2), NA)) #session x reinforcer level
           )
 
         # append row to rrv_data dataframe
