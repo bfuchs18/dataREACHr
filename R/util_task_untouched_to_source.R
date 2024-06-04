@@ -23,7 +23,7 @@
 #' @export
 
 util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector) {
-
+  print("you are in here")
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
   #### Set up/initial checks ####
@@ -54,15 +54,17 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
   if (isTRUE(task_vector_arg)) {
     if (!is.vector(task_vector)) {
-    stop("Input to task_vector must be vector (e.g., task_vector = c('rrv')")
+      stop("Input to task_vector must be vector (e.g., task_vector = c('rrv')")
     } else {
-    for (task in task_vector) {
-      if (!task %in% c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")) {
-        stop(paste(task, "is not an option for task_vector"))
+      for (task in task_vector) {
+        if (!task %in% c("sst","foodview","spacegame","nih_toolbox","rrv","pit")) {
+          stop(paste(task, "is not an option for task_vector"))
+        }
       }
     }
+  } else {
+    task_vector = c()
   }
-
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -71,6 +73,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     slash <- "\\"
     print('util_task_untouched_to_source.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
+
 
   #### Define copy_to_source() ####
   copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite) {
@@ -301,6 +304,4 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
       }
     }
   }
-
-}
 }
