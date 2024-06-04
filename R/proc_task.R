@@ -10,13 +10,13 @@
 #' @param base_wd (string) full path to directory that contains untouchedRaw/ and bids/
 #' @param overwrite_sourcedata (logical) overwrite files in sourcedata for all tasks (default = FALSE)
 #' @param overwrite_rawdata (logical) overwrite files in rawdata for all tasks (default = FALSE)
-#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox").
+#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv").
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)
 #'
 #' @return If return_data is set to TRUE, will return a list including:
-#'  1) clean datasets for each task
+#'  1) lists with cleaned dataframes for each subject for each task
 #'  2) meta-data information for each task stored in JSON format
 #'
 #' @examples
@@ -87,7 +87,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
     slash <- '/'
   } else {
     slash <- "\\"
-    print('The task_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    print('The proc_task.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   # define paths for processing
@@ -167,9 +167,6 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   }
 
-  #### Process Space Game data ####
-
-
   #### Process NIH toolbox data ####
 
   print("Processing NIH toolbox Data")
@@ -235,6 +232,9 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   }
 
+
+  #### TO DO: Process PIT data ####
+  #### TO DO: Process Space Game data ####
 
   #### Export meta-data ####
   meta_data = write_task_jsons(bids_wd = bids_wd, overwrite = overwrite_jsons)

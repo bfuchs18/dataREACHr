@@ -20,7 +20,7 @@ proc_task(
 
 \item{overwrite_rawdata}{(logical) overwrite files in rawdata for all tasks (default = FALSE)}
 
-\item{overwrite_rawdata_vector}{(vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox").}
+\item{overwrite_rawdata_vector}{(vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv").}
 
 \item{overwrite_jsons}{overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)}
 
@@ -29,7 +29,7 @@ proc_task(
 \value{
 If return_data is set to TRUE, will return a list including:
 \enumerate{
-\item clean datasets for each task
+\item lists with cleaned dataframes for each subject for each task
 \item meta-data information for each task stored in JSON format
 }
 }
