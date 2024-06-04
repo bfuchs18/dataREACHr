@@ -7,17 +7,20 @@
 proc_task(
   base_wd,
   overwrite_sourcedata = FALSE,
-  overwrite_rawdata_vector = c(),
+  overwrite_rawdata = FALSE,
+  overwrite_rawdata_vector,
   overwrite_jsons = FALSE,
   return_data = FALSE
 )
 }
 \arguments{
-\item{base_wd}{full path to directory that contains untouchedRaw/ and bids/ (string)}
+\item{base_wd}{(string) full path to directory that contains untouchedRaw/ and bids/}
 
-\item{overwrite_sourcedata}{overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)}
+\item{overwrite_sourcedata}{(logical) overwrite files in sourcedata for all tasks (default = FALSE)}
 
-\item{overwrite_rawdata_vector}{names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "nih_toolbox", all_tasks". Default is empty vector. (vector of characters)}
+\item{overwrite_rawdata}{(logical) overwrite files in rawdata for all tasks (default = FALSE)}
+
+\item{overwrite_rawdata_vector}{(vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox").}
 
 \item{overwrite_jsons}{overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)}
 
@@ -33,9 +36,9 @@ If return_data is set to TRUE, will return a list including:
 \description{
 This function:
 \enumerate{
-\item copies all task data from untouchedRaw into bids/sourcedata, using util_task_untouched_to_source(all_tasks = TRUE)
-\item processes task sourcedata into BIDS and exports into bids/rawdata for the following tasks: rrv, sst (beh and func), foodview, using task-specific util_task_{task-name} functions
-\item creates .json files for task data, using write_task_jsons()
+\item copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)
+\item processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview, using task-specific util_task_{task-name} functions
+\item exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()
 }
 }
 \details{
@@ -44,14 +47,17 @@ To use this function, the correct path to the directory containing untouchedRaw/
 \examples{
 \dontrun{
 
-# process task data without overwriting any existing files and return processed data
-task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
+# set base_wd
+base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
-# overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
-proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
+# process task data without overwriting any existing files, return processed data
+task_data <- proc_task(base_wd = base_wd, return_data = TRUE)
 
-# overwrite all task data in rawdata
-proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_vector = c("all_tasks"))
+# process task data and overwrite rawdata for foodview task only
+proc_task(base_wd = base_wd, overwrite_rawdata_vector = c("foodview"))
+
+# process task data and overwrite all sourcedata, rawdata, and meta-data
+proc_task(base_wd = base_wd, overwrite_sourcedata = TRUE, overwrite_rawdata = TRUE, overwrite_jsons = TRUE)
 
 }
 

@@ -1,15 +1,16 @@
 #' proc_task: Process task data from untouchedRaw to bids/rawdata
 #'
 #' This function:
-#' 1) copies all task data from untouchedRaw into bids/sourcedata, using util_task_untouched_to_source(all_tasks = TRUE)
-#' 2) processes task sourcedata into BIDS and exports into bids/rawdata for the following tasks: rrv, sst (beh and func), foodview, using task-specific util_task_{task-name} functions
-#' 3) creates .json files for task data, using write_task_jsons()
+#' 1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)
+#' 2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview, using task-specific util_task_{task-name} functions
+#' 3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()
 #'
 #' To use this function, the correct path to the directory containing untouchedRaw/ and bids/ must be supplied to base_wd
 #'
-#' @param base_wd full path to directory that contains untouchedRaw/ and bids/ (string)
-#' @param overwrite_sourcedata overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)
-#' @param overwrite_rawdata_vector names of tasks for which rawdata should be overwritten or "all_tasks" to overwrite all rawdata. Options include: "sst", "foodview", "nih_toolbox", all_tasks". Default is empty vector. (vector of characters)
+#' @param base_wd (string) full path to directory that contains untouchedRaw/ and bids/
+#' @param overwrite_sourcedata (logical) overwrite files in sourcedata for all tasks (default = FALSE)
+#' @param overwrite_rawdata (logical) overwrite files in rawdata for all tasks (default = FALSE)
+#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox").
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)
@@ -21,21 +22,24 @@
 #' @examples
 #' \dontrun{
 #'
-#' # process task data without overwriting any existing files and return processed data
-#' task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
+#' # set base_wd
+#' base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 #'
-#' # overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
-#' proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
+#' # process task data without overwriting any existing files, return processed data
+#' task_data <- proc_task(base_wd = base_wd, return_data = TRUE)
 #'
-#' # overwrite all task data in rawdata
-#' proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_vector = c("all_tasks"))
+#' # process task data and overwrite rawdata for foodview task only
+#' proc_task(base_wd = base_wd, overwrite_rawdata_vector = c("foodview"))
+#'
+#' # process task data and overwrite all sourcedata, rawdata, and meta-data
+#' proc_task(base_wd = base_wd, overwrite_sourcedata = TRUE, overwrite_rawdata = TRUE, overwrite_jsons = TRUE)
 #'
 #' }
 #'
 #' @importFrom utils tail write.csv read.csv
 #' @export
 
-proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_vector = c(), overwrite_jsons = FALSE, return_data = FALSE) {
+proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata = FALSE, overwrite_rawdata_vector, overwrite_jsons = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -52,6 +56,31 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
     stop("base_wd must be entered as a string")
   }
 
+  # check that overwrite_all[] options are logical
+  if (!is.logical(overwrite_sourcedata)) {
+    stop("overwrite_sourcedata must be logical. Enter TRUE or FALSE")
+  }
+
+  if (!is.logical(overwrite_rawdata)) {
+    stop("overwrite_rawdata must be logical. Enter TRUE or FALSE")
+  }
+
+  # check overwrite_rawdata_vector input
+  rawdata_vector_arg <- methods::hasArg(overwrite_rawdata_vector)
+
+  if (isTRUE(rawdata_vector_arg)) {
+    if (!is.vector(overwrite_rawdata_vector)) {
+      stop("Input to overwrite_rawdata_vector must be vector (e.g., overwrite_rawdata_vector = c('rrv')")
+    } else {
+      for (task in overwrite_rawdata_vector) {
+        if (!task %in% c("sst", "foodview", "nih_toolbox", "rrv")) {
+          stop(paste(task, "is not an option for overwrite_sourcedata_vector"))
+        }
+      }
+    }
+  } else {
+    overwrite_rawdata_vector = c()
+  }
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -82,7 +111,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
   print("Processing Food View Task Data")
 
   ## get foodview overwrite arg
-  overwrite_fv <- "foodview" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
+  overwrite_fv <- "foodview" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of foodview files in sourcedata
   foodview_source_files <- list.files(sourcedata_wd, pattern = "foodview", recursive = TRUE)
@@ -113,7 +142,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
   print("Processing SST Data")
 
   ## get SST overwrite arg
-  overwrite_sst <- "sst" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
+  overwrite_sst <- "sst" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of foodview files in sourcedata
   sst_source_files <- list.files(sourcedata_wd, pattern = "stop", recursive = TRUE)
@@ -146,7 +175,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
   print("Processing NIH toolbox Data")
 
   ## get toolbox overwrite arg
-  overwrite_toolbox <- "nih_toolbox" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
+  overwrite_toolbox <- "nih_toolbox" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   # list all toolbox files (ses-1 and ses-2) with full path
   toolbox_source_files <- list.files(sourcedata_wd, pattern = "toolbox", recursive = TRUE, full.names = TRUE)
@@ -181,7 +210,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata_v
   print("Processing RRV Data")
 
   ## get RRV overwrite arg
-  overwrite_rrv <- "rrv" %in% overwrite_rawdata_vector | "all_tasks" %in% overwrite_rawdata_vector
+  overwrite_rrv <- "rrv" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of foodview files in sourcedata
   rrv_source_files <- list.files(sourcedata_wd, pattern = "rrv", recursive = TRUE)
