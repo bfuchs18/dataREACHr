@@ -3,7 +3,8 @@
 #' This function generates and returns 1 dataframe with data from input RRV file
 #'
 #'
-#' @param rrv_file string with full path to rrv file
+#' @param rrv_file (character string) full path to rrv file
+#' @param participant_id (character string) bids-compliant subject ID
 #'
 #' @examples
 #'
@@ -11,14 +12,34 @@
 #'
 #' # process task data for the Food View Task
 #' file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
-#' rrv_csv <- rrv_parse_text(rrv_file = file_name)
+#' rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-001")
 #'
 #' }
 #'
 #'
 #' @export
 
-rrv_parse_text <- function(rrv_file) {
+rrv_parse_text <- function(rrv_file, participant_id) {
+
+  #### Argument check ####
+
+  participant_arg <- methods::hasArg(participant_id)
+  if (isTRUE(participant_arg)) {
+    if (!is.character(participant_id)) {
+      stop("participant_arg must be entered as a string")
+    }
+  } else if (isFALSE(participant_arg)) {
+    stop("participant_arg must be entered as a string")
+  }
+
+  file_arg <- methods::hasArg(rrv_file)
+  if (isTRUE(file_arg)) {
+    if (!is.character(rrv_file)) {
+      stop("rrv_file must be entered as a string")
+    }
+  } else if (isFALSE(file_arg)) {
+    stop("participant_arg must be entered as a string")
+  }
 
   #### IO setup ####
   if (.Platform$OS.type == "unix") {
@@ -31,7 +52,7 @@ rrv_parse_text <- function(rrv_file) {
   #### create empty dataframe to save data to ####
 
   ## created vector with column names
-  rrv_data_columns= c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+  rrv_data_columns= c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
 
   ## pass this vector length to ncol parameter
   rrv_data = data.frame(matrix(nrow = 0, ncol = length(rrv_data_columns)))
@@ -198,6 +219,7 @@ rrv_parse_text <- function(rrv_file) {
         # create row for game.csv
         rrv_data_row <-
           data.frame(
+            participant_id = participant_id, #user input to function
             ID = sub, #task-level
             screen = as.integer(Screen), #reinforcer-level
             reinforcer = reinforcer_cat, #reinforcer-level
