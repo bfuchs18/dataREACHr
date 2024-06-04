@@ -6,7 +6,6 @@
 \usage{
 proc_task(
   base_wd,
-  overwrite_parsed_rrv = FALSE,
   overwrite_sourcedata = FALSE,
   overwrite_rawdata_vector = c(),
   overwrite_jsons = FALSE,
@@ -15,8 +14,6 @@ proc_task(
 }
 \arguments{
 \item{base_wd}{full path to directory that contains untouchedRaw/ and bids/ (string)}
-
-\item{overwrite_parsed_rrv}{overwrite CSVs from parsed text files in untouchedRaw/rrv_task/ (default = FALSE) (logical)}
 
 \item{overwrite_sourcedata}{overwrite existing files in sourcedata. Applies to all tasks (default = FALSE) (logical)}
 
@@ -36,9 +33,8 @@ If return_data is set to TRUE, will return a list including:
 \description{
 This function:
 \enumerate{
-\item generates CSVs from txt files in untouchedRaw/rrv_task if CSVs don't exist, using rrv_parse_text()
-\item copies task data from untouchedRaw into bids/sourcedata, using util_task_untouched_to_source()
-\item processes task sourcedata into BIDS and exports into bids/rawdata for the following tasks: sst (beh and func), foodview, using task-specific util_task_{task-name} functions
+\item copies all task data from untouchedRaw into bids/sourcedata, using util_task_untouched_to_source(all_tasks = TRUE)
+\item processes task sourcedata into BIDS and exports into bids/rawdata for the following tasks: rrv, sst (beh and func), foodview, using task-specific util_task_{task-name} functions
 \item creates .json files for task data, using write_task_jsons()
 }
 }
@@ -52,10 +48,10 @@ To use this function, the correct path to the directory containing untouchedRaw/
 task_data <- proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", return_data = TRUE)
 
 # overwrite RRV CSVs from parsed text files, overwrite sourcedata, and overwrite foodview and sst rawdata
-proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_list = c("foodview", "sst"))
+proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", reparse_rrv = TRUE, overwrite_sourcedata = TRUE, overwrite_rawdata_vector = c("foodview", "sst"))
 
 # overwrite all task data in rawdata
-proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_list = c("all_tasks"))
+proc_task(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", overwrite_rawdata_vector = c("all_tasks"))
 
 }
 
