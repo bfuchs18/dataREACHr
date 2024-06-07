@@ -139,10 +139,7 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
   lbc_data <- lbc_data[, -grep("missingcheck|timestamp", names(lbc_data))] # remove extra columns
   lbc_data <- lbc_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
 
-  # extract column names containing "conf" -- these will be included in extra_scale_cols
-  colnames_with_conf <- colnames(lbc_data)[grep("conf", colnames(lbc_data))]
-
-  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date", colnames_with_conf)) # need to debug
+  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date")) # need to debug
 
   ## return data ####
   if (isTRUE(return_data)){
