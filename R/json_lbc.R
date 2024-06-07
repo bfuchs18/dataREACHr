@@ -495,15 +495,22 @@ json_lbc <- function() {
                                       '8' = '9',
                                       '9' = '10 - Certain I can do it')),
     lbc_misbeh = list( Description = 'Food-related misbehavior.',
-                       Derivative = TRUE),
+                       Derivative = TRUE,
+                       Reference = 'West F, Morawska A, Joughin K. The Lifestyle Behaviour Checklist: evaluation of the factor structure. Child: Care, Health and Development. 2010;36(4):508-515. doi:10.1111/j.1365-2214.2010.01074.x'),
     lbc_overeat = list( Description = 'Overeating.',
-                        Derivative = TRUE),
+                        Derivative = TRUE,
+                        Reference = 'West F, Morawska A, Joughin K. The Lifestyle Behaviour Checklist: evaluation of the factor structure. Child: Care, Health and Development. 2010;36(4):508-515. doi:10.1111/j.1365-2214.2010.01074.x'),
     lbc_em_overweight = list( Description = 'Emotion related to being overweight.',
-                              Derivative = TRUE),
+                              Derivative = TRUE,
+                              Reference = 'West F, Morawska A, Joughin K. The Lifestyle Behaviour Checklist: evaluation of the factor structure. Child: Care, Health and Development. 2010;36(4):508-515. doi:10.1111/j.1365-2214.2010.01074.x'),
     lbc_pa = list( Description = 'Physical activity.',
-                   Derivative = TRUE),
-    lbc_total = list( Description = 'Total score.',
-                      Derivative = TRUE))
+                   Derivative = TRUE,
+                   Reference = 'West F, Morawska A, Joughin K. The Lifestyle Behaviour Checklist: evaluation of the factor structure. Child: Care, Health and Development. 2010;36(4):508-515. doi:10.1111/j.1365-2214.2010.01074.x'),
+    lbc_problem_total = list( Description = 'total problem score',
+                      Derivative = TRUE),
+    lbc_conf_total = list( Description = 'total confidence score',
+                      Derivative = TRUE)
+    )
 
 
   # convert formatting to JSON
