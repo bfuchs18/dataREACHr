@@ -342,6 +342,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dplyr::mutate(child_age = dplyr::case_when(
       session_id == "ses-1" ~ v1_age,
       session_id == "ses-2" ~ v5_age
+
     )) %>%
     dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
 
@@ -442,7 +443,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(child_v5_data$anthro_data, visit_protocol = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
-  # add ages and sex
   prelim_anthro_data <- merge(prelim_anthro_data, demo_data[c("participant_id", "session_id", "child_age", "sex")], by=c("participant_id", "session_id"), all = TRUE)
 
   # add parent 2

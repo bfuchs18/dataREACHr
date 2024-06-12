@@ -16,8 +16,8 @@ get_participants_summary <- function(participants_data) {
     dplyr::group_by(risk_status_maternal.y)
 
 
-  hist(participants_data[participants_data$risk_status_maternal.y == "high-risk",]$baseline_visit_count, labels = TRUE, breaks=seq(.5, 4.5, by=1))
+  #hist(participants_data[participants_data$risk_status_maternal.y == "high-risk",]$baseline_visit_count, labels = TRUE, breaks=seq(.5, 4.5, by=1))
 
-  hist(participants_data[participants_data$risk_status_maternal.y == "low-risk",]$baseline_visit_count, labels = TRUE, breaks=seq(.5, 4.5, by=1))
+  #hist(participants_data[participants_data$risk_status_maternal.y == "low-risk",]$baseline_visit_count, labels = TRUE, breaks=seq(.5, 4.5, by=1))
 
   }

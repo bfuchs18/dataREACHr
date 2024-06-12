@@ -144,7 +144,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   ## get SST overwrite arg
   overwrite_sst <- "sst" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
-  ## get list of foodview files in sourcedata
+  ## get list of sst files in sourcedata
   sst_source_files <- list.files(sourcedata_wd, pattern = "stop", recursive = TRUE)
 
   # get list of subjects with sst files in sourcedata
@@ -209,7 +209,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   ## get RRV overwrite arg
   overwrite_rrv <- "rrv" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
-  ## get list of foodview files in sourcedata
+  ## get list of rrv files in sourcedata
   rrv_source_files <- list.files(sourcedata_wd, pattern = "rrv", recursive = TRUE)
 
   # get list of subjects with sst files in sourcedata
