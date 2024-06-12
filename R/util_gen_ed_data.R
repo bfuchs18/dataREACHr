@@ -14,22 +14,22 @@ util_gen_ed_data <- function() {
   grilled_cheese_ed <- NA # this will remain NA -- as this will be calculated for each person
 
   # EDs taken from redcap -- need to confirm
-  tender_ed <- 2.371
-  carrot_ed <- 0.353
-  chips_ed <- 5.714
-  fruit_ed <- 0.427
+  tender_ed <- 2.371 # consistent with label: 230/97 kcal/g
+  carrot_ed <- 0.353 ## use label or USDA (Energy (Atwater Specific Factors))?
+  chips_ed <- 5.714 # consistent with label: 160/28 kcal/g
+  fruit_ed <- 0.427 # consistent with label: 100/234 kcal/g
   water_ed <- 0.0
-  ranch_ed <- 4.577
-  ketchup_ed <- 1.176
-  brownie_ed <- 4.363
-  corn_chip_ed <- 5.714
-  kiss_ed <- 5.000 # check this
-  ice_cream_ed <- 2.184
-  oreo_ed <- 4.701
-  popcorn_ed <- 5.000 # check this
-  pretzel_ed <- 3.929
-  skittle_ed <- 3.929
-  starburst_ed <- 4.138
+  ranch_ed <- 4.577 # how to calculate/verify when label is in mL??
+  ketchup_ed <- 1.176 # consistent with label: 20/17 kcal/g
+  brownie_ed <- 4.363 # consistent with label: 240/55 kcal/g
+  corn_chip_ed <- 5.714 # consistent with label: 160/28 kcal/g
+  kiss_ed <- 5.000 # consistent with label: 160/32 kcal/g
+  ice_cream_ed <- 2.184 # consistent with label: 190/87 kcal/g
+  oreo_ed <- 4.706 # consistent with label: 160/34 kcal/g
+  popcorn_ed <- 5.000 # consistent with label: 140/28 kcal/g
+  pretzel_ed <- 3.929 # consistent with label: 110/28 kcal/g
+  skittle_ed <- 3.929 # consistent with label: 110/28 kcal/g
+  starburst_ed <- 4.138 # consistent with label: 120/29 kcal/g
   water_eah_ed <- 0.0
 
   # create vectors
