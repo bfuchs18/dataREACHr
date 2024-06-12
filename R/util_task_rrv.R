@@ -64,18 +64,21 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
   # parse text file if it exists
   if (file.exists(rrv_txt_file)) {
-    print(paste("parsing RRV text file for", sub_str))
-    rrv_data <- rrv_parse_text(rrv_file = rrv_txt_file)
+
+    rrv_data <- rrv_parse_text(rrv_file = rrv_txt_file, participant_id = sub_str)
 
   } else if (file.exists(rrv_csv_file)){
 
-    print(paste(sub_str, "has no rrv text file. Formatting RRV csv file"))
+    print(paste(sub_str, "has no rrv text file. Processing RRV csv file"))
 
     # import game.csv
     game_dat <- read.csv(rrv_csv_file, header = TRUE)
 
     # update column names
-    colnames(game_dat) <- c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"time_block",	"responses",	"reinforcers",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+    colnames(game_dat) <- c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+
+    # add participant_id column
+    game_dat$participant_id <- sub_str
 
     # fill in ID column
     game_dat$ID <- game_dat$ID[1]
@@ -123,11 +126,12 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     minutes_part <- as.numeric(game_dat$total_time[!is_seconds]) * 60
 
     ## replace values in total_time with processed values
+    game_dat$total_time <- NA # set to NA first, otherwise column will remain "character" type
     game_dat$total_time[is_seconds] <- round(seconds_part, 3)
     game_dat$total_time[!is_seconds] <- round(minutes_part, 3)
 
-    # reorder columns
-    game_dat <- game_dat[, c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"time_block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")]
+    # reorder columns -- save as rrv_data
+    rrv_data <- game_dat[, c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")]
 
   } else {
     print(paste(sub_str, "has no rrv text or _game.csv file. Aborting processing"))
@@ -142,11 +146,11 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     dir.create(raw_beh_wd, recursive = TRUE)
   }
 
-  # # export files if don't exist or overwrite = TRUE
-  # beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-rrv_beh.tsv')
-  # if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
-  #   utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE )
-  # }
+  # export files if don't exist or overwrite = TRUE
+  beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-rrv_beh.tsv')
+  if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
+   utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+  }
 
 
   #### Return data #####
