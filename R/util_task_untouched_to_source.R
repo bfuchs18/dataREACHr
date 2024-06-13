@@ -23,7 +23,7 @@
 #' @export
 
 util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector) {
-  print("you are in here")
+
   # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
   #### Set up/initial checks ####
@@ -145,7 +145,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
       # extract subject from file
       temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
-      sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
+      sub_num <- gsub('.txt|_1st.txt', '', temp) # extract sub number (replace '.txt' or '_1st.txt' with "")
       sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
 
       # copy to sourcedata
