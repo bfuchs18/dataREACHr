@@ -20,24 +20,23 @@ deriv_rrv <- function(data) {
 
   for (df_num in 1:length(data)) {
 
-    print(df_num)
-
     # extract dataframe
     rrv_data <- data[[df_num]]
     print(rrv_data$participant_id[1])
 
     # TO DO: figure how how to define these values if no responses/completed sessions -- 0 ?? NA ??
     # get maximum session with responses for each reinforcer
-    max_responded_session_food = ifelse(length(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$total_responses > 0, ]$session) == 0, NA, max(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$total_responses > 0, ]$session))
-    max_responded_session_toy = ifelse(length(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$total_responses > 0, ]$session) == 0, NA, max(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$total_responses > 0, ]$session))
+    max_responded_session_food = ifelse(length(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$session_responses > 0, ]$session) == 0, 0, max(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$session_responses > 0, ]$session))
+    max_responded_session_toy = ifelse(length(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$session_responses > 0, ]$session) == 0, 0, max(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$session_responses > 0, ]$session))
 
     # get maximum sessions completed (i.e., 5 reinforcers acquired) for each reinforcer
-    max_completed_session_food = ifelse(length(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$total_reinforcers == 5, ]$session) == 0, NA, max(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$total_reinforcers == 5, ]$session))
-    max_completed_session_toy = ifelse(length(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$total_reinforcers == 5, ]$session) == 0, NA, max(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$total_reinforcers == 5, ]$session))
+    max_completed_session_food = ifelse(length(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$session_reinforcers == 5, ]$session) == 0, 0, max(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$session_reinforcers == 5, ]$session))
+    max_completed_session_toy = ifelse(length(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$session_reinforcers == 5, ]$session) == 0, 0, max(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$session_reinforcers == 5, ]$session))
 
 
     # define session to schedule mapping
-    session_mapping = list("1" = 4,
+    session_mapping = list("0" = 0,
+                           "1" = 4,
                            "2" = 8,
                            "3" = 16,
                            "4" = 32,
@@ -63,8 +62,8 @@ deriv_rrv <- function(data) {
     rrv_food_completed = pmax_completed_food / (pmax_completed_food + pmax_completed_toy)
 
     # total responses
-    total_responses_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$total_responses)
-    total_responses_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$total_responses)
+    total_responses_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_responses)
+    total_responses_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$session_responses)
 
     # create row for summary
     summary_row <-
@@ -74,10 +73,10 @@ deriv_rrv <- function(data) {
         pmax_completed_food = pmax_completed_food,
         pmax_responded_toy = pmax_responded_toy,
         pmax_completed_toy = pmax_completed_toy,
-        # rrv_food_responded = rrv_food_responded, # will be null right now if pmax is 0 bc not included in session_mapping
-        # rrv_food_completed = rrv_food_completed, # will be null right now if pmax is 0 bc not included in session_mapping
-        total_responses_food = NA,
-        total_responses_toy = NA,
+        rrv_food_responded = rrv_food_responded,
+        rrv_food_completed = rrv_food_completed,
+        total_responses_food = total_responses_food,
+        total_responses_toy = total_responses_toy,
         mean_response_rate_food = NA,
         mean_response_rate_toy = NA
       )
@@ -88,6 +87,12 @@ deriv_rrv <- function(data) {
     } else {
       summary_dat <- dplyr::bind_rows(summary_dat, summary_row)
     }
+
+    # process long data
+
+    # for reinforcer
+
+      # for session
 
   }
 
