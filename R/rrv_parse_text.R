@@ -11,8 +11,8 @@
 #' \dontrun{
 #'
 #' # process task data for the Food View Task
-#' file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
-#' rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-001")
+#' file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/rrv_060.txt"
+#' rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-060")
 #'
 #' }
 #'
@@ -52,7 +52,7 @@ rrv_parse_text <- function(rrv_file, participant_id) {
   #### create empty dataframe to save data to ####
 
   ## created vector with column names
-  rrv_data_columns= c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+  rrv_data_columns= c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers", "session_blocks", "session_nonresp_blocks",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")
 
   ## pass this vector length to ncol parameter
   rrv_data = data.frame(matrix(nrow = 0, ncol = length(rrv_data_columns)))
@@ -117,9 +117,9 @@ rrv_parse_text <- function(rrv_file, participant_id) {
 
     # set defaults to NA
     total_resp_screen1 <- NA
-    total_reinforcers_screen1 <- NA
+    session_reinforcers_screen1 <- NA
     total_resp_screen2 <- NA
-    total_reinforcers_screen2 <- NA
+    session_reinforcers_screen2 <- NA
 
     for (line in 1:length(total_response_lines)) {
 
@@ -131,12 +131,12 @@ rrv_parse_text <- function(rrv_file, participant_id) {
 
       if (line_screen == "1") {
         total_resp_screen1 <- line_parts[1]
-        total_reinforcers_screen1 <- line_parts[2]
+        session_reinforcers_screen1 <- line_parts[2]
       }
 
       if (line_screen == "2") {
         total_resp_screen2 <- line_parts[1]
-        total_reinforcers_screen2 <- line_parts[2]
+        session_reinforcers_screen2 <- line_parts[2]
       }
     }
 
@@ -225,17 +225,17 @@ rrv_parse_text <- function(rrv_file, participant_id) {
             reinforcer = reinforcer_cat, #reinforcer-level
             type = ifelse(Type == "Slot Machine Game with Reinforcers", "slot machine", NA), #task-level
             session = session_number, #session-level
-            total_time = ifelse(Screen == "1", TimeTaken1, ifelse(Screen == "2", TimeTaken2, NA)), #session x reinforcer level
+            session_time = ifelse(Screen == "1", TimeTaken1, ifelse(Screen == "2", TimeTaken2, NA)), #session x reinforcer level
             schedule = ifelse(Screen == "1", Screen1, ifelse(Screen == "2", Screen2, NA)), # session level
             block = block_number, #time-block level
-            responses = as.integer(Responses), #reinforcer-level
-            reinforcers = as.integer(Reinforcers),
-            total_blocks = NA,
-            total_nonresp_blocks = NA,
-            total_responses = ifelse(Screen == "1", as.integer(total_resp_screen1), ifelse(Screen == "2", as.integer(total_resp_screen2), NA)), #session x reinforcer level
-            total_reinforcers = ifelse(Screen == "1", as.integer(total_reinforcers_screen1), ifelse(Screen == "2", as.integer(total_reinforcers_screen2), NA)), #session x reinforcer level
-            average_responses = ifelse(Screen == "1", as.numeric(avg_resp_screen1), ifelse(Screen == "2", as.numeric(avg_resp_screen2), NA)), #session x reinforcer level
-            average_reinforcers = ifelse(Screen == "1", as.numeric(avg_reinforcers_screen1), ifelse(Screen == "2", as.numeric(avg_reinforcers_screen2), NA)) #session x reinforcer level
+            block_responses = as.integer(Responses), #reinforcer-level
+            block_reinforcers = as.integer(Reinforcers),
+            session_blocks = NA,
+            session_nonresp_blocks = NA,
+            session_responses = ifelse(Screen == "1", as.integer(total_resp_screen1), ifelse(Screen == "2", as.integer(total_resp_screen2), NA)), #session x reinforcer level
+            session_reinforcers = ifelse(Screen == "1", as.integer(session_reinforcers_screen1), ifelse(Screen == "2", as.integer(session_reinforcers_screen2), NA)), #session x reinforcer level
+            session_average_responses = ifelse(Screen == "1", as.numeric(avg_resp_screen1), ifelse(Screen == "2", as.numeric(avg_resp_screen2), NA)), #session x reinforcer level
+            session_average_reinforcers = ifelse(Screen == "1", as.numeric(avg_reinforcers_screen1), ifelse(Screen == "2", as.numeric(avg_reinforcers_screen2), NA)) #session x reinforcer level
           )
 
         # append row to rrv_data dataframe
@@ -245,7 +245,7 @@ rrv_parse_text <- function(rrv_file, participant_id) {
 
     }
 
-    # determine total_blocks and total_nonresp_blocks (summary values)
+    # determine session_blocks and session_nonresp_blocks (summary values)
     for (session in unique(rrv_data$session)){
 
       for (screen_number in c("1", "2")) {
@@ -254,14 +254,14 @@ rrv_parse_text <- function(rrv_file, participant_id) {
         subset <- rrv_data[rrv_data$session == session & rrv_data$screen == screen_number, ]
 
         # determine number of blocks within session for given screen (number of rows)
-        total_blocks = nrow(subset)
+        session_blocks = nrow(subset)
 
         # determine number of non-response blocks within session for given screen
-        total_nonresp_blocks = sum(subset$responses == 0)
+        session_nonresp_blocks = sum(subset$block_responses == 0)
 
         #add values to dataframe
-        rrv_data$total_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- total_blocks
-        rrv_data$total_nonresp_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- total_nonresp_blocks
+        rrv_data$session_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- session_blocks
+        rrv_data$session_nonresp_blocks[rrv_data$session == session & rrv_data$screen == screen_number ] <- session_nonresp_blocks
       }
 
     }

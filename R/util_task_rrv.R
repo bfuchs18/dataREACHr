@@ -75,7 +75,7 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     game_dat <- read.csv(rrv_csv_file, header = TRUE)
 
     # update column names
-    colnames(game_dat) <- c("ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")
+    colnames(game_dat) <- c("ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")
 
     # add participant_id column
     game_dat$participant_id <- sub_str
@@ -91,47 +91,47 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
         subset <- game_dat[game_dat$session == session & game_dat$screen == screen_number, ]
 
         # extract values from first row
-        total_responses <- subset[1,]$total_responses
-        total_reinforcers <- subset[1,]$total_reinforcers
-        average_responses <- subset[1,]$average_responses
-        average_reinforcers <- subset[1,]$average_reinforcers
+        session_responses <- subset[1,]$session_responses
+        session_reinforcers <- subset[1,]$session_reinforcers
+        session_average_responses <- subset[1,]$session_average_responses
+        session_average_reinforcers <- subset[1,]$session_average_reinforcers
 
         # fill in values
-        game_dat$total_responses[game_dat$session == session & game_dat$screen == screen_number] <- total_responses
-        game_dat$total_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- total_reinforcers
-        game_dat$average_responses[game_dat$session == session & game_dat$screen == screen_number] <- average_responses
-        game_dat$average_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- average_reinforcers
+        game_dat$session_responses[game_dat$session == session & game_dat$screen == screen_number] <- session_responses
+        game_dat$session_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- session_reinforcers
+        game_dat$session_average_responses[game_dat$session == session & game_dat$screen == screen_number] <- session_average_responses
+        game_dat$session_average_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- session_average_reinforcers
 
         # determine number of blocks within session for given screen (number of rows)
-        total_blocks = nrow(subset)
+        session_blocks = nrow(subset)
 
         # determine number of non-response blocks within session for given screen
-        total_nonresp_blocks = sum(subset$responses == 0)
+        session_nonresp_blocks = sum(subset$responses == 0)
 
         #add values to dataframe
-        game_dat$total_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- total_blocks
-        game_dat$total_nonresp_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- total_nonresp_blocks
+        game_dat$session_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- session_blocks
+        game_dat$session_nonresp_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- session_nonresp_blocks
       }
     }
 
     # convert time column to seconds
 
-    ## create a logical vector to check for 'seconds' in the total_time column
-    is_seconds <- grepl("seconds", game_dat$total_time)
+    ## create a logical vector to check for 'seconds' in the session_time column
+    is_seconds <- grepl("seconds", game_dat$session_time)
 
     ## process rows with time in seconds: remove "seconds" string and make numeric
-    seconds_part <- as.numeric(gsub(" seconds", "", game_dat$total_time[is_seconds]))
+    seconds_part <- as.numeric(gsub(" seconds", "", game_dat$session_time[is_seconds]))
 
     ## process rows with time in minutes: convert to seconds
-    minutes_part <- as.numeric(game_dat$total_time[!is_seconds]) * 60
+    minutes_part <- as.numeric(game_dat$session_time[!is_seconds]) * 60
 
-    ## replace values in total_time with processed values
-    game_dat$total_time <- NA # set to NA first, otherwise column will remain "character" type
-    game_dat$total_time[is_seconds] <- round(seconds_part, 3)
-    game_dat$total_time[!is_seconds] <- round(minutes_part, 3)
+    ## replace values in session_time with processed values
+    game_dat$session_time <- NA # set to NA first, otherwise column will remain "character" type
+    game_dat$session_time[is_seconds] <- round(seconds_part, 3)
+    game_dat$session_time[!is_seconds] <- round(minutes_part, 3)
 
     # reorder columns -- save as rrv_data
-    rrv_data <- game_dat[, c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"total_time",	"schedule",	"block",	"responses",	"reinforcers", "total_blocks", "total_nonresp_blocks",  "total_responses",	"total_reinforcers",	"average_responses",	"average_reinforcers")]
+    rrv_data <- game_dat[, c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers", "session_blocks", "session_nonresp_blocks",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")]
 
   } else {
     print(paste(sub_str, "has no rrv text or _game.csv file. Aborting processing"))

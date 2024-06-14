@@ -19,8 +19,8 @@ This function generates and returns 1 dataframe with data from input RRV file
 \dontrun{
 
 # process task data for the Food View Task
-file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/060.txt"
-rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-001")
+file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/rrv_060.txt"
+rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-060")
 
 }
 
