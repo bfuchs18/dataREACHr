@@ -96,7 +96,7 @@ deriv_rrv <- function(data) {
     #### process long data ####
 
     # extract data for candy
-    long_rows <- rrv_data[rrv_data$block == 1, c("participant_id", "session", "session_time", "schedule", "session_blocks", "session_nonresp_blocks", "session_responses", "session_reinforcers", "session_average_responses", "session_average_reinforcers")]
+    long_rows <- rrv_data[rrv_data$block == 1, c("participant_id", "reinforcer", "session", "session_time", "schedule", "session_blocks", "session_nonresp_blocks", "session_responses", "session_reinforcers", "session_average_responses", "session_average_reinforcers")]
 
     # add long_rows to long_summary
     if (df_num == 1) {
