@@ -2,13 +2,13 @@
 % Please edit documentation in R/json_deriv_rrv.R
 \name{json_deriv_rrv}
 \alias{json_deriv_rrv}
-\title{json_deriv_rrv: Generates a json file for the derivative RRV data}
+\title{json_deriv_rrv: Generates 2 json file for the derivative RRV data}
 \usage{
 json_deriv_rrv()
 }
 \value{
-A string with data stored in JSON format containing meta-data the summary RRV database
+A list of 2 strings (labels: rrv_summary_json, rrv_summary_long_json) with data stored in JSON format containing meta-data the summary RRV database
 }
 \description{
-This function generates a json file the summary RRV outcomes reported in derivatives/beh_databases
+This function generates 2 json files RRV databases reported in derivatives/beh_databases: (1) for total summary outcomes, (2) for session summary outcomes (long data)
 }
