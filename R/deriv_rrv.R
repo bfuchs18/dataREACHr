@@ -22,7 +22,6 @@ deriv_rrv <- function(data) {
 
     # extract dataframe
     rrv_data <- data[[df_num]]
-    print(rrv_data$participant_id[1])
 
     # TO DO: figure how how to define these values if no responses/completed sessions -- 0 ?? NA ??
     # get maximum session with responses for each reinforcer
