@@ -65,6 +65,11 @@ deriv_rrv <- function(data) {
     total_responses_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_responses)
     total_responses_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$session_responses)
 
+    # total time
+    ### Issue: sessions where no responses were made can still have time associated with them. Result of task left running? E.g., sub-023. How to determine true end of task?
+#    total_time_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_time)
+#    total_time_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$session_time)
+
     # create row for summary
     summary_row <-
       data.frame(
@@ -81,21 +86,28 @@ deriv_rrv <- function(data) {
         mean_response_rate_toy = NA
       )
 
-    # add row to summary
+    # add summary_row to summary
     if (df_num == 1) {
       summary_dat <- summary_row
     } else {
       summary_dat <- dplyr::bind_rows(summary_dat, summary_row)
     }
 
-    # process long data
+    #### process long data ####
 
-    # for reinforcer
+    # extract data for candy
+    long_rows <- rrv_data[rrv_data$block == 1, c("participant_id", "session", "session_time", "schedule", "session_blocks", "session_nonresp_blocks", "session_responses", "session_reinforcers", "session_average_responses", "session_average_reinforcers")]
 
-      # for session
+    # add long_rows to long_summary
+    if (df_num == 1) {
+      long_summary_dat <- long_rows
+    } else {
+      long_summary_dat <- dplyr::bind_rows(long_summary_dat, long_rows)
+    }
 
   }
 
-  return(summary_dat)
+  return(list(summary = summary_dat,
+              summary_long = long_summary_dat))
 }
 
