@@ -64,6 +64,10 @@ deriv_rrv <- function(data) {
     total_responses_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_responses)
     total_responses_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$session_responses)
 
+    # total reinforcers
+    total_reinforcers_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_reinforcers)
+    total_reinforcers_toy = sum(rrv_data[rrv_data$reinforcer == "Toy" & rrv_data$block == 1, ]$session_reinforcers)
+
     # total time
     ### Issue: sessions where no responses were made can still have time associated with them. Result of task left running? E.g., sub-023. How to determine true end of task?
 #    total_time_food = sum(rrv_data[rrv_data$reinforcer == "Candy" & rrv_data$block == 1, ]$session_time)
@@ -81,6 +85,8 @@ deriv_rrv <- function(data) {
         rrv_food_completed = rrv_food_completed,
         total_responses_food = total_responses_food,
         total_responses_toy = total_responses_toy,
+        total_reinforcers_food = total_reinforcers_food,
+        total_reinforcers_toy = total_reinforcers_toy,
         mean_response_rate_food = NA,
         mean_response_rate_toy = NA
       )
