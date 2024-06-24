@@ -86,7 +86,7 @@ util_calc_intake <- function(stacked_intake) {
   ## EAH
 
   # define vectors of eah foods and items (foods + water)
-  eah_foods <- c("brownie", "corn_chip", "ice_cream", "oreo", "popcorn", "pretzel", "skittle", "starburst")
+  eah_foods <- c("brownie", "corn_chip", "kiss", "ice_cream", "oreo", "popcorn", "pretzel", "skittle", "starburst")
   eah_items <- c(eah_foods, "water_eah")
 
   # make lists of eah item consumption variables
