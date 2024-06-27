@@ -26,7 +26,7 @@ json_bisbas <- function() {
                                  '1' = 'Somewhat true for me',
                                  '2' = 'Somewhat false for me',
                                  '3' = 'Very false for me')),
-    bisbas2 = list( Description = 'Even if something bad is about to happen to my child, he/she Somewhat true for me experiences fear or nervousness.',
+    bisbas2 = list( Description = 'Even if something bad is about to happen to my child, he/she rarely experiences fear or nervousness.',
                   Levels = list ('0' = 'Very true for me',
                                  '1' = 'Somewhat true for me',
                                  '2' = 'Somewhat false for me',
