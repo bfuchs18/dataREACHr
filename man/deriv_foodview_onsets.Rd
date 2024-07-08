@@ -24,10 +24,10 @@ deriv_foodview_onsets(
 \item{return_data}{logical indicating if data should be returned. Default = TRUE}
 }
 \value{
-If return_data is set to TRUE, will return XXX
+If return_data is set to TRUE, will return a long dataframe with onset times for each trial_type by run
 }
 \description{
-This function generates onset files for the foodview task formatted for analyses in AFNI
+This function generates onset files for the foodview task formatted for analyses in AFNI. One onset file is generated for each of the following trial types: food commercial block (food_ad), toy commercial block (toy_ad), high-ED savory food image block after toy commercial (hed_savory_toy_cond), high-ED savory food image block after food commercial (hed_savory_food_cond), high-ED sweet food image block after toy commercial (hed_sweet_toy_cond), high-ED sweet food image block after food commercial (hed_sweet_food_cond), low-ED savory food image block after toy commercial (led_savory_toy_cond), low-ED savory food image block after food commercial (led_savory_food_cond), low-ED sweet food image block after toy commercial (led_sweet_toy_cond), low-ED sweet food image block after food commercial (led_sweet_food_cond)
 }
 \examples{
 

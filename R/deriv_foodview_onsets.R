@@ -1,6 +1,6 @@
 #' deriv_foodview_onsets: Generate onset files for foodview task
 #'
-#' This function generates onset files for the foodview task formatted for analyses in AFNI
+#' This function generates onset files for the foodview task formatted for analyses in AFNI. One onset file is generated for each of the following trial types: food commercial block (food_ad), toy commercial block (toy_ad), high-ED savory food image block after toy commercial (hed_savory_toy_cond), high-ED savory food image block after food commercial (hed_savory_food_cond), high-ED sweet food image block after toy commercial (hed_sweet_toy_cond), high-ED sweet food image block after food commercial (hed_sweet_food_cond), low-ED savory food image block after toy commercial (led_savory_toy_cond), low-ED savory food image block after food commercial (led_savory_food_cond), low-ED sweet food image block after toy commercial (led_sweet_toy_cond), low-ED sweet food image block after food commercial (led_sweet_food_cond)
 #'
 #' @param sub subject label used in sub-label. Leading zeros not required
 #' @param ses session label used in ses-label. Default = 1
@@ -8,7 +8,7 @@
 #' @param overwrite logical indicating if onset files should be overwritten in /derivatives. Default = FALSE
 #' @param return_data logical indicating if data should be returned. Default = TRUE
 #'
-#' @return If return_data is set to TRUE, will return XXX
+#' @return If return_data is set to TRUE, will return a long dataframe with onset times for each trial_type by run
 #'
 #' @examples
 #'
@@ -18,7 +18,6 @@
 #'
 #' }
 #' @importFrom utils read.table
-#' @importFrom rlang .data
 #' @export
 
 deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
