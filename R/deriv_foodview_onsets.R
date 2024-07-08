@@ -163,28 +163,44 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
   # for each condition
   for (trial_type in unique(onsets$trial_type)) {
 
-    trial_type_dat <- onsets[onsets$trial_type == trial_type ,]
+    # define output file name
+    onset_file_name = paste0(onset_dir, sub_str, "_onsets_", trial_type, ".txt")
 
-    # get 1 line of data per run
-    for (run in seq(max(onsets$run))) {
-      run_dat <- trial_type_dat[trial_type_dat$run == run,]
+    # export if no file or overwrite = TRUE
+    if (!file.exists(onset_file_name) | isTRUE(overwrite)) {
 
-      if (nrow(run_dat) == 0) {
-        line = '*'
-
-      } else if (nrow(run_dat) == 1) {
-        line = run_dat$onset
-
-      } else {
-        # make onset times tab separated
-        line <- paste(run_dat$onset, collapse = "\t")
+      # delete file if it exists
+      if (file.exists(onset_file_name)) {
+        file.remove(onset_file_name)
       }
 
-      onset_file_name = paste0(onset_dir, sub_str, "_onsets_", trial_type, ".txt")
-      write(line, file = onset_file_name,
-            append = TRUE, sep = "\n")
+      trial_type_dat <- onsets[onsets$trial_type == trial_type ,]
+
+      # get 1 line of data per run
+      for (run in seq(max(onsets$run))) {
+        run_dat <- trial_type_dat[trial_type_dat$run == run,]
+
+        if (nrow(run_dat) == 0) {
+          line = '*'
+
+        } else if (nrow(run_dat) == 1) {
+          line = run_dat$onset
+
+        } else {
+          # make onset times tab separated
+          line <- paste(run_dat$onset, collapse = "\t")
+        }
+
+        # export
+        write(line,
+              file = onset_file_name,
+              append = TRUE,
+              sep = "\n")
+      }
     }
   }
+
+
 
 
   #### Return data ####
