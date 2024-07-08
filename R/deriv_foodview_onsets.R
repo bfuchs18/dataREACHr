@@ -129,6 +129,8 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
     ##### Get food image block onset times #####
 
     # extract onset times for food image blocks:
+      ## note: each of these food image conditions occur 1x per run (either after food or toy commercial),
+      ## so there is no need to also loop by commercial type (just need extract which commercial condition it followed)
 
     for (food_cond in c("hed_savory", "hed_sweet", "led_savory", "led_sweet") ) {
 
