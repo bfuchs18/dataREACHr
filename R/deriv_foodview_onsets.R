@@ -72,21 +72,11 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
     return()
   }
 
-  #### Extract onset and duration data ####
+  #### Extract onset and duration data for each block ####
 
-  # initialize dataframe to save commerical block onsets and durations to -- extract durations because these can vary by commerical
-  commercial_onsets <- data.frame(run = integer(),
-                                  commercial_cond = character() ,
-                                  vid_block = character(),
-                                  onset = double(),
-                                  onset_tr = double(),
-                                  duration = double(),
-                                  stringsAsFactors = FALSE)
-
-  # initialize dataframe to save image block onsets to
-  commercial_onsets <- data.frame(run = integer(),
-                                  commercial_cond = character() ,
-                                  vid_block = character(),
+  # initialize dataframe to save block onsets and durations to
+  onsets <- data.frame(run = integer(),
+                                  trial_type = character() ,
                                   onset = double(),
                                   onset_tr = double(),
                                   duration = double(),
@@ -126,42 +116,79 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
         commercial_onsets_row <-
           data.frame(
             run = as.integer(run),
-            commercial_cond = ad_cond,
-            vid_block = block,
+            trial_type = paste0("ad_", ad_cond),
             onset = min(block_cond_rows$onset), # onset for first commercial in a block
             onset_tr = min(block_cond_rows$onset) / 2, #divide onset by TR (2)
             duration = sum(block_cond_rows$duration) # sum duration of both commercials
           )
 
         # add row to dataframe
-        commercial_onsets <- dplyr::bind_rows(commercial_onsets, commercial_onsets_row)
+        onsets <- dplyr::bind_rows(onsets, commercial_onsets_row)
       }
     }
 
     ##### Get food image block onset times #####
 
-    # extract onset times for the following conditions:
+    # extract onset times for food image blocks:
 
-    ## post_food_image_blocks =
-    ## post_toy_image_blocks =
+    for (food_cond in c("hed_savory", "hed_sweet", "led_savory", "led_sweet") ) {
 
-    ## by image type??
-    ## post_food_image_blocks_led_savory =
-    ## post_food_image_blocks_led_sweet =
-    ## post_food_image_blocks_hed_savory =
-    ## post_food_image_blocks_hed_sweet =
-    ## post_toy_image_blocks_led_savory =
-    ## post_toy_image_blocks_led_sweet =
-    ## post_toy_image_blocks_hed_savory =
-    ## post_toy_image_blocks_hed_sweet =
+      cond_rows <- events_dat[grep(food_cond, events_dat$stim_file), ]
+
+      image_block_onsets_row <-
+        data.frame(
+          run = as.integer(run),
+          trial_type = paste0(food_cond, "_", unique(cond_rows$commercial_cond), "_cond"),
+          onset = min(cond_rows$onset), # onset for first image in a block
+          onset_tr = min(cond_rows$onset) / 2, #divide onset by TR (2)
+          duration = (max(cond_rows$onset) + cond_rows[which.max(cond_rows$onset),]$duration) - min(cond_rows$onset)
+        )
+
+      # add row to dataframe
+      onsets <- dplyr::bind_rows(onsets, image_block_onsets_row)
+    }
 
   }
 
-  #### Make AFNI onset files ####
+  #### Make AFNI onset files for each trial_type ####
+
+  onset_dir <- paste0(bids_wd, slash, 'derivatives', slash, 'afni', slash, 'foodview_onsets', slash)
+
+  # create onset_dir if it doesnt exist
+  if (!file.exists(onset_dir)){
+    dir.create(onset_dir, recursive = TRUE)
+  }
+
+  # for each condition
+  for (trial_type in unique(onsets$trial_type)) {
+
+    trial_type_dat <- onsets[onsets$trial_type == trial_type ,]
+
+    # get 1 line of data per run
+    for (run in seq(max(onsets$run))) {
+      run_dat <- trial_type_dat[trial_type_dat$run == run,]
+
+      if (nrow(run_dat) == 0) {
+        line = '*'
+
+      } else if (nrow(run_dat) == 1) {
+        line = run_dat$onset
+
+      } else {
+        # make onset times tab separated
+        line <- paste(run_dat$onset, collapse = "\t")
+      }
+
+      onset_file_name = paste0(onset_dir, sub_str, "_onsets_", trial_type, ".txt")
+      write(line, file = onset_file_name,
+            append = TRUE, sep = "\n")
+    }
+  }
+
 
   #### Return data ####
   if (isTRUE(return_data)) {
-    return(list())
+    return(onsets)
   }
 }
 
