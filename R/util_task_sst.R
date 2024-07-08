@@ -28,16 +28,16 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
   #### Set up/initial checks #####
 
-  # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(bids_wd)
+  # check that bids_wd exist and is a string
+  bids_wd_arg <- methods::hasArg(bids_wd)
 
-  if (isTRUE(data_arg)) {
+  if (isTRUE(bids_wd_arg)) {
     if (!is.character(bids_wd)) {
       stop("bids_wd must be entered as a string")
     } else if (!file.exists(bids_wd)) {
-      stop("bids_wd entered, but file does not exist. Check bids_wd string.")
+      stop("bids_wd entered, but directory does not exist. Check bids_wd string.")
     }
-  } else if (isFALSE(data_arg)) {
+  } else if (isFALSE(bids_wd_arg)) {
     stop("bids_wd must be entered as a string")
   }
 
