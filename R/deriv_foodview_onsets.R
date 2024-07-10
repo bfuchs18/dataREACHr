@@ -23,6 +23,7 @@
 deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
 
   # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+  # bids_wd = "/Users/bari/projects/Keller_Marketing/ParticipantData/bids"
 
   #### Set up/initial checks ####
 
@@ -100,31 +101,38 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
 
     # add video block column
     video_rows <- video_rows %>%
-      mutate(vid_block = stringr::str_extract(stim_file, "(?<=block)."))
+      dplyr::mutate(vid_block = stringr::str_extract(stim_file, "(?<=block)."))
 
+    # extract number of video blocks -- will be zero if child aborted scan before any vid blocks finished
+    n_vid_blocks <- nrow(video_rows)
 
-    # extract onsets and durations by ad condition and block
-    for (ad_cond in c("toy", "food")) {
+    # if has video blocks
+    if (n_vid_blocks > 0) {
 
-      ad_cond_rows <- video_rows[grep(ad_cond, video_rows$stim_file), ]
+      # extract onsets and durations by ad condition and block
+      for (ad_cond in c("toy", "food")) {
 
-      for (block in unique(ad_cond_rows$vid_block) ) {
+        ad_cond_rows <- video_rows[grep(ad_cond, video_rows$stim_file), ]
 
-        block_cond_rows <- ad_cond_rows[ad_cond_rows$vid_block == block,]
+        for (block in unique(ad_cond_rows$vid_block) ) {
 
-        commercial_onsets_row <-
-          data.frame(
-            run = as.integer(run),
-            trial_type = paste0("ad_", ad_cond),
-            onset = min(block_cond_rows$onset), # onset for first commercial in a block
-            onset_tr = min(block_cond_rows$onset) / 2, #divide onset by TR (2)
-            duration = sum(block_cond_rows$duration) # sum duration of both commercials
-          )
+          block_cond_rows <- ad_cond_rows[ad_cond_rows$vid_block == block,]
 
-        # add row to dataframe
-        onsets <- dplyr::bind_rows(onsets, commercial_onsets_row)
+          commercial_onsets_row <-
+            data.frame(
+              run = as.integer(run),
+              trial_type = paste0("ad_", ad_cond),
+              onset = min(block_cond_rows$onset), # onset for first commercial in a block
+              onset_tr = min(block_cond_rows$onset) / 2, #divide onset by TR (2)
+              duration = sum(block_cond_rows$duration) # sum duration of both commercials
+            )
+
+          # add row to dataframe
+          onsets <- dplyr::bind_rows(onsets, commercial_onsets_row)
+        }
       }
     }
+
 
     ##### Get food image block onset times #####
 
@@ -136,17 +144,24 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
 
       cond_rows <- events_dat[grep(food_cond, events_dat$stim_file), ]
 
-      image_block_onsets_row <-
-        data.frame(
-          run = as.integer(run),
-          trial_type = paste0(food_cond, "_", unique(cond_rows$commercial_cond), "_cond"),
-          onset = min(cond_rows$onset), # onset for first image in a block
-          onset_tr = min(cond_rows$onset) / 2, #divide onset by TR (2)
-          duration = (max(cond_rows$onset) + cond_rows[which.max(cond_rows$onset),]$duration) - min(cond_rows$onset)
-        )
+      # get number of image events for given condition
+      n_jpeg_events <- nrow(cond_rows)
 
-      # add row to dataframe
-      onsets <- dplyr::bind_rows(onsets, image_block_onsets_row)
+      # if has image blocks (i.e., any image events)
+      if (n_jpeg_events > 0) {
+        image_block_onsets_row <-
+          data.frame(
+            run = as.integer(run),
+            trial_type = paste0(food_cond, "_", unique(cond_rows$commercial_cond), "_cond"),
+            onset = min(cond_rows$onset), # onset for first image in a block
+            onset_tr = min(cond_rows$onset) / 2, #divide onset by TR (2)
+            duration = (max(cond_rows$onset) + cond_rows[which.max(cond_rows$onset),]$duration) - min(cond_rows$onset)
+          )
+
+        # add row to dataframe
+        onsets <- dplyr::bind_rows(onsets, image_block_onsets_row)
+      }
+
     }
 
   }
@@ -177,7 +192,7 @@ deriv_foodview_onsets <- function(sub, ses = 1, bids_wd, overwrite = FALSE, retu
       trial_type_dat <- onsets[onsets$trial_type == trial_type ,]
 
       # get 1 line of data per run
-      for (run in seq(max(onsets$run))) {
+      for (run in seq(length(events_files))) {
         run_dat <- trial_type_dat[trial_type_dat$run == run,]
 
         if (nrow(run_dat) == 0) {
