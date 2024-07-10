@@ -118,6 +118,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   names(dat)[names(dat) == "stim"] <- "stim_file"
   names(dat)[names(dat) == "rt"] <- "response_time"
   names(dat)[names(dat) == "resp"] <- "response"
+  names(dat)[names(dat) == "onset_time"] <- "sys_onset_time"
 
   # split data by run, process onset and duration, save into run_dfs
   run_dfs <- list()
@@ -127,9 +128,9 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_label <- paste0("run", run)
     run_dat <- dat[(dat$run == run),]
 
-    # transform onset_time to start at 0 and be in seconds
-    run_dat$onset <- (run_dat$onset_time - min(run_dat$onset_time))/1000
-    run_dat <- run_dat[,!(names(run_dat) %in% c("onset_time"))] # remove original onset_time column
+    # transform sys_onset_time to start at 0 and be in seconds
+    run_dat$onset <- (run_dat$sys_onset_time - min(run_dat$sys_onset_time))/1000
+    #run_dat <- run_dat[,!(names(run_dat) %in% c("onset_time"))] # remove original onset_time column
 
     # add duration column -- calculated based on onsets except for final fixation
     for (row in 1:nrow(run_dat)) {
