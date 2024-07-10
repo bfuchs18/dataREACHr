@@ -130,7 +130,6 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
 
     # transform sys_onset_time to start at 0 and be in seconds
     run_dat$onset <- (run_dat$sys_onset_time - min(run_dat$sys_onset_time))/1000
-    #run_dat <- run_dat[,!(names(run_dat) %in% c("onset_time"))] # remove original onset_time column
 
     # add duration column -- calculated based on onsets except for final fixation
     for (row in 1:nrow(run_dat)) {
@@ -152,7 +151,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_dat[is.na(run_dat)] <- "n/a"
 
     # re-order columns
-    run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'response', 'response_time' , 'food_ed', 'food_taste')]
+    run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'response', 'response_time' , 'food_ed', 'food_taste', 'sys_onset_time')]
 
     # append to run_dfs
     run_dfs[[run_label]] <- run_dat
