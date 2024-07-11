@@ -211,9 +211,14 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       run_label <- paste0("run", run)
       run_dat <- func_dat[(func_dat$run == run),]
 
-      # issue warning if > 1 "wait" stimulus
+      # check for > 1 "wait" stimulus - this indicates the run was restarted but onsets from the original attempt were not overwritten
       if (sum(run_dat$stim_file == "wait") > 1) {
-        warning(paste(sub_str, "SST", run_label, "has >1 'wait' stim. This indicates the run was restarted but onsets from the original attempt were not overwritten. Onsets may be incorrect."))
+
+        # identify row with the final "wait" stimulus -- indicates the start of the actual (un-aborted) run
+        run_start <- max(grep("wait", run_dat$stim_file))
+
+        # remove rows prior to run_start (i.e. onsets from aborted runs)
+        run_dat <- run_dat[-(1:run_start-1), ]
       }
 
       # transform onset so first stimulus in run occurs at 0, convert to seconds
