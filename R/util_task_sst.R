@@ -211,6 +211,11 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       run_label <- paste0("run", run)
       run_dat <- func_dat[(func_dat$run == run),]
 
+      # issue warning if > 1 "wait" stimulus
+      if (sum(run_dat$stim_file == "wait") > 1) {
+        warning(paste(sub_str, "SST", run_label, "has >1 'wait' stim. This indicates the run was restarted but onsets from the original attempt were not overwritten. Onsets may be incorrect."))
+      }
+
       # transform onset so first stimulus in run occurs at 0, convert to seconds
       run_dat$onset <- (run_dat$onset_time - min(run_dat$onset_time))/1000
       run_dat <- run_dat[,!(names(run_dat) %in% c("onset_time"))] # remove original onset_time column

@@ -128,6 +128,11 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_label <- paste0("run", run)
     run_dat <- dat[(dat$run == run),]
 
+    # issue warning if > 1 "wait" stimulus
+    if (sum(run_dat$stim_file == "wait") > 1) {
+      warning(paste(sub_str, "foodview", run_label, "has >1 'wait' stim. This indicates the run was restarted but onsets from the original attempt were not overwritten. Onsets may be incorrect."))
+    }
+
     # transform sys_onset_time to start at 0 and be in seconds
     run_dat$onset <- (run_dat$sys_onset_time - min(run_dat$sys_onset_time))/1000
 
