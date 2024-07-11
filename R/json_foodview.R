@@ -17,7 +17,7 @@ json_foodview <- function() {
     onset = list( Description = 'onset time of stimulus relative to start of run. Derived from sys_onset_time by subtracting the first sys_onset_time in a run from all sys_onset_time in that run and dividing by 1000',
                   Unit = "seconds",
                   Derivative = TRUE),
-    duration = list( Description = 'stimulus duration. Calculated by subtracting the onset for the subsequent stimulus from the onset of the present stimulus',
+    duration = list( Description = 'stimulus duration. Calculated by subtracting the onset of the present stimulus from the onset of the subsequent stimulus',
                      Derivative = TRUE,
                      Unit = "seconds"),
     sub = list( Description = 'Participant ID'),
