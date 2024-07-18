@@ -115,7 +115,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   dat <- dat[,!(names(dat) %in% c("food_cond"))]
 
   # update names
-  names(dat)[names(dat) == "stim"] <- "stim_file"
+  names(dat)[names(dat) == "stim"] <- "stim_file_name"
   names(dat)[names(dat) == "rt"] <- "response_time"
   names(dat)[names(dat) == "resp"] <- "response"
   names(dat)[names(dat) == "onset_time"] <- "sys_onset_time"
@@ -129,10 +129,10 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_dat <- dat[(dat$run == run),]
 
     # check for > 1 "wait" stimulus - this indicates the run was restarted but onsets from the original attempt were not overwritten
-    if (sum(run_dat$stim_file == "wait") > 1) {
+    if (sum(run_dat$stim_file_name == "wait") > 1) {
 
       # identify row with the final "wait" stimulus -- indicates the start of the actual (un-aborted) run
-      run_start <- max(grep("wait", run_dat$stim_file))
+      run_start <- max(grep("wait", run_dat$stim_file_name))
 
       # remove rows prior to run_start (i.e. onsets from aborted runs)
       run_dat <- run_dat[-(1:run_start-1), ]
@@ -145,7 +145,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     for (row in 1:nrow(run_dat)) {
       if (row < nrow(run_dat)) {
         run_dat[row, "duration"] <- round(run_dat[row+1,"onset"] - run_dat[row,"onset"], 2)
-      } else if (row == nrow(run_dat) & run_dat[row, "stim_file"] == "fix") {
+      } else if (row == nrow(run_dat) & run_dat[row, "stim_file_name"] == "fix") {
         run_dat[row, "duration"] <- 10 #set to 10 seconds based on task program
       }
     }
@@ -161,7 +161,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_dat[is.na(run_dat)] <- "n/a"
 
     # re-order columns
-    run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file', 'response', 'response_time' , 'food_ed', 'food_taste', 'sys_onset_time')]
+    run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file_name', 'response', 'response_time' , 'food_ed', 'food_taste', 'sys_onset_time')]
 
     # append to run_dfs
     run_dfs[[run_label]] <- run_dat

@@ -107,7 +107,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     dataframe <- beh_dfs[[i]]
 
     # update column names
-    names(dataframe)[names(dataframe) == "stimName"] <- "stim_file"
+    names(dataframe)[names(dataframe) == "stimName"] <- "stim_file_name"
     names(dataframe)[names(dataframe) == "resp1"] <- "response"
     names(dataframe)[names(dataframe) == "rt1"] <- "response_time"
     names(dataframe)[names(dataframe) == "stim"] <- "go_stim"
@@ -126,7 +126,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
     # reorder columns
     dataframe <- dataframe[c('sub', 'type', 'run', 'set', 'run_cond', 'block',
-                         'stim_file', 'img_cat', 'go_stim', 'signal', 'reqSSD' ,
+                         'stim_file_name', 'img_cat', 'go_stim', 'signal', 'reqSSD' ,
                          'correct', 'response', 'response_time', 'trueSSD')]
 
     # split beh by run?
@@ -175,21 +175,21 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     }
 
     # update columns names
-    names(onset_dat)[names(onset_dat) == "stim"] <- "stim_file"
-    names(fmri_dat)[names(fmri_dat) == "stimName"] <- "stim_file"
+    names(onset_dat)[names(onset_dat) == "stim"] <- "stim_file_name"
+    names(fmri_dat)[names(fmri_dat) == "stimName"] <- "stim_file_name"
 
-    # Add column indicating trial number (trial = event when stim_file contains ".jpeg")
+    # Add column indicating trial number (trial = event when stim_file_name contains ".jpeg")
     ## trial number corresponds to the order within the txt file
     ## adding this column allows for accurate merging of onset_dat and fmri_dat below
 
     fmri_dat$trial_num <- seq.int(nrow(fmri_dat))
     onset_dat <- onset_dat %>%
-      dplyr::mutate(trial_num = ifelse(grepl(".jpeg", .data$stim_file),
-                                       cumsum(grepl(".jpeg", .data$stim_file)),
+      dplyr::mutate(trial_num = ifelse(grepl(".jpeg", .data$stim_file_name),
+                                       cumsum(grepl(".jpeg", .data$stim_file_name)),
                                        NA))
 
     # combine onset_dat (onset data) and fmri_dat (response data) into func_dat
-    func_dat <- merge(onset_dat, fmri_dat, by=c("run", "set","run_cond","stim_file", "trial_num"), all = TRUE)
+    func_dat <- merge(onset_dat, fmri_dat, by=c("run", "set","run_cond","stim_file_name", "trial_num"), all = TRUE)
     func_dat <- func_dat[order(func_dat$onset_time),] #order by onset_time
 
     # add subject column
@@ -212,10 +212,10 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       run_dat <- func_dat[(func_dat$run == run),]
 
       # check for > 1 "wait" stimulus - this indicates the run was restarted but onsets from the original attempt were not overwritten
-      if (sum(run_dat$stim_file == "wait") > 1) {
+      if (sum(run_dat$stim_file_name == "wait") > 1) {
 
         # identify row with the final "wait" stimulus -- indicates the start of the actual (un-aborted) run
-        run_start <- max(grep("wait", run_dat$stim_file))
+        run_start <- max(grep("wait", run_dat$stim_file_name))
 
         # remove rows prior to run_start (i.e. onsets from aborted runs)
         run_dat <- run_dat[-(1:run_start-1), ]
@@ -229,7 +229,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       for (row in 1:nrow(run_dat)) {
         if (row < nrow(run_dat)) {
           run_dat[row, "duration"] <- round(run_dat[row+1,"onset"] - run_dat[row,"onset"], 2)
-        } else if (row == nrow(run_dat) & run_dat[row, "stim_file"] == "fix") {
+        } else if (row == nrow(run_dat) & run_dat[row, "stim_file_name"] == "fix") {
           run_dat[row, "duration"] <- 10 #set to 10 seconds based on task program
         }
       }
@@ -248,7 +248,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
       # re-order columns
       run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'set', 'run_cond',
-                           'stim_file', 'trial_num', 'type', 'block', 'img_cat',
+                           'stim_file_name', 'trial_num', 'type', 'block', 'img_cat',
                            'go_stim', 'signal', 'reqSSD' , 'correct', 'response',
                            'response_time', 'trueSSD')]
 
