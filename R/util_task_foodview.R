@@ -163,6 +163,9 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     # re-order columns
     run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file_name', 'response', 'response_time' , 'food_ed', 'food_taste', 'sys_onset_time')]
 
+    # rename run column
+    names(run_dat)[names(run_dat) == "run"] <- "run_num"
+
     # append to run_dfs
     run_dfs[[run_label]] <- run_dat
   }
@@ -185,7 +188,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_label <- gsub('run', 'run-0', names(run_dfs)[runnum])
 
     # define output file with path
-    outfile <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodview_', run_label, '_bold_events.tsv')
+    outfile <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodview_', run_label, '_events.tsv')
 
     # export file if doesn't exist or overwrite = TRUE
     if (!file.exists(outfile) | isTRUE(overwrite)) {

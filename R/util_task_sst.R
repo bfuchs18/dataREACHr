@@ -129,6 +129,9 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
                          'stim_file_name', 'img_cat', 'go_stim', 'signal', 'reqSSD' ,
                          'correct', 'response', 'response_time', 'trueSSD')]
 
+    # rename run column
+    names(dataframe)[names(dataframe) == "run"] <- "run_num"
+
     # split beh by run?
 
     # assign the modified dataframe back to the list
@@ -252,6 +255,9 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
                            'go_stim', 'signal', 'reqSSD' , 'correct', 'response',
                            'response_time', 'trueSSD')]
 
+      # rename run column
+      names(run_dat)[names(run_dat) == "run"] <- "run_num"
+
       # append to func_run_dfs
       func_run_dfs[[run_label]] <- run_dat
 
@@ -259,7 +265,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       run_label <- paste0("run-0", run)
 
       # define output file with path
-      outfile <- paste0(raw_func_wd, sub_str, '_ses-', ses, '_task-sst_', run_label, '_bold_events.tsv')
+      outfile <- paste0(raw_func_wd, sub_str, '_ses-', ses, '_task-sst_', run_label, '_events.tsv')
 
       # export file if doesn't exist or overwrite = TRUE
       if (!file.exists(outfile) | isTRUE(overwrite)) {

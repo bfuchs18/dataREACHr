@@ -11,9 +11,7 @@ json_foodview <- function() {
 
   foodview_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
+      Description = 'Food View Task developed in Keller Lab for Project REACH'),
     onset = list( Description = 'onset time of stimulus relative to start of run. Derived from sys_onset_time by subtracting the first sys_onset_time in a run from all sys_onset_time in that run and dividing by 1000',
                   Unit = "seconds",
                   Derivative = TRUE),
@@ -21,7 +19,11 @@ json_foodview <- function() {
                      Derivative = TRUE,
                      Unit = "seconds"),
     sub = list( Description = 'Participant ID'),
-    run = list( Description = 'Food View Task run number (1-4)'),
+    run_num = list( Description = 'Food View Task run number',
+                Levels = list ('1' = 'run 1',
+                               '2' = 'run 2',
+                               '3' = 'run 3',
+                               '4' = 'run 4')),
     commercial_cond = list( Description = 'commercial condition',
                             Levels = list ('food' = 'food',
                                            'toy' = 'toy')),

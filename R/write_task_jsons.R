@@ -59,8 +59,8 @@ write_task_jsons <- function(bids_wd, overwrite) {
   json_functions <- list(
 
     json_sst_beh = "task-sst_beh.json",
-    json_sst_bold = "task-sst_bold.json",
-    json_foodview = "task-foodview_bold.json",
+    json_sst_bold = "task-sst_events.json",
+    json_foodview = "task-foodview_events.json",
     json_toolbox_beh = "task-toolbox_beh.json",
     json_toolbox_phenotype = "toolbox_scores.json",
     json_rrv = "task-rrv_beh.json"

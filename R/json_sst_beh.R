@@ -11,12 +11,10 @@ json_sst_beh <- function() {
 
   sst_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
-
-    run = list( Description = ''),
-    set = list( Description = ''),
+      Description = 'Behavioral SST developed by Keller Lab for Project REACH'),
+    sub = list( Description = 'Participant ID'),
+    run_num = list( Description = 'behavioral SST run number (1-2)'),
+    set = list( Description = 'run set'),
     run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',
                      Levels = list ('food' = 'food',
                                     'toy' = 'toy')),
@@ -35,11 +33,11 @@ json_sst_beh <- function() {
     go_stim = list( Description = 'go signal (napkin) side',
                     Levels = list ('1' = 'left side',
                                    '2' = 'right side')),
-    signal = list( Description = '',
+    signal = list( Description = 'Signal type on trial',
                    Levels = list ('0' = 'no stop signal given (go trial)',
                                   '1' = 'stop signal given (stop trial)')),
     reqSSD = list( Description = 'requested stop signal delay'),
-    correct = list( Description = '',
+    correct = list( Description = 'Response type',
                     Levels = list ('1' = 'missed go response',
                                    '2' = 'incorrect go response (go_stim != response)',
                                    '3' = 'failed stop trial',

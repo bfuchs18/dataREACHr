@@ -11,17 +11,21 @@ json_sst_bold <- function() {
 
   sst_list <- list(
     'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
-
-    onset = list( Description = '',
+      Description = 'Stop Signal Task developed in Keller Lab for Project REACH'),
+    onset = list( Description = 'onset time relative to start of run',
                   Unit = "seconds"),
     duration = list( Description = 'stimulus duration. Calculated by subtracting the onset for the subsequent stimulus from the onset of the present stimulus',
                      Derivative = TRUE,
                       Unit = "seconds"),
-    run = list( Description = ''),
-    set = list( Description = ''),
+    sub = list( Description = 'participant ID'),
+    run_num = list( Description = 'SST run number',
+                Levels = list ('1' = 'run 1',
+                               '2' = 'run 2',
+                               '3' = 'run 3',
+                               '4' = 'run 4',
+                               '5' = 'run 5',
+                               '6' = 'run 6')),
+    set = list( Description = 'run set (A-F)'),
     run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',
                      Levels = list ('food' = 'food',
                                     'toy' = 'toy')),
