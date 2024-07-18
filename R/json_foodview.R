@@ -25,7 +25,7 @@ json_foodview <- function() {
     commercial_cond = list( Description = 'commercial condition',
                             Levels = list ('food' = 'food',
                                            'toy' = 'toy')),
-    stim_file = list( Description = ''),
+    stim_file_name = list( Description = 'basename of stimulus file'),
     response = list( Description = 'response to question "Do you want to eat this right now?',
                      Levels = list ('0' = 'no response',
                                     '1' = 'left response button (Yes)',

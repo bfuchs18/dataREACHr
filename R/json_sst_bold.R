@@ -25,7 +25,7 @@ json_sst_bold <- function() {
     run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',
                      Levels = list ('food' = 'food',
                                     'toy' = 'toy')),
-    stim_file = list( Description = ''),
+    stim_file_name = list( Description = 'basename of stimulus file'),
     trial_num = list( Description = ''),
     type = list( Description = 'task type',
                  Levels = list ('Prac' = 'pratice task',
