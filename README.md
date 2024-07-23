@@ -4,16 +4,19 @@
 # dataREACHr
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 dataREACHr package contains tools to process data for Project REACH at
-Penn State. Project REACH is a longitudinal study of the effects of food marketing on children's eating behaviors and neural responses to food cues. Data are collected from children and parents across 5 visits. 
+Penn State. Project REACH is a longitudinal study of the effects of food
+marketing on children’s eating behaviors and neural responses to food
+cues. Data are collected from children and parents across 5 visits.
 
-dataREACHr functions:
+dataREACHr functions can:
 
-- organize data and meta-data (JSONS) for surveys (REDCap) and 
-behavioral tasks into the [Brain
-Imaging Data Structure](https://bids.neuroimaging.io/)
+- organize data and meta-data (JSONS) for surveys (REDCap) and
+  behavioral tasks into the [Brain Imaging Data
+  Structure](https://bids.neuroimaging.io/)
 
 - parse text files from the RRV task into CSVs
 
@@ -23,7 +26,7 @@ Imaging Data Structure](https://bids.neuroimaging.io/)
 - generate subject-specific dataframes containing cleaned behavioral
   data
 
-- export BIDS-compliant TSVs and JSONS for survey and behavioral data
+- export bids-compliant TSVs and JSONS for survey and behavioral data
 
 ## Installation
 
@@ -37,7 +40,8 @@ devtools::install_github("bfuchs18/dataREACHr")
 
 ## Processing data with dataREACHr
 
-The wrapper function to process survey data is **proc_redcap()**. The wrapper function to process task data is **proc_task()**.
+The wrapper function to process survey data is **proc_redcap()**. The
+wrapper function to process task data is **proc_task()**.
 
 Using these functions requires a directory structure of:
 
@@ -80,12 +84,12 @@ proc_redcap(visit_data_path, data_de_path, overwrite = TRUE)
 
 # process task data and export TSVs and JSONS into bids/; overwrite existing files in rawdata for all tasks
 proc_task(
-  base_wd = base_dir,
-  overwrite_parsed_rrv = FALSE,
-  overwrite_sourcedata = FALSE,
-  overwrite_rawdata_vector = c("all_tasks"),
-  overwrite_jsons = FALSE
-)
+    base_wd = base_dir,
+    overwrite_sourcedata = FALSE,
+    overwrite_rawdata = TRUE,
+    overwrite_jsons = TRUE,
+    return_data = FALSE
+  )
 ```
 
 This README was generated from README.Rmd using
