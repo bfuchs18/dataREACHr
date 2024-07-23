@@ -11,9 +11,7 @@ Penn State. This includes organizing multi-visit survey (REDCap),
 behavioral (e.g., cognitive task), and fmri-related data into the Brain
 Imaging Data Structure and generating meta-data (jsons).
 
-dataREACHr functions can:
-
-- copy behavioral data from untouchedRaw to bids/sourcedata/
+dataREACHr functions:
 
 - parse text files from the RRV task into CSVs
 
