@@ -149,7 +149,7 @@ util_task_rrv <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   # export files if don't exist or overwrite = TRUE
   beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-rrv_beh.tsv')
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
-   utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+   utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a")
   }
 
 

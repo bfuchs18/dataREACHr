@@ -154,11 +154,8 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     ## convert response_time from ms to sec
     run_dat$response_time <- run_dat$response_time/1000
 
-    ## make rt = n/a when dat$resp = 0 (indicating no response)
-    run_dat$response_time[run_dat$response == 0] <- "n/a"
-
-    # Replace all NA values with "n/a" for BIDS compliance
-    run_dat[is.na(run_dat)] <- "n/a"
+    ## make rt = NA when dat$resp = 0 (indicating no response)
+    run_dat$response_time[run_dat$response == 0] <- NA
 
     # re-order columns
     run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'commercial_cond', 'stim_file_name', 'response', 'response_time' , 'food_ed', 'food_taste', 'sys_onset_time')]
@@ -192,7 +189,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
 
     # export file if doesn't exist or overwrite = TRUE
     if (!file.exists(outfile) | isTRUE(overwrite)) {
-      utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+      utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" ) # specify BIDS-compliant NA string
     }
   }
 
