@@ -11,7 +11,8 @@ deriv_foodview(data)
 
 \item{return_data}{If return_data is set to TRUE, will return a list including:
 \enumerate{
-\item a dataframe with long summary data by commerical_condition
+\item summary_long_by_cond = a long dataframe with summary data by commerical_condition (metrics calculated across runs)
+\item summary_long_by_block = a long dataframe with summary data by block
 }}
 }
 \description{

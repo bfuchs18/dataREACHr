@@ -4,7 +4,8 @@
 #'
 #' @param data a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata
 #' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) a dataframe with long summary data by commerical_condition
+#'  1) summary_long_by_cond = a long dataframe with summary data by commerical_condition (metrics calculated across runs)
+#'  2) summary_long_by_block = a long dataframe with summary data by block
 #'
 #' @examples
 #'
@@ -32,7 +33,7 @@ deriv_foodview <- function(data) {
     # extract subject's list of dataframes
     foodview_data <- data[[i]]
 
-    # Summarize data by condition ----
+    # Summarize data by advertisement condition in long format ----
 
     # make one dataframe with all run data
     combined_df <- dplyr::bind_rows(foodview_data)
@@ -118,7 +119,7 @@ deriv_foodview <- function(data) {
       }
     }
 
-    # Summarize data by block in long format  ----
+    # Summarize data by block in long format  -----
 
     # determine number of runs
     n_runs <- length(foodview_data)
@@ -184,7 +185,7 @@ deriv_foodview <- function(data) {
     }
   }
 
-  return(list(summary_long = summary_bycond_df,
-              summary_long = summary_byblock_df))
+  return(list(summary_long_by_cond = summary_bycond_df,
+              summary_long_by_block = summary_byblock_df))
 }
 
