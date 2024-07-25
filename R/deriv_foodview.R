@@ -81,7 +81,7 @@ deriv_foodview <- function(data) {
       # summarize data across task for condition
       cond_summary_row <-
         data.frame(
-          participant_id = sub,
+          sub = sub,
           commerical_cond = cond,
 
           n_image = n_image,
@@ -112,7 +112,7 @@ deriv_foodview <- function(data) {
 
 
       # add row to dataframe
-      if (nrow(summary_df) == 0) {
+      if (nrow(summary_bycond_df) == 0) {
         summary_bycond_df <- cond_summary_row
       } else {
         summary_bycond_df <- dplyr::bind_rows(summary_bycond_df, cond_summary_row)
@@ -160,7 +160,7 @@ deriv_foodview <- function(data) {
 
         block_summary_row <-
           data.frame(
-            participant_id = block_rows$sub[1],
+            sub = block_rows$sub[1],
             run_num = block_rows$run_num[1],
             block_num = block,
             commerical_cond = block_rows$commercial_cond[1],
