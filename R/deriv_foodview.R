@@ -21,15 +21,18 @@
 deriv_foodview <- function(data) {
 
   # create output dataframes
-  summary_df <- data.frame()
+  summary_bycond_df <- data.frame()
 
+  # create output dataframes
+  summary_byblock_df <- data.frame()
+
+  # for each sub (top-level list in data)
   for (i in 1:length(data)) {
 
-    # extract subjects foodview data
+    # extract subject's list of dataframes
     foodview_data <- data[[i]]
 
-    # determine number of runs
-    n_runs <- length(foodview_data)
+    # Summarize data by condition ----
 
     # make one dataframe with all run data
     combined_df <- dplyr::bind_rows(foodview_data)
@@ -109,14 +112,79 @@ deriv_foodview <- function(data) {
 
       # add row to dataframe
       if (nrow(summary_df) == 0) {
-        summary_df <- cond_summary_row
+        summary_bycond_df <- cond_summary_row
       } else {
-        summary_df <- dplyr::bind_rows(summary_df, cond_summary_row)
+        summary_bycond_df <- dplyr::bind_rows(summary_bycond_df, cond_summary_row)
       }
     }
 
+    # Summarize data by block in long format  ----
+
+    # determine number of runs
+    n_runs <- length(foodview_data)
+
+    for (run in 1:n_runs) {
+
+      # extract foodview data for given run
+      run_data <- foodview_data[[run]]
+
+      # subset image rows
+      run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
+
+      rownames(run_jpeg_rows) <- NULL
+
+      # Get unique block combos
+      unique_combos <- unique(run_jpeg_rows[,c('commercial_cond','food_ed','food_taste')])
+
+      # Add a "block" column with an integer for each unique combination
+      run_jpeg_rows <- run_jpeg_rows %>%
+        dplyr::mutate(block = match(
+          interaction(commercial_cond, food_ed, food_taste),
+          interaction(
+            unique_combos$commercial_cond,
+            unique_combos$food_ed,
+            unique_combos$food_taste
+          )
+        ))
+
+      # for each block
+      for (block in unique(run_jpeg_rows$block)) {
+
+        # subset images in block
+        block_rows <- run_jpeg_rows[run_jpeg_rows$block == block,]
+
+        n_image = nrow(block_rows)
+        n_resp = sum(block_rows$response == 1 | block_rows$response == 2)
+        n_want = sum(block_rows$response == 1)
+
+        block_summary_row <-
+          data.frame(
+            participant_id = block_rows$sub[1],
+            run_num = block_rows$run_num[1],
+            block_num = block,
+            commerical_cond = block_rows$commercial_cond[1],
+            food_ed = block_rows$food_ed[1],
+            food_taste = block_rows$food_taste[1],
+            n_image = n_image,
+            n_resp = n_resp,
+            n_want = n_want,
+            p_resp = n_resp / n_image,
+            p_want_of_resp = n_want / n_resp,
+            avg_rt = mean(block_rows$response_time, na.rm = TRUE)
+          )
+
+        # add row to dataframe
+        if (nrow(summary_byblock_df) == 0) {
+          summary_byblock_df <- block_summary_row
+        } else {
+          summary_byblock_df <- dplyr::bind_rows(summary_byblock_df, block_summary_row)
+        }
+
+      }
+    }
   }
 
-  return(list(summary_by_cond = summary_df))
+  return(list(summary_long = summary_bycond_df,
+              summary_long = summary_byblock_df))
 }
 
