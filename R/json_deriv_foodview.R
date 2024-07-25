@@ -9,12 +9,13 @@
 
 json_deriv_foodview <- function() {
 
+  # JSON for dataframe by condition ----
   foodview_bycond_list <- list(
     'MeasurementToolMetadata' = list(
       Description = '' ,
       Reference = '',
       TermURL = ''),
-    participant_id = list( Description = 'participant id number'),
+    sub = list( Description = 'participant id number'),
     commercial_cond = list( Description = '',
                                 Levels = list("toy" = "",
                                               "food" = "")),
@@ -59,29 +60,48 @@ json_deriv_foodview <- function() {
                          Derivative = TRUE)
   )
 
+  # JSON for dataframe by block ----
 
-  # rrv_summary_long_list <- list(
-  #   'MeasurementToolMetadata' = list(
-  #     Description = '',
-  #     Reference = '',
-  #     TermURL = ''),
-  #   participant_id = list( Description = 'participant id number'),
-  #   reinforcer = list( Description = 'Reinforcer',
-  #                      Levels = list ('Candy' = 'candy',
-  #                                     'Toy' = 'toy')),
-  #   session = list( Description = 'RRV task session number. Each session corresponds to a different reinforcement schedule'),
-  #   session_time = list( Description = 'Time spent within a session for a given reinforcer/screen',
-  #                        Unit = "seconds"),
-  #   schedule = list( Description = 'Reinforcement schedule',
-  #                    Levels = list ('Variable Response Based 1:4' = '1 reinforcer earned per 4 responses',
-  #                                   'Variable Response Based 1:8' = '1 reinforcer earned per 8 responses')),
-  #   session_responses = list( Description = 'Number of responses made within a session for a given reinforcer'),
-  #   session_reinforcers = list( Description = 'Number of reinforcers earned within a session for a given reinforcer'),
-  #   session_blocks = list( Description = 'Number of blocks within a session for a given reinforcer'),
-  #   session_nonresp_blocks = list( Description = 'Number of blocks with 0 responses within a session for a given reinforcer'),
-  #   session_average_responses = list( Description = '??'),
-  #   session_average_reinforcers = list( Description = '??')
-  # )
+  rrv_summary_long_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = '',
+      Reference = '',
+      TermURL = ''),
+    sub = list( Description = 'participant id number'),
+    run_num = list( Description = 'Food View Task run number',
+                    Levels = list ('1' = 'run 1',
+                                   '2' = 'run 2',
+                                   '3' = 'run 3',
+                                   '4' = 'run 4')),
+    block_num = list( Description = 'Block number within a run',
+                    Levels = list ('1' = 'block 1',
+                                   '2' = 'block 2',
+                                   '3' = 'block 3',
+                                   '4' = 'block 4')),
+    commercial_cond = list( Description = 'commercial condition',
+                            Levels = list ('food' = 'food',
+                                           'toy' = 'toy')),
+    food_ed = list( Description = 'block energy density category',
+                    Levels = list ('low' = 'low energy density foods',
+                                   'high' = 'high energy density foods')),
+    food_taste = list( Description = 'block taste category',
+                       Levels = list ('sweet' = 'sweet foods',
+                                      'savory' = 'savory foods')),
+    n_image = list( Description = 'Number of images in a block',
+                    derivative = TRUE),
+    n_resp = list( Description = 'Number of responses in given block',
+                   derivative = TRUE),
+    n_want = list( Description = 'Number of want responses in given block',
+                   derivative = TRUE),
+    p_resp = list( Description = 'Proportion of responses out of images in a given block',
+                   derivative = TRUE),
+    p_resp_of_want = list( Description = 'Proportion of "want" responses out of all responses in a given block',
+                    derivative = TRUE),
+    avg_rt = list( Description = 'Average reaction time for responses in given block',
+                           Unit = "seconds")
+  )
+
+  # convert and return JSONS ----
 
   # convert formatting to JSON
   foodview_bycond_json <- RJSONIO::toJSON(foodview_bycond_list, pretty = TRUE)
