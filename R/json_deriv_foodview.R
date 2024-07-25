@@ -62,7 +62,7 @@ json_deriv_foodview <- function() {
 
   # JSON for dataframe by block ----
 
-  rrv_summary_long_list <- list(
+  foodview_byblock_list <- list(
     'MeasurementToolMetadata' = list(
       Description = '',
       Reference = '',
@@ -105,17 +105,18 @@ json_deriv_foodview <- function() {
 
   # convert formatting to JSON
   foodview_bycond_json <- RJSONIO::toJSON(foodview_bycond_list, pretty = TRUE)
-  # rrv_summary_long_json <- RJSONIO::toJSON(rrv_summary_long_list, pretty = TRUE)
-  #
+  foodview_byblock_json <- RJSONIO::toJSON(foodview_byblock_list, pretty = TRUE)
+
   # double check
   if (isFALSE(RJSONIO::isValidJSON(foodview_bycond_json, asText = TRUE))){
     print('foodview_bycond_json JSON file may be invalid')
   }
 
-  # if (isFALSE(RJSONIO::isValidJSON(rrv_summary_long_json, asText = TRUE))){
-  #   print('RRV long summary derivative JSON file may be invalid')
-  # }
+  if (isFALSE(RJSONIO::isValidJSON(foodview_byblock_json, asText = TRUE))){
+    print('foodview_byblock_json JSON file may be invalid')
+  }
 
-  return(list(foodview_bycond_json = foodview_bycond_json))
+  return(list(foodview_bycond_json = foodview_bycond_json,
+              foodview_byblock_json = foodview_byblock_json))
 
 }
