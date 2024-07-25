@@ -41,8 +41,6 @@ json_foodview <- function() {
     food_taste = list( Description = 'food image taste category',
                   Levels = list ('sweet' = 'sweet',
                                  'savory' = 'savory')),
-    response_time = list( Description = 'response time',
-                          Unit = "seconds"),
     sys_onset_time = list( Description = 'System onset time of stimulus',
                           Unit = "milliseconds")
   )
