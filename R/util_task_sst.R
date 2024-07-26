@@ -115,14 +115,11 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     # add subject column
     dataframe$sub <- sub_str
 
-    # replace missing values with "n/a" for bids compliance
-    dataframe[is.na(dataframe)] <- "n/a"
-
     # convert response_time from ms to sec
     dataframe$response_time <- dataframe$response_time / 1000
 
-    # make response_time = n/a when dataframe$response = 0 (indicating no response)
-    dataframe$response_time[dataframe$response == 0] <- "n/a"
+    # make response_time NA when dataframe$response = 0 (indicating no response)
+    dataframe$response_time[dataframe$response == 0] <- NA
 
     # reorder columns
     dataframe <- dataframe[c('sub', 'type', 'run', 'set', 'run_cond', 'block',
@@ -150,13 +147,13 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   ## practice data
   prac_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-sst_acq-practice_beh.tsv')
   if (!file.exists(prac_outfile) | isTRUE(overwrite)) {
-    utils::write.table(beh_dfs[[1]], prac_outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+    utils::write.table(beh_dfs[[1]], prac_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   }
 
   ## task data
   beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-sst_beh.tsv')
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
-    utils::write.table(beh_dfs[[2]], beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+    utils::write.table(beh_dfs[[2]], beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   }
 
   #### Clean and Export Func Data (onset_dat and fmri_dat) #####
@@ -240,14 +237,10 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       # convert response_time from ms to sec
       run_dat$response_time <- run_dat$response_time/1000
 
-      # make response_time = n/a when func_dat$response = 0 (indicating no response)
-      run_dat$response_time[run_dat$response == 0] <- "n/a"
+      # make response_time NA when func_dat$response = 0 (indicating no response)
+      run_dat$response_time[run_dat$response == 0] <- NA
 
       # fill in block category
-
-
-      # Replace all NA values with "n/a" for BIDS compliance
-      run_dat[is.na(run_dat)] <- "n/a"
 
       # re-order columns
       run_dat <- run_dat[c('onset', 'duration', 'sub', 'run', 'set', 'run_cond',
@@ -269,7 +262,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
       # export file if doesn't exist or overwrite = TRUE
       if (!file.exists(outfile) | isTRUE(overwrite)) {
-        utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE )
+        utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
       }
     }
   }
