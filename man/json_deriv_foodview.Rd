@@ -7,8 +7,8 @@
 json_deriv_foodview()
 }
 \value{
-A list of 2 strings (labels: XX, XX) with data stored in JSON format containing meta-data the summary Foodview database
+A list of 2 strings (labels: foodview_bycond_json, foodview_byblock_json) with data stored in JSON format containing meta-data the summary Foodview database
 }
 \description{
-This function XXXXX
+This function generates 2 json files for FoodView summary data reported in derivatives/beh_databases: (1) summary metrics computed by ad condition, (2) summary metrics computed by block
 }
