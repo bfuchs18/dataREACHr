@@ -46,13 +46,70 @@ deriv_sst <- function(data) {
       # subset image rows
       run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
 
-      rownames(run_jpeg_rows) <- NULL
-
       # for each block
       for (block in unique(run_jpeg_rows$block)) {
 
         # subset images in block
         block_rows <- run_jpeg_rows[run_jpeg_rows$block == block,]
+        go_trials <- block_rows[block_rows$signal == 0,]
+        stop_trials <- block_rows[block_rows$signal == 1,]
+
+        print(block_rows$sub[1])
+
+        # calculate metrics
+        n_stop_trials = nrow(stop_trials) # number of stop trials
+        n_go_trials = nrow(go_trials) # number of go trials
+        n_go_cor = sum(go_trials$correct == 4) # number of correct go trials
+        n_go_error = sum(go_trials$correct == 2) # number of incorrect go trials (wrong left/right response)
+        n_go_miss = sum(go_trials$correct == 1)
+
+        go_rt_mean = mean(go_trials$response_time, na.rm = TRUE) # average reaction time on go trials, rm trials with no response
+        go_correct_rt_mean = mean(go_trials[go_trials$correct == 4,]$response_time) # average reaction time on correct go trials
+        go_error_rt_mean = mean(go_trials[go_trials$correct == 2,]$response_time) # average reaction time on incorrect correct go trials
+        us_rt_mean = mean(stop_trials[stop_trials$correct == 3,]$response_time)  # average reaction time on unsuccessful stop trials
+        stop_prob_resp = sum(stop_trials$correct == 3) / n_stop_trials  #probability of responding on signal  -- p(resp|signal)
+        ssd_mean = mean(stop_trials$trueSSD) #average stop signal delay on stop trials
+
+        ## ISSUE: if/else below will error if there are no unsuccessful stop trials, causing us_rt_mean to be NaN -- what is racehorse_check in this case?
+
+        # determine racehorse_check and ssrt
+        if ( go_rt_mean > us_rt_mean ){
+          racehorse_check = 1 # meet racehorse assumptions
+
+          #calculate ssrt with mean method
+          ssrt_mean = go_rt_mean - ssd
+
+          # replace omissions with max RT if there are omissions
+          if (n_go_miss > 0) {
+
+            # get max go rt
+            max_go_rt = max(go_trials$response_time, na.rm = TRUE)
+
+            # make copy of go ataset
+            go_trials_replace <- go_trials
+
+            #replace omitted go rt values
+            go_trials_replace$response_time[is.na(go_trials_replace$response_time)] <- max_go_rt
+
+            #get rt at stop_prob_resp percentile
+            nth_rt = quantile(go_trials_replace$response_time, probs = stop_prob_resp, names = FALSE)
+
+          } else {
+
+            # get go trial rt at stop_prob_resp percentile
+            nth_rt = quantile(go_trials$response_time, probs = stop_prob_resp, names = FALSE)
+          }
+
+          #calculate ssrt with integration method
+          ssrt_int = nth_rt - ssd_mean
+
+        } else {
+          racehorse_check = 0 # fail to meet racehorse assumptions
+
+          # don't calculate ssrt
+          ssrt_mean = NA
+          ssrt_int = NA
+        }
 
         block_summary_row <-
           data.frame(
@@ -64,20 +121,20 @@ deriv_sst <- function(data) {
             img_cat = block_rows$img_cat[1],
 
             # add summary metrics
-            racehorse_check = NA,
-            n_stop_trials = sum(block_rows$signal == 1),
-            n_go_trials = sum(block_rows$signal == 0),
-            go_rt = mean(block_rows$response_time, na.rm = TRUE),
-            n_go_cor = sum(block_rows$signal == 0 & block_rows$correct == 4),
-            go_cor_rt = mean(block_rows[block_rows$signal == 0 & block_rows$correct == 4,]$response_time),
-            n_go_error = sum(block_rows$correct == 2),
-            go_error_rt = mean(block_rows[block_rows$correct == 2,]$response_time),
-            n_go_miss = sum(block_rows$correct == 1),
-            stop_prob_resp = NA,
-            us_rt = NA,
-            ssd = NA,
-            ssrt_mean = NA,
-            ssrt_int = NA
+            racehorse_check = racehorse_check,
+            n_stop_trials = n_stop_trials,
+            n_go_trials = n_go_trials,
+            go_rt_mean = go_rt_mean,
+            n_go_cor = n_go_cor,
+            go_correct_rt_mean = go_correct_rt_mean,
+            n_go_error = n_go_error,
+            go_error_rt_mean = go_error_rt_mean,
+            n_go_miss = n_go_miss,
+            stop_prob_resp = stop_prob_resp,
+            us_rt_mean = us_rt_mean,
+            ssd_mean = ssd_mean,
+            ssrt_mean = ssrt_mean,
+            ssrt_int = ssrt_int
           )
 
         # add row to dataframe
