@@ -146,8 +146,6 @@ deriv_sst <- function(data) {
         # convert response_time unit from seconds to milliseconds
         run_data$response_time <- run_data$response_time*1000
 
-        # Summarize data by run in long format  -----
-
         # subset image rows
         run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
 
@@ -155,7 +153,7 @@ deriv_sst <- function(data) {
         if (nrow(run_jpeg_rows) > 0 & sum(!is.na(run_jpeg_rows$response_time))) { ## change this so we still get a row in DF if no responses?
         # if (nrow(run_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
 
-
+          # get dataframe row of summary metrics
           run_summary_row <- get_summary_row(run_jpeg_rows)
 
           # add row to dataframe
@@ -167,8 +165,6 @@ deriv_sst <- function(data) {
 
         }
 
-
-        # # Summarize data by block in long format  -----
         # for (block in unique(run_jpeg_rows$block)) {
         #
         #   # subset images in block
