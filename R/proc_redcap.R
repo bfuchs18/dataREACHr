@@ -27,7 +27,8 @@
 #' \dontrun{
 #' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
 #' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-20_1520.csv"
-#'
+#' data_de_path = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData//bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-04-08_1306.csv"
+#' visit_data_path = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData//bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-07-17_1252.csv"
 #' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
 #' }
@@ -435,7 +436,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   prelim_intake_data <- prelim_intake_data[, -grep("fullness_time", names(prelim_intake_data))] # remove extra columns
 
   # compute intake variables
-  prelim_intake_data <- util_calc_intake(prelim_intake_data)
+  prelim_intake_data  <- util_calc_intake(prelim_intake_data)
 
   ####  Get prelim anthro -- will be obsolete with double-entry data is available ####
   prelim_anthro_data <- dplyr::bind_rows(
