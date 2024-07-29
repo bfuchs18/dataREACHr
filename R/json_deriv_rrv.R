@@ -10,10 +10,9 @@
 json_deriv_rrv <- function() {
 
   rrv_summary_list <- list(
-    'MeasurementToolMetadata' = list(
-      Description = '' ,
-      Reference = '',
-      TermURL = ''),
+    'FileLevelMetadata' = list(
+      Description = "Relative Reinforcing Value of Food Task behavior summarized across the whole task",
+      Sources = "bids::rawdata/sub*/ses-1/beh/sub*rrv_beh.tsv"),
     participant_id = list( Description = 'participant id number'),
     pmax_responded_food = list( Description = 'Maximum schedule with responses for food reinforcer',
                                 Levels = list("0" = "no responses made",
@@ -83,10 +82,9 @@ json_deriv_rrv <- function() {
 
 
   rrv_summary_long_list <- list(
-    'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
+    'FileLevelMetadata' = list(
+      Description = "Relative Reinforcing Value of Food Task behavior summarized by session/reinforcement schedule for each reinforcer",
+      Sources = "bids::rawdata/sub*/ses-1/beh/sub*rrv_beh.tsv"),
     participant_id = list( Description = 'participant id number'),
     reinforcer = list( Description = 'Reinforcer',
                        Levels = list ('Candy' = 'candy',

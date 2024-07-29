@@ -1,8 +1,8 @@
 #' json_deriv_foodview: Generates json file for the derivative Foodview data
 #'
-#' This function XXXXX
+#' This function generates 2 json files for FoodView summary data reported in derivatives/beh_databases: (1) summary metrics computed by ad condition, (2) summary metrics computed by block
 #'
-#' @return A list of 2 strings (labels: XX, XX) with data stored in JSON format containing meta-data the summary Foodview database
+#' @return A list of 2 strings (labels: foodview_bycond_json, foodview_byblock_json) with data stored in JSON format containing meta-data the summary Foodview database
 #'
 #'
 #' @export
@@ -11,62 +11,64 @@ json_deriv_foodview <- function() {
 
   # JSON for dataframe by condition ----
   foodview_bycond_list <- list(
-    'MeasurementToolMetadata' = list(
-      Description = '' ,
-      Reference = '',
-      TermURL = ''),
+    'FileLevelMetadata' = list(
+      Description = "Foodview task behavior summarized by commerical condition across all blocks/runs in the task",
+      Sources = "bids::rawdata/sub*/ses-1/func/sub*foodview*events.tsv"),
     sub = list( Description = 'participant id number'),
-    commercial_cond = list( Description = '',
-                                Levels = list("toy" = "",
-                                              "food" = "")),
-    n_image = list(Description = 'number of image events for given commercial_cond',
+    commercial_cond = list( Description = 'commerical condition',
+                                Levels = list("toy" = "toy",
+                                              "food" = "food")),
+    n_image = list(Description = 'number of image events (i.e., the presentation of a food item where a child is to respond to the question "do you want this item?"',
                     Derivative = TRUE),
     p_resp = list(Description = 'proportion of image events with response out of the total number of image events',
                     Derivative = TRUE),
     p_want_of_resp = list(Description = 'proportion of items a child reported wanting out of the total number of responses they provided',
                           Derivative = TRUE),
-    avg_rt = list(Description = 'average reaction time',
+    avg_rt = list(Description = 'average reaction time for responses to all items',
                   unit = "seconds",
                   Derivative = TRUE),
-    hed_n_image = list(Description = 'number of high ED image events for given commercial_cond',
+    hed_n_image = list(Description = 'number of high ED image events',
                   Derivative = TRUE),
-    hed_p_resp = list(Description = '',
+    hed_p_resp = list(Description = 'proportion of high ED events with a response out of the total number of high ED events',
                   Derivative = TRUE),
-    hed_p_want_of_resp = list( Description = '',
+    hed_p_want_of_resp = list( Description = 'proportion of high ED items a child reported wanting out of the total number of high ED responses they provided',
                   Derivative = TRUE),
-    hed_avg_rt = list(Description = '',
-                  Derivative = TRUE),
+    hed_avg_rt = list(Description = 'average reaction time for responses to items in high ED food blocks',
+                      unit = "seconds",
+                      Derivative = TRUE),
     led_n_image = list(Description = 'number of low ED image events for given commercial_cond',
                   Derivative = TRUE),
-    led_p_resp = list(Description = '',
+    led_p_resp = list(Description = 'proportion of low ED events with a response out of the total number of low ED events',
                   Derivative = TRUE),
-    led_p_want_of_resp = list( Description = '',
+    led_p_want_of_resp = list( Description = 'proportion of low ED items a child reported wanting out of the total number of low ED responses they provided',
                     Derivative = TRUE),
-    led_avg_rt = list( Description = '',
-                    Derivative = TRUE),
+    led_avg_rt = list( Description = 'average reaction time for responses to items in low ED food blocks',
+                       unit = "seconds",
+                       Derivative = TRUE),
     sweet_n_image = list( Description = 'number of sweet image events for given commercial_cond',
                     Derivative = TRUE),
-    sweet_p_want_of_resp = list( Description = '',
+    sweet_p_want_of_resp = list( Description = 'proportion of sweet items a child reported wanting out of the total number of sweet responses they provide',
                     Derivative = TRUE),
-    sweet_avg_rt = list( Description = '',
+    sweet_avg_rt = list( Description = 'average reaction time for responses to items in sweet food blocks',
+                         unit = "seconds",
                          Derivative = TRUE),
     savory_n_image = list( Description = 'number of savory image events for given commercial_cond',
                          Derivative = TRUE),
-    savory_p_resp = list( Description = '',
+    savory_p_resp = list( Description = 'proportion of savory events with a response out of the total number of savory events',
                          Derivative = TRUE),
-    savory_p_want_of_resp = list( Description = '',
+    savory_p_want_of_resp = list( Description = 'proportion of savory items a child reported wanting out of the total number of savory responses they provide',
                          Derivative = TRUE),
-    savory_avg_rt = list( Description = '',
-                         Derivative = TRUE)
+    savory_avg_rt = list( Description = 'average reaction time for responses to items in savory food blocks',
+                          unit = "seconds",
+                          Derivative = TRUE)
   )
 
   # JSON for dataframe by block ----
 
   foodview_byblock_list <- list(
-    'MeasurementToolMetadata' = list(
-      Description = '',
-      Reference = '',
-      TermURL = ''),
+    'FileLevelMetadata' = list(
+      Description = "Foodview task behavior summarized by block",
+      Sources = "bids::rawdata/sub*/ses-1/func/sub*foodview*events.tsv"),
     sub = list( Description = 'participant id number'),
     run_num = list( Description = 'Food View Task run number',
                     Levels = list ('1' = 'run 1',
