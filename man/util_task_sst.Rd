@@ -27,8 +27,9 @@ Data from practice and behavioral runs will be organized into bids/rawdata/sub-l
 \examples{
 
 \dontrun{
+bids_wd = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids"
 # process task data for the Food View Task
-list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = bids_wd, return = TRUE)
 
 }
 }
