@@ -1,10 +1,10 @@
 #' deriv_sst: Generate derivative behavioral databases for SST analyses
 #'
-#' This function generates SST derivative databases from participant-level FoodView files
+#' This function generates SST derivative databases from participant-level SST events files (fmri runs)
 #'
 #' @param data a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata
 #' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) summary_long_by_cond = a long dataframe with summary data by commerical_condition (metrics calculated across runs)
+#'  1) summary_long_by_run = a long dataframe with summary data by run
 #'  2) summary_long_by_block = a long dataframe with summary data by block
 #'
 #' @examples
@@ -19,14 +19,15 @@
 #' food_view_summary <- deriv_foodview(task_data$sst)
 #' }
 
+## To do: add summary metrics for behavioral runs
 deriv_sst <- function(data) {
 
   # define function to get summary metrics for a given subset of data. Returns a dataframe with with summary values
   get_summary_row <- function(jpeg_events){
 
     # subset trials by signal
-    go_trials <- run_jpeg_rows[run_jpeg_rows$signal == 0,]
-    stop_trials <- run_jpeg_rows[run_jpeg_rows$signal == 1,]
+    go_trials <- jpeg_events[jpeg_events$signal == 0,]
+    stop_trials <- jpeg_events[jpeg_events$signal == 1,]
 
     # calculate metrics
     n_stop_trials = nrow(stop_trials) # number of stop trials
@@ -36,22 +37,35 @@ deriv_sst <- function(data) {
     n_go_miss = sum(go_trials$correct == 1) # number of go response omissions
     n_stop_fail = sum(stop_trials$correct == 3) # number of unsuccessful stops
 
-
     go_rt_mean = mean(go_trials$response_time, na.rm = TRUE) # average reaction time on go trials, rm trials with no response
     go_correct_rt_mean = mean(go_trials[go_trials$correct == 4,]$response_time) # average reaction time on correct go trials
     go_error_rt_mean = mean(go_trials[go_trials$correct == 2,]$response_time) # average reaction time on incorrect correct go trials
     us_rt_mean = mean(stop_trials[stop_trials$correct == 3,]$response_time)  # average reaction time on unsuccessful stop trials
-    prop_stop_resp = n_stop_fail / n_stop_trials  #proportion of of failed stop trials
+    prop_stop_fail = n_stop_fail / n_stop_trials  #proportion of of failed stop trials
     ssd_mean = mean(stop_trials$trueSSD) #average stop signal delay on stop trials
 
-    ## ISSUE: if/else below will error if there are no unsuccessful stop trials, causing us_rt_mean to be NaN -- what is racehorse_check in this case?
-
-    if (n_stop_fail == 0) {
-      print(paste("n_stop_fail is 0 for", go_trials$sub[1]))
+    # if only 1 block in subset data, get block number
+    if (length(unique(jpeg_events$block)) == 1) {
+      block_num = unique(jpeg_events$block)
+    } else {
+      block_num = NA
     }
 
-    # determine racehorse_check and ssrt
-    if ( go_rt_mean > us_rt_mean ){
+    ## ISSUE: if/else below will error if there are no unsuccessful stop trials, causing us_rt_mean to be NaN -- what is racehorse_check in this case and should ssrt be calculated?
+    if (n_stop_fail == 0) {
+
+      if (is.na(block_num)) {
+        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1]))
+      } else {
+        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "block", block_num))
+      }
+
+      racehorse_check = NA
+      # don't calculate ssrt ??
+      ssrt_mean = NA
+      ssrt_int = NA
+
+    } else if ( go_rt_mean > us_rt_mean ){
       racehorse_check = 1 # meet racehorse assumptions
 
       #calculate ssrt with mean method
@@ -69,13 +83,13 @@ deriv_sst <- function(data) {
         #replace omitted go rt values
         go_trials_replace$response_time[is.na(go_trials_replace$response_time)] <- max_go_rt
 
-        #get rt at stop_prob_resp percentile
-        nth_rt = quantile(go_trials_replace$response_time, probs = stop_prob_resp, names = FALSE)
+        #get rt at prop_stop_fail percentile
+        nth_rt = quantile(go_trials_replace$response_time, probs = prop_stop_fail, names = FALSE)
 
       } else {
 
-        # get go trial rt at stop_prob_resp percentile
-        nth_rt = quantile(go_trials$response_time, probs = stop_prob_resp, names = FALSE)
+        # get go trial rt at prop_stop_fail percentile
+        nth_rt = quantile(go_trials$response_time, probs = prop_stop_fail, names = FALSE)
       }
 
       #calculate ssrt with integration method
@@ -94,6 +108,7 @@ deriv_sst <- function(data) {
         sub = go_trials$sub[1],
         type = go_trials$type[1],
         run_num = go_trials$run_num[1],
+        block_num = block_num,
         commerical_cond = go_trials$run_cond[1],
         img_cat = go_trials$img_cat[1],
 
@@ -107,7 +122,7 @@ deriv_sst <- function(data) {
         n_go_error = n_go_error,
         go_error_rt_mean = go_error_rt_mean,
         n_go_miss = n_go_miss,
-        prop_stop_resp = prop_stop_resp,
+        prop_stop_fail = prop_stop_fail,
         us_rt_mean = us_rt_mean,
         ssd_mean = ssd_mean,
         ssrt_mean = ssrt_mean,
@@ -165,28 +180,34 @@ deriv_sst <- function(data) {
 
         }
 
-        # for (block in unique(run_jpeg_rows$block)) {
-        #
-        #   # subset images in block
-        #   block_rows <- run_jpeg_rows[run_jpeg_rows$block == block,]
+        for (block in unique(run_jpeg_rows$block)) {
 
-        #   # get row of summary metrics
-        #   block_summary_row <- get_summary_row(block_rows)
-        #
-        #   # add row to dataframe
-        #   if (nrow(summary_byblock_df) == 0) {
-        #     summary_byblock_df <- block_summary_row
-        #   } else {
-        #     summary_byblock_df <- dplyr::bind_rows(summary_byblock_df, block_summary_row)
-        #   }
-        #
-        # }
+          # subset images in block
+          block_rows <- run_jpeg_rows[run_jpeg_rows$block == block,]
+
+          ## change this so we still get a row in DF if no responses?
+          if (nrow(block_rows) > 0 & sum(!is.na(block_rows$response_time))) {
+
+            # get row of summary metrics
+            block_summary_row <- get_summary_row(block_rows)
+
+            # add row to dataframe
+            if (nrow(summary_byblock_df) == 0) {
+              summary_byblock_df <- block_summary_row
+            } else {
+              summary_byblock_df <- dplyr::bind_rows(summary_byblock_df, block_summary_row)
+            }
+
+          }
+
+
+        }
       }
     }
 
   }
 
-  return(list(summary_long_by_cond = summary_bycond_df,
+  return(list(summary_long_by_run = summary_byrun_df,
               summary_long_by_block = summary_byblock_df))
 }
 

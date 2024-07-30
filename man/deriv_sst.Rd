@@ -11,12 +11,12 @@ deriv_sst(data)
 
 \item{return_data}{If return_data is set to TRUE, will return a list including:
 \enumerate{
-\item summary_long_by_cond = a long dataframe with summary data by commerical_condition (metrics calculated across runs)
+\item summary_long_by_run = a long dataframe with summary data by run
 \item summary_long_by_block = a long dataframe with summary data by block
 }}
 }
 \description{
-This function generates SST derivative databases from participant-level FoodView files
+This function generates SST derivative databases from participant-level SST events files (fmri runs)
 }
 \examples{
 
