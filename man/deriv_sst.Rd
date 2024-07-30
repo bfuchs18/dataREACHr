@@ -16,7 +16,7 @@ deriv_sst(data)
 }}
 }
 \description{
-This function generates SST derivative databases from participant-level SST events files (fmri runs)
+This function generates SST derivative databases from participant-level beh and func SST files
 }
 \examples{
 

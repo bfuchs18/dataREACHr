@@ -1,6 +1,6 @@
 #' deriv_sst: Generate derivative behavioral databases for SST analyses
 #'
-#' This function generates SST derivative databases from participant-level SST events files (fmri runs)
+#' This function generates SST derivative databases from participant-level beh and func SST files
 #'
 #' @param data a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata
 #' @param return_data If return_data is set to TRUE, will return a list including:
@@ -144,19 +144,33 @@ deriv_sst <- function(data) {
   # for each sub (top-level list in data)
   for (i in 1:length(data)) {
 
-    # extract subject's list of dataframes for func runs
-    sst_data <- data[[i]][['func_data']]
+    # start a new combined dataframe with data from behavioral runs
+    combined_data <- data[[i]][['beh_data']]
 
-    # sst_data should be a list of dataframes with 1 dataframe per run
-    if (is.list(sst_data)) {
+    # check if func_data is a list -- will be a list of dataframes (1 per run) if child has func data
+    func_data_list <- data[[i]][['func_data']]
+    if (is.list(func_data_list)) {
+
+      # combine func data
+      func_data <- dplyr::bind_rows(func_data_list)
+
+      # add func_data to combined_data
+      combined_data <- dplyr::bind_rows(combined_data, func_data)
+    }
+
+    # for each data type (e.g., "beh", "func")
+    for (type in unique(combined_data$type)) {
+
+      # subset data by type
+      type_data <- combined_data[combined_data$type == type,]
 
       # determine number of runs
-      n_runs <- length(sst_data)
+      n_runs <- length(unique(type_data$run_num))
 
       for (run in 1:n_runs) {
 
         # extract foodview data for given run
-        run_data <- sst_data[[run]]
+        run_data <- type_data[type_data$run_num == run,]
 
         # convert response_time unit from seconds to milliseconds
         run_data$response_time <- run_data$response_time*1000
@@ -166,7 +180,7 @@ deriv_sst <- function(data) {
 
         # if there are jpeg events and there are no responses
         if (nrow(run_jpeg_rows) > 0 & sum(!is.na(run_jpeg_rows$response_time))) { ## change this so we still get a row in DF if no responses?
-        # if (nrow(run_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
+          # if (nrow(run_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
 
           # get dataframe row of summary metrics
           run_summary_row <- get_summary_row(run_jpeg_rows)
@@ -197,14 +211,10 @@ deriv_sst <- function(data) {
             } else {
               summary_byblock_df <- dplyr::bind_rows(summary_byblock_df, block_summary_row)
             }
-
           }
-
-
         }
       }
     }
-
   }
 
   return(list(summary_long_by_run = summary_byrun_df,
