@@ -25,7 +25,7 @@ json_deriv_foodview <- function() {
     p_want_of_resp = list(Description = 'proportion of items a child reported wanting out of the total number of responses they provided. For a response to counted, the response_time had to be >0ms',
                           Derivative = TRUE),
     avg_rt = list(Description = 'average reaction time for responses to all items. For a response to counted, the response_time had to be >0ms.',
-                  unit = "seconds",
+                  unit = "ms",
                   Derivative = TRUE),
     hed_n_image = list(Description = 'number of high ED image events',
                   Derivative = TRUE),
@@ -34,7 +34,7 @@ json_deriv_foodview <- function() {
     hed_p_want_of_resp = list( Description = 'proportion of high ED items a child reported wanting out of the total number of high ED responses they provided. For a response to counted, the response_time had to be >0ms.',
                   Derivative = TRUE),
     hed_avg_rt = list(Description = 'average reaction time for responses to items in high ED food blocks. For a response to counted, the response_time had to be >0ms.',
-                      unit = "seconds",
+                      unit = "ms",
                       Derivative = TRUE),
     led_n_image = list(Description = 'number of low ED image events for given commercial_cond',
                   Derivative = TRUE),
@@ -43,14 +43,14 @@ json_deriv_foodview <- function() {
     led_p_want_of_resp = list( Description = 'proportion of low ED items a child reported wanting out of the total number of low ED responses they provided. For a response to counted, the response_time had to be >0ms.',
                     Derivative = TRUE),
     led_avg_rt = list( Description = 'average reaction time for responses to items in low ED food blocks. For a response to counted, the response_time had to be >0ms.',
-                       unit = "seconds",
+                       unit = "ms",
                        Derivative = TRUE),
     sweet_n_image = list( Description = 'number of sweet image events for given commercial_cond',
                     Derivative = TRUE),
     sweet_p_want_of_resp = list( Description = 'proportion of sweet items a child reported wanting out of the total number of sweet responses they provide. For a response to counted, the response_time had to be >0ms.',
                     Derivative = TRUE),
     sweet_avg_rt = list( Description = 'average reaction time for responses to items in sweet food blocks. For a response to counted, the response_time had to be >0ms.',
-                         unit = "seconds",
+                         unit = "ms",
                          Derivative = TRUE),
     savory_n_image = list( Description = 'number of savory image events for given commercial_cond',
                          Derivative = TRUE),
@@ -59,7 +59,7 @@ json_deriv_foodview <- function() {
     savory_p_want_of_resp = list( Description = 'proportion of savory items a child reported wanting out of the total number of savory responses they provide. For a response to counted, the response_time had to be >0ms.',
                          Derivative = TRUE),
     savory_avg_rt = list( Description = 'average reaction time for responses to items in savory food blocks. For a response to counted, the response_time had to be >0ms.',
-                          unit = "seconds",
+                          unit = "ms",
                           Derivative = TRUE)
   )
 
@@ -99,8 +99,8 @@ json_deriv_foodview <- function() {
                    derivative = TRUE),
     p_resp_of_want = list( Description = 'Proportion of "want" responses out of all responses in a given block. For a response to counted, the response_time had to be >0ms.',
                     derivative = TRUE),
-    avg_rt = list( Description = 'Average reaction time for responses in given block. For a response to counted, the response_time had to be >0ms.',
-                           Unit = "seconds")
+    avg_rt = list(Description = 'Average reaction time for responses in given block. For a response to counted, the response_time had to be >0ms.',
+                  Unit = "ms")
   )
 
   # convert and return JSONS ----
