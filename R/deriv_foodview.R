@@ -147,6 +147,9 @@ deriv_foodview <- function(data) {
       # extract foodview data for given run
       run_data <- foodview_data[[run]]
 
+      # convert rt to ms
+      run_data$response_time <- run_data$response_time* 1000
+
       # subset image rows
       run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
 
