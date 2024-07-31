@@ -19,7 +19,7 @@
 #' food_view_summary <- deriv_foodview(task_data$foodview)
 #' }
 
-deriv_foodview <- function() {
+deriv_foodview <- function(data) {
 
   # create output dataframes
   summary_bycond_df <- data.frame()
