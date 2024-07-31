@@ -19,7 +19,7 @@
 #' food_view_summary <- deriv_foodview(task_data$foodview)
 #' }
 
-deriv_foodview <- function(data) {
+deriv_foodview <- function() {
 
   # create output dataframes
   summary_bycond_df <- data.frame()
@@ -33,13 +33,31 @@ deriv_foodview <- function(data) {
     # extract subject's list of dataframes
     foodview_data <- data[[i]]
 
-    # Summarize data by advertisement condition in long format ----
-
     # make one dataframe with all run data
     combined_df <- dplyr::bind_rows(foodview_data)
 
+    # convert rt to ms
+    combined_df$response_time <- combined_df$response_time* 1000
+
     # sub
     sub = combined_df$sub[1]
+
+    # on trials with responses times of 0, set response as 0 and RT as NA -- response times of 0 are not considered real responses
+    combined_df$response_time[combined_df$response_time == 0] <- NA
+    combined_df$response[combined_df$response_time == 0] <- 0
+
+    # # assess response_time outliers
+    # average_rt = mean(combined_df[combined_df$response == 1 | combined_df$response == 2,]$response_time, na.rm = TRUE)
+    # outliers = boxplot.stats(combined_df[combined_df$response == 1 | combined_df$response == 2,]$response_time)$out
+    # if (length(outliers) > 0) {
+    #   if (sum(outliers < average_rt) > 0) {
+    #     print(sub)
+    #     print(outliers)
+    #     print(max(outliers))
+    #   }
+    # }
+
+    # Summarize data by advertisement condition in long format ----
 
     # subset image rows
     jpeg_rows <- combined_df[grep("jpeg", combined_df$stim_file_name),]
