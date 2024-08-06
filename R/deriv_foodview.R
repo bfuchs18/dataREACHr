@@ -46,6 +46,9 @@ deriv_foodview <- function(data) {
     combined_df$response_time[combined_df$response_time == 0] <- NA
     combined_df$response[combined_df$response_time == 0] <- 0
 
+    # on trials with responses of -99, set RT as NA -- -99 indicates responses other than 1 or 2 in first 2 subs (3, 6) due to trigger
+    combined_df$response_time[combined_df$response == -99] <- NA
+
     # # assess response_time outliers
     # average_rt = mean(combined_df[combined_df$response == 1 | combined_df$response == 2,]$response_time, na.rm = TRUE)
     # outliers = boxplot.stats(combined_df[combined_df$response == 1 | combined_df$response == 2,]$response_time)$out
@@ -59,7 +62,7 @@ deriv_foodview <- function(data) {
 
     # Summarize data by advertisement condition in long format ----
 
-    # subset image rows
+    # subset image rows from combined_df
     jpeg_rows <- combined_df[grep("jpeg", combined_df$stim_file_name),]
 
     for (cond in c("food", "toy")) {
@@ -139,13 +142,10 @@ deriv_foodview <- function(data) {
 
     # Summarize data by block in long format  -----
 
-    # determine number of runs
-    n_runs <- length(foodview_data)
+    for (run in unique(combined_df$run_num)) {
 
-    for (run in 1:n_runs) {
-
-      # extract foodview data for given run
-      run_data <- foodview_data[[run]]
+      # subset foodview data from combined_df for given run
+      run_data <- combined_df[combined_df$run_num == run,]
 
       # convert rt to ms
       run_data$response_time <- run_data$response_time* 1000
