@@ -34,7 +34,7 @@ json_foodview <- function() {
                                     '2' = 'right response button (No)',
                                     '-99' = 'Response other than 1 or 2. For the first 2 particpants (3, 6), -99 responses resulted from scanner pulses accidently interfering with response collection. The MATLAB program was then modified to only capture responses left and right buttons')),
     response_time = list( Description = 'response time',
-                          Unit = "seconds"),
+                          Unit = "milliseconds"),
     food_ed = list( Description = 'food image energy density category',
                  Levels = list ('low' = 'low energy density',
                                 'high' = 'high energy density')),

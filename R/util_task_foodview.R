@@ -151,8 +151,6 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     }
 
     # clean response_time column
-    ## convert response_time from ms to sec
-    run_dat$response_time <- run_dat$response_time/1000
 
     ## make rt = NA when dat$resp = 0 (indicating no response)
     run_dat$response_time[run_dat$response == 0] <- NA
