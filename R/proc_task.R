@@ -132,8 +132,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
     sub_foodview_data <- util_task_foodview(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_fv, return_data = TRUE)
 
     # append sub_foodview_data to foodview_data
-    sub_label <- paste0("sub-", sub)
-    foodview_data[[sub_label]] <- sub_foodview_data
+    foodview_data[[sub_str]] <- sub_foodview_data
 
   }
 
