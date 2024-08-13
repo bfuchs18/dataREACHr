@@ -71,7 +71,7 @@ deriv_foodview <- function(data) {
       p_resp = nrow(cond_jpeg_rows[cond_jpeg_rows$response == 1 | cond_jpeg_rows$response == 2,]) / n_image
       p_want_of_resp = nrow(cond_jpeg_rows[cond_jpeg_rows$response == 1,]) / nrow(cond_jpeg_rows[cond_jpeg_rows$response == 1 | cond_jpeg_rows$response == 2,])
       avg_rt = mean(as.numeric(cond_jpeg_rows[cond_jpeg_rows$response == 1 | cond_jpeg_rows$response == 2,]$response_time))
-      print(avg_rt)
+
       hed_rows <- cond_jpeg_rows[cond_jpeg_rows$food_ed == "high",]
       hed_n_image = nrow(hed_rows)
       hed_p_resp = nrow(hed_rows[hed_rows$response == 1 | hed_rows$response == 2,]) / hed_n_image
