@@ -10,5 +10,5 @@ json_deriv_sst()
 A list of 2 strings (labels: XX, sst_byblock_json) with data stored in JSON format containing meta-data the summary SST database
 }
 \description{
-This function generates 2 json files for SST summary data reported in derivatives/beh_databases: (1) summary metrics computed by ad condition, (2) summary metrics computed by block
+This function generates 2 json files for SST summary data reported in derivatives/beh_databases: (1) summary metrics computed by ad run, (2) summary metrics computed by block
 }
