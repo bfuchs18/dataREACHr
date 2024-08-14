@@ -36,15 +36,12 @@ deriv_foodview <- function(data) {
     # make one dataframe with all run data
     combined_df <- dplyr::bind_rows(foodview_data)
 
-    # convert rt to ms
-    combined_df$response_time <- combined_df$response_time* 1000
-
     # sub
     sub = combined_df$sub[1]
 
     # on trials with responses times of 0, set response as 0 and RT as NA -- response times of 0 are not considered real responses
-    combined_df$response_time[combined_df$response_time == 0] <- NA
     combined_df$response[combined_df$response_time == 0] <- 0
+    combined_df$response_time[combined_df$response_time == 0] <- NA
 
     # on trials with responses of -99, set RT as NA -- -99 indicates responses other than 1 or 2 in first 2 subs (3, 6) due to trigger
     combined_df$response_time[combined_df$response == -99] <- NA
@@ -146,9 +143,6 @@ deriv_foodview <- function(data) {
 
       # subset foodview data from combined_df for given run
       run_data <- combined_df[combined_df$run_num == run,]
-
-      # convert rt to ms
-      run_data$response_time <- run_data$response_time* 1000
 
       # subset image rows
       run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
