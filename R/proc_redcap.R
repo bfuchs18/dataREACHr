@@ -25,10 +25,8 @@
 #' @examples
 #'
 #' \dontrun{
-#' data_de_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-03-12_1045.csv"
-#' visit_data_path = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-05-20_1520.csv"
-#' data_de_path = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData//bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-04-08_1306.csv"
-#' visit_data_path = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData//bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-07-17_1252.csv"
+#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-08-14_1521.csv"
+#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-08-14_1522.csv"
 #' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
 #' }
@@ -284,8 +282,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   ## merge notes/visit data? update data?
 
-  # merge visit data and double entry MRI data (CAMS/freddies)
-  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
+  # merge visit data and double entry MRI data (CAMS/freddies) -- these data are no longer double entered -- need to get from elsewhere
+#  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
 
   #### Additional processing: anthro data ####
 
@@ -299,27 +297,27 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                                                        "parent2_reported_bmi",
                                                        "session_id",
                                                        "demo_child_relationship")])
-
-  # Merge double entered anthro_data with stacked_parent2_anthro
-  merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
-
-  # Define parental BMI values and method
-
-  ## parent1_sex ("female" or "male") indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form
-  ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
-
-  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
-                                                 ifelse(merged_anthro$demo_child_relationship == 1, "reported", NA))
-
-  merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-                                       ifelse(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
-
-  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
-                                                 ifelse(merged_anthro$demo_child_relationship == 0, "reported", NA))
-
-  merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-                                       ifelse(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
-
+# COMMENT OUT FOR NOW - anthro_data is no longer in processed_de_data
+#   # Merge double entered anthro_data with stacked_parent2_anthro
+#   merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+#
+#   # Define parental BMI values and method
+#
+#   ## parent1_sex ("female" or "male") indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form
+#   ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
+#
+#   merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
+#                                                  ifelse(merged_anthro$demo_child_relationship == 1, "reported", NA))
+#
+#   merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+#                                        ifelse(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+#
+#   merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
+#                                                  ifelse(merged_anthro$demo_child_relationship == 0, "reported", NA))
+#
+#   merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+#                                        ifelse(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+#
   #### Generate demographics dataframe  ####
 
   # combine demo data from demo_data and household form
@@ -347,17 +345,18 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     )) %>%
     dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
 
-  # add anthro data
-  demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
-
-  # add risk status - compute based on ses-1 maternal_bmi
-  ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
-  ses_1_data$risk_status_maternal <- ifelse(ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
-#  ses_1_data$risk_status_both_parents <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 26), "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal and paternal
-
-  ses_1_data$child_bmi_criteria <- ifelse(is.na(ses_1_data$child_bmi_p), NA, ifelse(ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
-
-  demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
+  # TO DO: figure out another data -- double entry or elsewhere?
+  # add anthro data -- cant add from merged_anthro right now -- figure out double entry for anthro data
+#   demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
+#
+#   # add risk status - compute based on ses-1 maternal_bmi
+#   ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
+#   ses_1_data$risk_status_maternal <- ifelse(ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
+# #  ses_1_data$risk_status_both_parents <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 26), "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal and paternal
+#
+#   ses_1_data$child_bmi_criteria <- ifelse(is.na(ses_1_data$child_bmi_p), NA, ifelse(ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
+#
+#   demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
 
   # rename columns
   names(demo_data)[names(demo_data) == "demo_ethnicity"] <- "ethnicity"
@@ -370,12 +369,13 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # add demo_data and date_data (visit dates, visit ages, child sex)
   participants_data <- merge(parent_v1_data$demo_data, date_data, by = "participant_id", all = TRUE)
 
-  # add risk status -- take from demo_data
-  participants_data <- merge(participants_data,
-                                         demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status_maternal")],
-                                         by = "participant_id",
-                                         all = TRUE)
-
+  # TO DO: figure out anthro data in demo_data
+  # # add risk status -- take from demo_data
+  # participants_data <- merge(participants_data,
+  #                                        demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status_maternal")],
+  #                                        by = "participant_id",
+  #                                        all = TRUE)
+  #
 
   # remove birthday and other columns
   participants_data <- participants_data[, -grep("birthdate|timestamp|brief", names(participants_data))]
@@ -419,7 +419,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # reorder columns
   participants_data <-
     participants_data %>%
-    dplyr::relocate("risk_status_maternal", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
+  #  dplyr::relocate("risk_status_maternal", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
     dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
@@ -526,9 +526,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     # non-questionnaire data
     demographics = demo_data,
-    anthropometrics = merged_anthro,
+   # anthropometrics = merged_anthro, -- no longer created since anthro removed from DE
     intake = merged_intake,
-    mri_visit = merged_mri,
+    # mri_visit = merged_mri, -- need to get cams and freddy data from visit form
     dexa = processed_de_data$dexa_data
 
   )
