@@ -273,6 +273,10 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     parent_v5_data$visit_data_parent
   )
 
+  stacked_prelim_anthro_data <- dplyr::bind_rows(
+    transform(child_v1_data$anthro_data, visit_protocol = "1"),
+    transform(child_v5_data$anthro_data, visit_protocol = "5")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
   # Merge visit and double entry intake data (meal, EAH, vas)
   merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit_protocol"), all = TRUE)
@@ -287,7 +291,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Additional processing: anthro data ####
 
-  # Extract parent 2 BMI from household_data
+  # Extract parent 2 BMI from household_data and stack
   stacked_parent2_anthro <-
     dplyr::bind_rows(parent_v1_data$household_data[, c("participant_id",
                                                        "parent2_reported_bmi",
@@ -297,27 +301,44 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
                                                        "parent2_reported_bmi",
                                                        "session_id",
                                                        "demo_child_relationship")])
-# COMMENT OUT FOR NOW - anthro_data is no longer in processed_de_data
-#   # Merge double entered anthro_data with stacked_parent2_anthro
-#   merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
-#
-#   # Define parental BMI values and method
-#
-#   ## parent1_sex ("female" or "male") indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form
-#   ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
-#
-#   merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
-#                                                  ifelse(merged_anthro$demo_child_relationship == 1, "reported", NA))
-#
-#   merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-#                                        ifelse(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
-#
-#   merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
-#                                                  ifelse(merged_anthro$demo_child_relationship == 0, "reported", NA))
-#
-#   merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
-#                                        ifelse(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
-#
+  # Add parent 2 anthro variables
+  ## !! Uncomment line below if/when anthro_data is available in processed_de_data !!
+  ## merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+  ## !! comment out this line when double entry data is available !!
+  merged_anthro <- merge(stacked_prelim_anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+
+  # add variables needed to calculate BMI percentiles
+  merged_anthro <- dplyr::left_join(merged_anthro, date_data[c("participant_id", "v1_age", "v5_age", "sex")], by = "participant_id") # merge dates and ages from date_data
+  merged_anthro <- merged_anthro %>%   # create column 'child_age' based on ages at V1 and V5
+    dplyr::mutate(child_age = dplyr::case_when(
+      session_id == "ses-1" ~ v1_age,
+      session_id == "ses-2" ~ v5_age
+
+    )) %>%
+    dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
+
+  # compute bmi variables
+  merged_anthro$child_bmi <- round(merged_anthro$child_average_weight / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
+  merged_anthro$parent1_bmi <- round(merged_anthro$parent1_weight_average_kg / ((merged_anthro$parent1_height_average_cm / 100) ^ 2), digits = 2)
+  merged_anthro$child_bmi <- round(merged_anthro$child_average_weight / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
+  merged_anthro$child_bmi_z <- round(childsds::sds(value = merged_anthro[["child_bmi"]], age = merged_anthro[["child_age"]], sex = merged_anthro[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = "male", female = "female"), digits = 2)
+  merged_anthro$child_bmi_p <- round((childsds::sds(value = merged_anthro[["child_bmi"]], age = merged_anthro[["child_age"]], sex = merged_anthro[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = "male", female = "female")) * 100, digits = 2)
+
+  # Define parental BMI values and method
+  ## parent1_sex ("female" or "male") indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form
+  ## parent1_sex and demo_child_relationship should indicate the same parent, but referencing both in ifelse statements in case of scenario where this is not true
+  merged_anthro$maternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "female", "measured",
+                                                              ifelse(merged_anthro$demo_child_relationship == 1, "reported", NA))
+
+  merged_anthro$maternal_bmi <- ifelse(merged_anthro$maternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+                                                    ifelse(merged_anthro$maternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+
+  merged_anthro$paternal_anthro_method <- ifelse(merged_anthro$parent1_sex == "male", "measured",
+                                                              ifelse(merged_anthro$demo_child_relationship == 0, "reported", NA))
+
+  merged_anthro$paternal_bmi <- ifelse(merged_anthro$paternal_anthro_method == "measured", merged_anthro$parent1_bmi,
+                                                    ifelse(merged_anthro$paternal_anthro_method == "reported", merged_anthro$parent2_reported_bmi, NA))
+
   #### Generate demographics dataframe  ####
 
   # combine demo data from demo_data and household form
@@ -345,18 +366,15 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     )) %>%
     dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
 
-  # TO DO: figure out another data -- double entry or elsewhere?
-  # add anthro data -- cant add from merged_anthro right now -- figure out double entry for anthro data
-#   demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
-#
-#   # add risk status - compute based on ses-1 maternal_bmi
-#   ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
-#   ses_1_data$risk_status_maternal <- ifelse(ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
-# #  ses_1_data$risk_status_both_parents <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 26), "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal and paternal
-#
-#   ses_1_data$child_bmi_criteria <- ifelse(is.na(ses_1_data$child_bmi_p), NA, ifelse(ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
-#
-#   demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
+
+  demo_data <- merge(demo_data, merged_anthro[c("participant_id", "session_id", "child_bmi", "child_bmi_p", "child_bmi_z", "maternal_bmi", "maternal_anthro_method")], by=c("participant_id", "session_id"), all = TRUE)
+
+  # add risk status - compute based on ses-1 maternal_bmi
+  ses_1_data <- subset(demo_data, session_id == "ses-1") # subset the dataset to include only session 1 data
+  ses_1_data$risk_status_maternal <- ifelse(ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
+#  ses_1_data$risk_status_both_parents <- ifelse(dplyr::between(ses_1_data$maternal_bmi, 18.5, 26), "low-risk", ifelse(ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal and paternal
+  ses_1_data$child_bmi_criteria <- ifelse(is.na(ses_1_data$child_bmi_p), NA, ifelse(ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
+  demo_data <- merge(demo_data, ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
 
   # rename columns
   names(demo_data)[names(demo_data) == "demo_ethnicity"] <- "ethnicity"
@@ -369,13 +387,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # add demo_data and date_data (visit dates, visit ages, child sex)
   participants_data <- merge(parent_v1_data$demo_data, date_data, by = "participant_id", all = TRUE)
 
-  # TO DO: figure out anthro data in demo_data
-  # # add risk status -- take from demo_data
-  # participants_data <- merge(participants_data,
-  #                                        demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status_maternal")],
-  #                                        by = "participant_id",
-  #                                        all = TRUE)
-  #
+  # add risk status -- take from demo_data
+  participants_data <- merge(participants_data,
+                                         demo_data[demo_data$session_id == "ses-1", c("participant_id", "risk_status_maternal")],
+                                         by = "participant_id",
+                                         all = TRUE)
+
 
   # remove birthday and other columns
   participants_data <- participants_data[, -grep("birthdate|timestamp|brief", names(participants_data))]
@@ -438,42 +455,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # compute intake variables
   prelim_intake_data  <- util_calc_intake(prelim_intake_data)
 
-  ####  Get prelim anthro -- will be obsolete with double-entry data is available ####
-  prelim_anthro_data <- dplyr::bind_rows(
-    transform(child_v1_data$anthro_data, visit_protocol = "1"),
-    transform(child_v5_data$anthro_data, visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
-
-  prelim_anthro_data <- merge(prelim_anthro_data, demo_data[c("participant_id", "session_id", "child_age", "sex")], by=c("participant_id", "session_id"), all = TRUE)
-
-  # add parent 2
-  prelim_anthro_data <- merge(prelim_anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
-
-  # compute bmi variables
-  prelim_anthro_data$child_bmi_z <- round(childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = "male", female = "female"), digits = 2)
-  prelim_anthro_data$child_bmi_p <- round((childsds::sds(value = prelim_anthro_data[["child_bmi"]], age = prelim_anthro_data[["child_age"]], sex = prelim_anthro_data[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = "male", female = "female")) * 100, digits = 2)
-
-  prelim_anthro_data$maternal_anthro_method <- ifelse(prelim_anthro_data$parent1_sex == "female", "measured",
-                                                      ifelse(prelim_anthro_data$demo_child_relationship == 1, "reported", NA))
-
-  prelim_anthro_data$maternal_bmi <- ifelse(prelim_anthro_data$maternal_anthro_method == "measured", prelim_anthro_data$parent1_bmi,
-                                            ifelse(prelim_anthro_data$maternal_anthro_method == "reported", prelim_anthro_data$parent2_reported_bmi, NA))
-
-  prelim_anthro_data$paternal_anthro_method <- ifelse(prelim_anthro_data$parent1_sex == "male", "measured",
-                                                      ifelse(prelim_anthro_data$demo_child_relationship == 0, "reported", NA))
-
-  prelim_anthro_data$paternal_bmi <- ifelse(prelim_anthro_data$paternal_anthro_method == "measured", prelim_anthro_data$parent1_bmi,
-                                            ifelse(prelim_anthro_data$paternal_anthro_method == "reported", prelim_anthro_data$parent2_reported_bmi, NA))
-
-  prelim_ses_1_data <- subset(prelim_anthro_data, session_id == "ses-1") # subset the dataset to include only session 1 data
-  prelim_ses_1_data$risk_status_maternal <- ifelse(prelim_ses_1_data$maternal_bmi <= 26, "low-risk", ifelse(prelim_ses_1_data$maternal_bmi >= 29, "high-risk", NA)) # calculate risk based on maternal bmi
-
-  prelim_ses_1_data$child_bmi_criteria <- ifelse(is.na(prelim_ses_1_data$child_bmi_p), NA, ifelse(prelim_ses_1_data$child_bmi_p < 95, 1,0)) # calculate risk based on maternal bmi
-
-  prelim_anthro_data <- merge(prelim_anthro_data, prelim_ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
-
-  participants_data <- merge(participants_data, prelim_ses_1_data[, c("participant_id", "risk_status_maternal", "child_bmi_criteria", "child_bmi_p")], by = "participant_id", all = TRUE) # merge 'risk_status' variable into demo_data
-
   #### Export Data ####
 
   # make a list dataframes to export, where the name is the corresponding json function without json_)
@@ -526,7 +507,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
     # non-questionnaire data
     demographics = demo_data,
-   # anthropometrics = merged_anthro, -- no longer created since anthro removed from DE
+    anthropometrics = merged_anthro,
     intake = merged_intake,
     # mri_visit = merged_mri, -- need to get cams and freddy data from visit form
     dexa = processed_de_data$dexa_data
@@ -581,10 +562,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     }
   }
 
-  #### Export prelim data ####
+  #### Export prelim intake data ####
   # write prelim intake data (not double entered )
   prelim_intake_tsv <- paste0(phenotype_wd, slash, "intake_not_doubleentered.tsv")
-  prelim_anthro_tsv <- paste0(phenotype_wd, slash, "anthro_not_doubleentered.tsv")
 
   # write tsv
   if ( isTRUE(overwrite) | !file.exists(prelim_intake_tsv) ) {
@@ -599,18 +579,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     )
   }
 
-  # write tsv
-  if ( isTRUE(overwrite) | !file.exists(prelim_anthro_tsv) ) {
-    write.table(
-      prelim_anthro_data,
-      prelim_anthro_tsv,
-      quote = FALSE,
-      sep = '\t',
-      col.names = TRUE,
-      row.names = FALSE,
-      na = "n/a" # use 'n/a' for missing values for BIDS compliance
-    )
-  }
+
   #### Return Data ####
   if (isTRUE(return_data)) {
     return(list(
