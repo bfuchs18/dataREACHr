@@ -42,22 +42,42 @@ util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
   ## DEXA data ####
 
   # visit 1 data
-  dexa_v1_data <- data[, grep("participant_id|^v1.*v1$", names(data))] # Subset columns that start with "v1" and end with "v1"
+  dexa_v1_data <- data[, grep("participant_id|^dxa.*v1$|^left.*v1$|right.*v1$|^v1.*v1$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
   colnames(dexa_v1_data) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_data)) # Remove "v1_" and "_v1" from column names
 
   # visit 5 data
-  dexa_v5_data <- data[, grep("participant_id|^v1.*v5$", names(data))] # Subset columns that start with "v1" and end with "v5"
+  dexa_v5_data <- data[, grep("participant_id|^dxa.*v5$|^left.*v5$|right.*v5$|^v1.*v5$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
   colnames(dexa_v5_data) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_data)) # Remove "v1_" and "_v5" from column names
 
-  # make all values numeric except column 1 (participant_id)
-  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, -1, function(x) as.numeric(as.character(x)))
-  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, -1, function(x) as.numeric(as.character(x)))
+  # make height, weight, age, and dexa values numeric
+  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, 9:121, function(x) as.numeric(as.character(x)))
+  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, 9:121, function(x) as.numeric(as.character(x)))
 
   # stack visit 1 and visit 5 data, add "visit_protocol" and "session_id" columns and reorder
   stacked_dexa <- dplyr::bind_rows(
     transform(dexa_v1_data, visit_protocol = "1", session_id = "ses-1"),
     transform(dexa_v5_data, visit_protocol = "5", session_id = "ses-2")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  # remove columns
+  stacked_dexa <- stacked_dexa[, -grep("dxa_visit_number|dxa_remove_name_check|dxa_id", names(stacked_dexa))]
+
+  # update column names -- mostly to match names from food and brain to facilitate compiling
+
+  # add "dexa" prefix to all cols except "participant_id", "session_id", "visit_protocol" and cols that already start with "dxa"
+  names(stacked_dexa) <- ifelse(names(stacked_dexa) %in% c("participant_id", "session_id", "visit_protocol", grep("^dxa", names(stacked_dexa), value = TRUE)),
+                                names(stacked_dexa),
+                                paste0("dxa_", names(stacked_dexa)))
+  names(stacked_dexa) <- gsub("left", "l", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("right", "r", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("_am", "_ptile", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("_am", "_ptile", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("fat_trunk_over_leg", "percfat_trunk_legs_ratio", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("lean_over_height", "lean_height_ratio", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("fat_mass_over_height", "fatmass_height_ratio", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("trunk_over_limb_fat", "fatmass_trunk_limb_ratio", names(stacked_dexa)) # name wont match Food and Brain which uses leg instead of limb for these vars, but limb is more accurate based on description
+  names(stacked_dexa) <- gsub("z_score", "zscore", names(stacked_dexa))
+  names(stacked_dexa) <- gsub("lean_and_bmc", "lean_bmc_comb", names(stacked_dexa))
 
 
   ## intake data ####
