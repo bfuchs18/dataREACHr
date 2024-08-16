@@ -81,14 +81,6 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   # re-label parent1 sex
   anthro_data$parent1_sex <- ifelse(anthro_data$parent1_sex == 0, "female", ifelse(anthro_data$parent1_sex == 1, "male", NA))
 
-  # calculate parent1 BMI
-#  anthro_data$parent1_bmi <- round(anthro_data$parent1_weight_average_kg / ((anthro_data$parent1_height_average_cm / 100) ^ 2), digits = 2)
-
-  # calculate child BMI
-#  anthro_data$child_bmi <- round(anthro_data$child_average_weight / ((anthro_data$child_height_average / 100) ^ 2), digits = 2)
-#  anthro_data$child_bmi_z <- NA # calculate this
-#  anthro_data$child_bmi_p <- NA # calculate this
-
   ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
