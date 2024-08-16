@@ -36,7 +36,7 @@ util_redcap_child_v5 <- function(data, return_data = TRUE) {
   ## intake-related data ####
 
   # food paradigm information (does not include fullness, intake)
-  food_paradigm_info <- data[, grepl('participant_id|session_id|meal|advertisement_condition', names(data))]
+  food_paradigm_info <- data[, grepl('participant_id|session_id|meal|advertisement_condition|eah_notes|eah_intake_notes', names(data))]
   food_paradigm_info <- food_paradigm_info[, !grepl('complete|freddy|consumed|hrt', names(food_paradigm_info))] #v5 needs "hrt" removed (v1, v3, v4 do)
   names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
