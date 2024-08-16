@@ -286,8 +286,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   ## merge notes/visit data? update data?
 
-  # merge visit data and double entry MRI data (CAMS/freddies) -- these data are no longer double entered -- need to get from elsewhere
-#  merged_mri <- merge(child_v2_data$mri_notes, processed_de_data$mri_visit_data, by = "participant_id", all = TRUE)
+  # merge MRI visit data and cams/fullness data -- cams/fullness data may eventually be double entered, for now, take from child_v2_data
+  merged_mri <- merge(child_v2_data$mri_notes, child_v2_data$mri_cams_ff, by = "participant_id", all = TRUE)
 
   #### Additional processing: anthro data ####
 
@@ -412,7 +412,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   names(participants_data)[names(participants_data) == "v4_age"] <- "child_protocol_4_age"
   names(participants_data)[names(participants_data) == "v5_age"] <- "child_protocol_5_age"
 
-  # make column child_protocol_order (e.g., 13425) based on order of child protocol dates - only include visits have dates (i.e., occurred)
+  # make column child_protocol_order (e.g., 13425) based on order of child protocol dates - only include visits that have dates (i.e., occurred)
 
   ## define function to get order of dates for each row
   get_order <- function(row) {
@@ -436,7 +436,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # reorder columns
   participants_data <-
     participants_data %>%
-  #  dplyr::relocate("risk_status_maternal", .after = 1) %>% #move risk_status var after column 1 -- need to add to dataframe
+    dplyr::relocate("risk_status_maternal", .after = 1) %>% #move risk_status var after column 1
     dplyr::relocate("sex", .after = 2) %>% #move sex var after column 2
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
@@ -509,7 +509,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     demographics = demo_data,
     anthropometrics = merged_anthro,
     intake = merged_intake,
-    # mri_visit = merged_mri, -- need to get cams and freddy data from visit form
+    mri_visit = merged_mri,
     dexa = processed_de_data$dexa_data
 
   )
