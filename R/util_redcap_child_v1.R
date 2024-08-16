@@ -2,7 +2,7 @@
 #'
 #' This function organizes REDCap data from REDCap visit data, event child_visit_1_arm_1
 #'
-#' @param data data from REDCap event child_visit_1_arm_1
+#' @param data data from REDCap event
 #' @param return_data If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, freddy_data, intake_data, liking_data, kbas_data, stq_data, anthro_data
 
 
@@ -67,13 +67,12 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
 
   ## anthro data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
   anthro_data <- data[, grep("participant_id|session|parent_height|child_height|parent_weight|child_weight|child_average_weight", names(data))]
-  anthro_data <- anthro_data[, -grep("complete|self_report", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
+  anthro_data <- anthro_data[, -grep("complete|self_report|check|notes", names(anthro_data))] #self-report will be merged from household questionnaire -- this is automatically taken from there (not entered data)
 
-  # Update columns names
+  # rename columns
   colnames(anthro_data) <- gsub("parent_", "parent1_", colnames(anthro_data))
-
-  # rename parent1 sex variable
   colnames(anthro_data) <- gsub("parent1_height_sex", "parent1_sex", colnames(anthro_data))
+  colnames(anthro_data) <- gsub("child_average_weight", "child_weight_average", colnames(anthro_data))
 
   # re-label parent1 sex
   anthro_data$parent1_sex <- ifelse(anthro_data$parent1_sex == 0, "female", ifelse(anthro_data$parent1_sex == 1, "male", NA))

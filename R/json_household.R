@@ -295,7 +295,7 @@ json_household <- function() {
     demo_parent_age = list( Description = 'Age of parent calculated from self-reported parent date of birth (data not shared) and date of form completion (data not shared)',
                             Unit = "years",
                             Derivative = TRUE),
-    parent2_reported_height_m = list( Description = 'Parent2 (i.e., biological parent not at visit) height alculated from demo_parent2_reported_height_ft_component and demo_parent2_reported_height_inch_component',
+    parent2_reported_height_m = list( Description = 'Parent2 (i.e., biological parent not at visit) height calculated from demo_parent2_reported_height_ft_component and demo_parent2_reported_height_inch_component',
                             Unit = "meters",
                             Derivative = TRUE),
     parent2_reported_bmi = list( Description = 'Parent2 (i.e., biological parent not at visit) BMI calculated from parent2_reported_height_m and demo_parent2_reported_weight_lbs',

@@ -330,12 +330,14 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
       session_id == "ses-2" ~ v5_age
 
     )) %>%
-    dplyr::select(-v1_age, -v5_age) # drop v1_age and v5_age columns
+    dplyr::select(-v1_age, -v5_age)  %>% # drop v1_age and v5_age columns
+    dplyr::relocate("session_id", .after = 1) #move session_id var after column 1
+
 
   # compute bmi variables
-  merged_anthro$child_bmi <- round(merged_anthro$child_average_weight / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
+  merged_anthro$child_bmi <- round(merged_anthro$child_weight_average / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
   merged_anthro$parent1_bmi <- round(merged_anthro$parent1_weight_average_kg / ((merged_anthro$parent1_height_average_cm / 100) ^ 2), digits = 2)
-  merged_anthro$child_bmi <- round(merged_anthro$child_average_weight / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
+  merged_anthro$child_bmi <- round(merged_anthro$child_weight_average / ((merged_anthro$child_height_average / 100) ^ 2), digits = 2)
   merged_anthro$child_bmi_z <- round(childsds::sds(value = merged_anthro[["child_bmi"]], age = merged_anthro[["child_age"]], sex = merged_anthro[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "SDS", male = "male", female = "female"), digits = 2)
   merged_anthro$child_bmi_p <- round((childsds::sds(value = merged_anthro[["child_bmi"]], age = merged_anthro[["child_age"]], sex = merged_anthro[['sex']], item = "bmi", ref = childsds::cdc.ref, type = "perc", male = "male", female = "female")) * 100, digits = 2)
 
