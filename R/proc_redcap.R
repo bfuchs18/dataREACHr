@@ -293,9 +293,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
   merged_intake <- merge(stacked_food_paradigm_info, stacked_liking_data, by=c("participant_id", "session_id"), all = TRUE) #paradigm info and liking
   merged_intake <- merge(merged_intake, stacked_wanting_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add wanting
+  merged_intake <- merge(merged_intake, stacked_fullness_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add fullness -- for now, use visit data (not double entered)
   merged_intake <- merge(merged_intake, stacked_visit_intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add intake -- for now, use visit data (not double entered)
   # merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # uncomment when double-entered intake data is available
-  merged_intake <- merge(merged_intake, stacked_fullness_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add fullness -- for now, this is not double entered
 
   ## merge notes/visit data? update data?
 
