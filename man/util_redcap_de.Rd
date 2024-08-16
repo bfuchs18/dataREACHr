@@ -4,12 +4,10 @@
 \alias{util_redcap_de}
 \title{util_redcap_de: Organize double-entry data from REDCap (called within proc_redcap.R)}
 \usage{
-util_redcap_de(data, agesex_data, return_data = TRUE)
+util_redcap_de(data, return_data = TRUE)
 }
 \arguments{
 \item{data}{double-entry data}
-
-\item{agesex_data}{dataframe with participant_id, v1_age (visit 1 age) and v5_age (visit 5 age), sex}
 
 \item{return_data}{If return_data is set to TRUE, will return a list including: dexa_data, intake_data}
 }

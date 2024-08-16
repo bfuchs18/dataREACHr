@@ -2,11 +2,8 @@
 #'
 #' This function organizes REDCap data from REDCap visit data, event child_visit_5_arm_1
 #'
-#'
 #' @param data data from REDCap event child_visit_5_arm_1
-#' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) clean raw child visit 1 datasets
-#'  2) meta-data/.json for each dataset
+#' @param return_data If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, eah_wanting, freddy_data, intake_data, liking_data, hrt_data, puberty_data, loc_data, kbas_data, stq_data, tictoc_data, anthro_data
 #' @importFrom rlang .data
 
 util_redcap_child_v5 <- function(data, return_data = TRUE) {

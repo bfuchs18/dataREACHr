@@ -9,11 +9,7 @@ util_redcap_child_v3(data, return_data = TRUE)
 \arguments{
 \item{data}{data from REDCap event child_visit_3_arm_1}
 
-\item{return_data}{If return_data is set to TRUE, will return a list including:
-\enumerate{
-\item clean raw child visit 1 datasets
-\item meta-data/.json for each dataset
-}}
+\item{return_data}{If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, eah_wanting, freddy_data, intake_data, sleeplog_data}
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event child_visit_3_arm_1
