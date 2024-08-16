@@ -300,7 +300,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ## merge notes/visit data? update data?
 
   # merge MRI visit data and cams/fullness data -- cams/fullness data may eventually be double entered, for now, take from child_v2_data
-  merged_mri <- merge(child_v2_data$mri_notes, child_v2_data$mri_cams_ff, by = "participant_id", all = TRUE)
+  merged_mri <- merge(child_v2_data$mri_notes, child_v2_data$mri_cams_ff, by = c("participant_id", "session_id"), all = TRUE)
 
   #### Process stacked anthro data ####
 
