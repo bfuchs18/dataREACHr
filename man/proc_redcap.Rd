@@ -18,13 +18,15 @@ proc_redcap(
 
 \item{overwrite}{overwrite existing files (default = FALSE)}
 
-\item{return_data}{return phenotype to console (default = FLASE)}
+\item{return_data}{return raw and processed data to console (default = FALSE)}
 }
 \value{
 If return_data is set to TRUE, will return a list including:
 \enumerate{
-\item clean raw phenotype datasets for each task
-\item meta-data/.json information for each task
+\item input_data: list with 2 dataframes with raw data (visit_data, de_data (double_entered data))
+\item visit_data: list of 10 dataframes with intermediate-processed visit data (child_v1_data, child_v2_data, child_v3_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
+\item double_entry_data: list of dataframes with intermediate-processed double entry data
+\item phenotype_data: list of dataframes with processed data that gets exported into bids/phenotype
 }
 }
 \description{

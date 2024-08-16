@@ -16,11 +16,13 @@
 #' @param visit_data_path full path to the redcap visit data in bids/sourcedata/phenotype directory
 #' @param data_de_path full path to the redcap double entry data in bids/sourcedata/phenotype directory
 #' @param overwrite overwrite existing files (default = FALSE)
-#' @param return_data return phenotype to console (default = FLASE)
+#' @param return_data return raw and processed data to console (default = FALSE)
 #'
 #' @return If return_data is set to TRUE, will return a list including:
-#'  1) clean raw phenotype datasets for each task
-#'  2) meta-data/.json information for each task
+#'  1) input_data: list with 2 dataframes with raw data (visit_data, de_data (double_entered data))
+#'  2) visit_data: list of 10 dataframes with intermediate-processed visit data (child_v1_data, child_v2_data, child_v3_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
+#'  3) double_entry_data: list of dataframes with intermediate-processed double entry data
+#'  4) phenotype_data: list of dataframes with processed data that gets exported into bids/phenotype
 #'
 #' @examples
 #'
