@@ -4,9 +4,7 @@
 #'
 #'
 #' @param data data from REDCap event child_visit_2_arm_1
-#' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) clean raw child visit 1 datasets
-#'  2) meta-data/.json for each dataset
+#' @param return_data If return_data is set to TRUE, returns a list of the following dataframes: visit_data_child, mri_notes, mri_assessment_data, mri_cams_ff
 #'
 
 util_redcap_child_v2 <- function(data, return_data = TRUE) {
@@ -51,13 +49,16 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
   # score this data?
 
-  # CAMS and Freddy Fullness data will come from double-data entry forms
+  # CAMS and Freddy Fullness data
+  mri_cams_ff <- data[, grepl('participant_id|session_id|pre_cams_score|post_cams_score|freddy_score', names(data))]
+  mri_cams_ff <- mri_cams_ff %>% dplyr::relocate("session_id", .after = 1) # relocate columns
 
   ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
                 mri_notes = mri_notes,
-                mri_assessment_data = mri_assessment_data))
+                mri_assessment_data = mri_assessment_data,
+                mri_cams_ff = mri_cams_ff))
   }
 }
 
