@@ -11,7 +11,7 @@
 
 util_redcap_child_v4 <- function(data, return_data = TRUE) {
 
-  #### 1. Set up/initial checks #####
+  #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
   data_arg <- methods::hasArg(data)
@@ -36,25 +36,24 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v4_post_check_notes', 'v4_date', 'wasi_notes', 'pit_task_notes')]
   names(visit_data_child)[names(visit_data_child) == "v4_post_check_notes"] <- "v4_notes"
 
-  ## Intake information ####
-  # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
+  ## intake-related data ####
 
-  ## meal data
-  meal_data <- data[, grep("participant_id|session_id|test_meal|advertisement_condition|test_meal_notes|meal_intake_notes", names(data))]
-  meal_data <- meal_data[, -grep("complete", names(meal_data))]
-  names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
+  # food paradigm information (does not include fullness, intake)
+  food_paradigm_info <- data[, grepl('participant_id|session_id|meal|advertisement_condition', names(data))]
+  food_paradigm_info <- food_paradigm_info[, !grepl('complete|freddy|consumed', names(food_paradigm_info))]
+  names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
-  ## EAH data
-  eah_data <- data[, grep("participant_id|session_id|wanting|advertisement_condition|eah_notes|eah_intake_notes", names(data))]
-  eah_data <- eah_data[, -grep("complete|timestamp", names(eah_data))]
-  names(eah_data) <- gsub('intake_notes', 'prep_notes', names(eah_data))
-  names(eah_data) <- gsub('eah_notes', 'eah_protocol_notes', names(eah_data))
+  # eah wanting
+  eah_wanting <- data[, grep("participant_id|session_id|wanting", names(data))]
+  eah_wanting <- eah_wanting[, -grep("complete|timestamp", names(eah_wanting))]
 
-  ## intake_data (meal and eah) -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
-  intake_data <- data[, grep("participant_id|session_id|meal|eah_notes|advertisement_condition|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
-  intake_data <- intake_data[, -grep("complete|intake_eah_visit_number|check|consumed", names(intake_data))]
-  colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
-  colnames(intake_data) <- gsub('intake_notes', 'prep_notes', names(intake_data))
+  ## freddy data -- this may or may not be replaced with double entry data
+  freddy_data <- data[, grepl('participant_id|session_id|freddy', names(data))]
+  freddy_data <- freddy_data[, -grep("complete|check|time|visit_number", names(freddy_data))]
+  colnames(freddy_data) <- gsub("freddy", "fullness", colnames(freddy_data)) # Replace "freddy" with "fullness" in colnames
+
+  ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
+  intake_data <- data[, grep("participant_id|session_id|plate", names(data))]
 
   ## loc ####
   loc_data <-data[, grep("participant_id|session_id|^loc", names(data))]
@@ -79,8 +78,9 @@ util_redcap_child_v4 <- function(data, return_data = TRUE) {
   ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
-                meal_data = meal_data,
-                eah_data = eah_data,
+                food_paradigm_info = food_paradigm_info,
+                eah_wanting = eah_wanting,
+                freddy_data = freddy_data,
                 intake_data = intake_data,
                 loc_data = loc_data,
                 pptq_data = pptq_scored,

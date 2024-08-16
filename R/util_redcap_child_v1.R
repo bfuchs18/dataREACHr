@@ -36,26 +36,26 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   visit_data_child <- data[c('participant_id', 'v1_post_check_notes', 'v1_date', 'child_assent', 'dxa_notes', 'rrv_task_notes')]
   names(visit_data_child)[names(visit_data_child) == "v1_post_check_notes"] <- "v1_notes"
 
-  ## intake data ####
-  # note: this does not include intake or freddy fullness values, which will come from redcap double-entry data
+  ## intake-related data ####
 
-  ## meal data
-  meal_data <- data[, grepl('participant_id|session_id|meal|advertisement_condition', names(data))]
-  meal_data <- meal_data[, !grepl('complete|freddy|consumed', names(meal_data))]
-  names(meal_data) <- gsub('intake_notes', 'prep_notes', names(meal_data))
+  ## food paradigm information (does not include intake and freddy values)
+  food_paradigm_info <- data[, grepl('participant_id|session_id|meal|advertisement_condition', names(data))]
+  food_paradigm_info <- food_paradigm_info[, !grepl('complete|freddy|consumed', names(food_paradigm_info))]
+  names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
-  ## intake_data (meal and eah) -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
-  intake_data <- data[, grep("participant_id|session_id|meal|eah_notes|advertisement_condition|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
-  intake_data <- intake_data[, -grep("complete|intake_eah_visit_number|check|consumed", names(intake_data))]
-  colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
-  colnames(intake_data) <- gsub('intake_notes', 'prep_notes', names(intake_data))
+  ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
+  intake_data <- data[, grep("participant_id|session_id|plate", names(data))]
 
-  ## meal vas data
-  meal_vas_data <- data[, grepl('participant_id|session_id|vas_grilled|vas_chicken|vas_potato|vas_carrot|vas_fruit|vas_water', names(data))]
+  ## freddy data -- this may or may not be replaced with double entry data
+  freddy_data <- data[, grepl('participant_id|session_id|freddy', names(data))]
+  freddy_data <- freddy_data[, -grep("complete|check|time|visit_number", names(freddy_data))]
+  colnames(freddy_data) <- gsub("freddy", "fullness", colnames(freddy_data)) # Replace "freddy" with "fullness" in colnames
 
-  ## eah vas data
-  eah_vas_data <- data[, grepl('participant_id|session_id|brownie|corn_chip|chocolate|icecream|cookie|popcorn|pretzel|skittle|starburst', names(data))]
-  names(eah_vas_data) <- gsub('cookie', 'oreo', names(eah_vas_data))
+  ## vas food liking (eah and meal foods)
+  liking_data <- data[, grepl('participant_id|session_id|vas', names(data))]
+  names(liking_data) <- gsub('cookie', 'oreo', names(liking_data))
+  liking_data <- liking_data[, -grep("pre_vas_freddy", names(liking_data))]
+  colnames(liking_data) <- gsub("vas", "liking", colnames(liking_data)) # Replace "vas" with "liking" in colnames
 
   ## kbas data ####
   kbas_data <-data[, grep("participant_id|session_id|toy_|food_|^q.*score|kids_brand_awareness_survey_version_b_timestamp|kids_brand_awareness_survey_version_a_timestamp", names(data))]
@@ -84,10 +84,10 @@ util_redcap_child_v1 <- function(data, return_data = TRUE) {
   ## return data ####
   if (isTRUE(return_data)){
     return(list(visit_data_child = visit_data_child,
-                meal_data = meal_data,
+                food_paradigm_info = food_paradigm_info,
                 intake_data = intake_data,
-                meal_vas_data = meal_vas_data,
-                eah_vas_data = eah_vas_data,
+                freddy_data = freddy_data,
+                liking_data = liking_data,
                 kbas_data = kbas_data,
                 stq_data = stq_data,
                 anthro_data = anthro_data))

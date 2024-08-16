@@ -174,9 +174,8 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Process double-entry data ####
   processed_de_data <- util_redcap_de(redcap_de_data)
 
-  #### Compile (merge and stack) data ####
+  #### Stack visit data collected on multiple visits ####
 
-  ### Stack visit data collected on 2 visits
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
   stacked_stq <-
@@ -241,30 +240,31 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     transform(parent_v5_data$puberty_data$bids_phenotype, respondent = "parent"),
     transform(child_v5_data$puberty_data$bids_phenotype, respondent = "child")) %>% dplyr::relocate("respondent", .after = 4)
 
-  # note: visit column is vas_visit_protocol -- this data will merged with intake data by session_id only
-  stacked_meal_vas_data <- dplyr::bind_rows(
-    transform(child_v1_data$meal_vas_data, vas_visit_protocol = "1"),
-    transform(child_v5_data$meal_vas_data, vas_visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("vas_visit_protocol", .after = 2)
+  # note: visit column is liking_visit_protocol -- this data will merged with intake data by session_id only
+  stacked_liking_data <- dplyr::bind_rows(
+    transform(child_v1_data$liking_data, liking_visit_protocol = "1"),
+    transform(child_v5_data$liking_data, liking_visit_protocol = "5")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("liking_visit_protocol", .after = 2)
 
-  # note: visit column is vas_visit_protocol -- this data will merged with intake data by session_id only
-  stacked_eah_vas_data <- dplyr::bind_rows(
-    transform(child_v1_data$eah_vas_data, vas_visit_protocol = "1"),
-    transform(child_v5_data$eah_vas_data, vas_visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("vas_visit_protocol", .after = 2)
-
-  stacked_meal_data <- dplyr::bind_rows(
-    transform(child_v1_data$meal_data, visit_protocol = "1"),
-    transform(child_v3_data$meal_data, visit_protocol = "3"),
-    transform(child_v4_data$meal_data, visit_protocol = "4"),
-    transform(child_v5_data$meal_data, visit_protocol = "5")
+  stacked_wanting_data <- dplyr::bind_rows(
+      transform(child_v3_data$eah_wanting, visit_protocol = "3"),
+      transform(child_v4_data$eah_wanting, visit_protocol = "4"),
+      transform(child_v5_data$eah_wanting, visit_protocol = "5")
     ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
-  stacked_eah_data <- dplyr::bind_rows(
-    transform(child_v3_data$eah_data, visit_protocol = "3"),
-    transform(child_v4_data$eah_data, visit_protocol = "4"),
-    transform(child_v5_data$eah_data, visit_protocol = "5")
+  stacked_fullness_data <- dplyr::bind_rows(
+    transform(child_v1_data$freddy_data, visit_protocol = "1"),
+    transform(child_v3_data$freddy_data, visit_protocol = "3"),
+    transform(child_v4_data$freddy_data, visit_protocol = "4"),
+    transform(child_v5_data$freddy_data, visit_protocol = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  stacked_food_paradigm_info <- dplyr::bind_rows(
+    transform(child_v1_data$food_paradigm_info, visit_protocol = "1"),
+    transform(child_v3_data$food_paradigm_info, visit_protocol = "3"),
+    transform(child_v4_data$food_paradigm_info, visit_protocol = "4"),
+    transform(child_v5_data$food_paradigm_info, visit_protocol = "5")
+    ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
   stacked_updates <- dplyr::bind_rows(
     parent_v2_data$visit_data_parent,
@@ -273,23 +273,36 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     parent_v5_data$visit_data_parent
   )
 
-  stacked_prelim_anthro_data <- dplyr::bind_rows(
+  stacked_visit_anthro_data <- dplyr::bind_rows(
     transform(child_v1_data$anthro_data, visit_protocol = "1"),
     transform(child_v5_data$anthro_data, visit_protocol = "5")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
-  # Merge visit and double entry intake data (meal, EAH, vas)
-  merged_vas_data <- merge(stacked_eah_vas_data, stacked_meal_vas_data, by=c("participant_id","session_id", "vas_visit_protocol"), all = TRUE)
-  merged_intake <- merge(stacked_meal_data, stacked_eah_data, by=c("participant_id","visit_protocol", "session_id", "advertisement_condition"), all = TRUE)
-  merged_intake <- merge(merged_intake, merged_vas_data, by=c("participant_id", "session_id"), all = TRUE)
-  merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE)
+  stacked_visit_intake_data <- dplyr::bind_rows(
+    transform(child_v1_data$intake_data, visit_protocol = "1"),
+    transform(child_v3_data$intake_data, visit_protocol = "3"),
+    transform(child_v4_data$intake_data, visit_protocol = "4"),
+    transform(child_v5_data$intake_data, visit_protocol = "5")
+  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+
+  ### Process stacked intake data from visit forms (not double entered) ----
+  # intake data from visit forms will output until double entry data is ready
+  stacked_visit_intake_data  <- util_calc_intake(stacked_visit_intake_data)
+
+  ### Merge intake-related data ----
+  # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
+  merged_intake <- merge(stacked_food_paradigm_info, stacked_liking_data, by=c("participant_id", "session_id"), all = TRUE) #paradigm info and liking
+  merged_intake <- merge(merged_intake, stacked_wanting_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add wanting
+  merged_intake <- merge(merged_intake, stacked_visit_intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add intake -- for now, use visit data (not double entered)
+  # merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # uncomment when double-entered intake data is available
+  merged_intake <- merge(merged_intake, stacked_fullness_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add fullness -- for now, this is not double entered
 
   ## merge notes/visit data? update data?
 
   # merge MRI visit data and cams/fullness data -- cams/fullness data may eventually be double entered, for now, take from child_v2_data
   merged_mri <- merge(child_v2_data$mri_notes, child_v2_data$mri_cams_ff, by = "participant_id", all = TRUE)
 
-  #### Additional processing: anthro data ####
+  #### Process stacked anthro data ####
 
   # Extract parent 2 BMI from household_data and stack
   stacked_parent2_anthro <-
@@ -305,7 +318,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   ## !! Uncomment line below if/when anthro_data is available in processed_de_data !!
   ## merged_anthro <- merge(processed_de_data$anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
   ## !! comment out this line when double entry data is available !!
-  merged_anthro <- merge(stacked_prelim_anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
+  merged_anthro <- merge(stacked_visit_anthro_data, stacked_parent2_anthro, by=c("participant_id", "session_id"), all = TRUE)
 
   # add variables needed to calculate BMI percentiles
   merged_anthro <- dplyr::left_join(merged_anthro, date_data[c("participant_id", "v1_age", "v5_age", "sex")], by = "participant_id") # merge dates and ages from date_data
@@ -441,20 +454,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     dplyr::select(-dplyr::contains("date")) %>% #remove date columns from participants_data
     dplyr::bind_cols(participants_data %>% dplyr::select(dplyr::contains("date"))) # Bind date columns to end of participants_data
 
-
-  ####  Get prelim intake -- will be obsolete with double-entry data is available ####
-  prelim_intake_data <- dplyr::bind_rows(
-    transform(child_v1_data$intake_data, visit_protocol = "1"),
-    transform(child_v3_data$intake_data, visit_protocol = "3"),
-    transform(child_v4_data$intake_data, visit_protocol = "4"),
-    transform(child_v5_data$intake_data, visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
-
-  prelim_intake_data <- prelim_intake_data[, -grep("fullness_time", names(prelim_intake_data))] # remove extra columns
-
-  # compute intake variables
-  prelim_intake_data  <- util_calc_intake(prelim_intake_data)
-
   #### Export Data ####
 
   # make a list dataframes to export, where the name is the corresponding json function without json_)
@@ -560,23 +559,6 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
       write(json, filename_json)
     }
-  }
-
-  #### Export prelim intake data ####
-  # write prelim intake data (not double entered )
-  prelim_intake_tsv <- paste0(phenotype_wd, slash, "intake_not_doubleentered.tsv")
-
-  # write tsv
-  if ( isTRUE(overwrite) | !file.exists(prelim_intake_tsv) ) {
-    write.table(
-      prelim_intake_data,
-      prelim_intake_tsv,
-      quote = FALSE,
-      sep = '\t',
-      col.names = TRUE,
-      row.names = FALSE,
-      na = "n/a" # use 'n/a' for missing values for BIDS compliance
-    )
   }
 
 
