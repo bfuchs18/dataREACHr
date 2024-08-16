@@ -172,7 +172,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
 
   #### Process double-entry data ####
-  processed_de_data <- util_redcap_de(redcap_de_data, agesex_data = date_data)
+  processed_de_data <- util_redcap_de(redcap_de_data)
 
   #### Compile (merge and stack) data ####
 

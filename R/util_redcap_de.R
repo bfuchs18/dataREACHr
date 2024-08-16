@@ -4,11 +4,10 @@
 #'
 #' @importFrom rlang .data
 #' @param data double-entry data
-#' @param agesex_data dataframe with participant_id, v1_age (visit 1 age) and v5_age (visit 5 age), sex
 #' @param return_data If return_data is set to TRUE, will return a list including: dexa_data, intake_data
 #'
 
-util_redcap_de <- function(data, agesex_data, return_data = TRUE) {
+util_redcap_de <- function(data, return_data = TRUE) {
 
   #### 1. Set up/initial checks #####
 
