@@ -566,6 +566,13 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   }
 
 
+  # export dataset_description.json
+  filename_json <- paste0(phenotype_wd, slash, "dataset_description.json")
+  json <- json_phe_dataset_desc(visit_data_path, data_de_path)
+  if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+    write(json, filename_json)
+  }
+
   #### Return Data ####
   if (isTRUE(return_data)) {
     return(list(
