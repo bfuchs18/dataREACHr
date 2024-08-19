@@ -9,14 +9,13 @@
 
 json_deriv_beh_dataset_desc <- function() {
 
-  packageVersion("datareachr")
-
   description_list <- list(
     Name = 'Compiled and summary datasets for behavioral tasks',
     DatasetType = 'Derivative',
     GeneratedBy = list( Name = "dataREACHr",
-                        Version = packageVersion("datareachr"),
-                        Description = "Datasets generated with package functions: deriv_rrv.R, json_deriv_rrv.R",
+                        Version = paste0("dataREACHr is not versioned. Datasets were generated on ", Sys.Date(), " using the code from the GitHub repository at that time. Thus, this date serves as a reference point for the specific code version employed."),
+                        #Version = packageVersion("datareachr"),
+                        Description = "Datasets were generated using dataREACHr functions: deriv_rrv.R, json_deriv_rrv.R",
                         URL = "https://github.com/bfuchs18/dataREACHr")
     )
 

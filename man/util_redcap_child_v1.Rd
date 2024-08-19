@@ -7,7 +7,7 @@
 util_redcap_child_v1(data, return_data = TRUE)
 }
 \arguments{
-\item{data}{data from REDCap event child_visit_1_arm_1}
+\item{data}{data from REDCap event}
 
 \item{return_data}{If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, freddy_data, intake_data, liking_data, kbas_data, stq_data, anthro_data}
 }
