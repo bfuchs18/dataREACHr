@@ -176,9 +176,14 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   # list all toolbox files (ses-1 and ses-2) with full path
   toolbox_source_files <- list.files(sourcedata_wd, pattern = "toolbox", recursive = TRUE, full.names = TRUE)
 
+  ## initialize list to save subject assessment data to
+  toolbox_data <- list()
+
   for (session in c(1,2)) {
 
     ses_str <- paste0("ses-", session)
+
+    toolbox_data[[ses_str]] <- list()
 
     # Filter toolbox_source_files by session
     toolbox_session_source_files <- toolbox_source_files[grepl(ses_str, toolbox_source_files)]
@@ -197,6 +202,9 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
       # process score by adding it to phenotype/toolbox.csv
       sub_toolbox_score_data <- util_phenotype_toolbox(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_toolbox, return_data = TRUE)
+
+      # add assessment data to toolbox_data
+      toolbox_data[[ses_str]][[sub_str]] <- sub_toolbox_assessment_data
 
     }
   }
@@ -233,6 +241,8 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
 
   #### TO DO: Process PIT data ####
+
+
   #### TO DO: Process Space Game data ####
 
   #### Export meta-data ####
@@ -244,6 +254,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
     return(list(foodview_data = foodview_data,
                 sst_data = sst_data,
                 rrv_data = rrv_data,
+                toolbox_data = toolbox_data,
                 meta_data = meta_data
     ))
   }
