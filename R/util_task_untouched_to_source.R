@@ -261,6 +261,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
 
   #### PIT ####
+
   if (isTRUE(all_tasks) | "pit" %in% task_vector) {
     print("-- copying PIT task")
 
@@ -269,16 +270,16 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
       # define directory with pit data
       if (ses_str == "ses-1") {
-        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task')
+        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V4_PIT')
       } else {
         pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5_PIT')
       }
 
-      # get list of files in pit_dir (but not directories)
-      pit_ses_files <- setdiff(list.files(pit_dir, full.names = TRUE), list.dirs(pit_dir, recursive = FALSE, full.names = TRUE))
+      # get list of files in pit_dir
+      pit_ses_files <- list.files(pit_dir, "Food-PIT")
 
-      # get list of subs: get file basename and extract characters before first "_"
-      ses_subs <- unique(sub("(^[^_]+)_.*", "\\1", basename(pit_ses_files)))
+      # get list of subs: get first 3 characters in file name
+      ses_subs <- unique(substr(pit_ses_files, 1, 3))
 
       # for each sub
       for (sub in ses_subs) {
