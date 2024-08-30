@@ -2,7 +2,7 @@
 #'
 #' This function:
 #' 1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)
-#' 2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview, using task-specific util_task_{task-name} functions
+#' 2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, using task-specific util_task_{task-name} functions
 #' 3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()
 #'
 #' To use this function, the correct path to the directory containing untouchedRaw/ and bids/ must be supplied to base_wd
@@ -10,7 +10,7 @@
 #' @param base_wd (string) full path to directory that contains untouchedRaw/ and bids/
 #' @param overwrite_sourcedata (logical) overwrite files in sourcedata for all tasks (default = FALSE)
 #' @param overwrite_rawdata (logical) overwrite files in rawdata for all tasks (default = FALSE)
-#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv").
+#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv", "pit").
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)
@@ -240,7 +240,48 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   }
 
 
-  #### TO DO: Process PIT data ####
+  #### Process PIT data ####
+
+  print("Processing PIT Data")
+
+  ## get pit overwrite arg
+  overwrite_pit <- "pit" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+
+  # get list of pit files in sourcedata
+  pit_source_files <- list.files(sourcedata_wd, pattern = "Food-PIT", recursive = TRUE)
+
+  # get list of subjects with sst files in sourcedata
+  pit_subs <- unique(substr(pit_source_files, 1, 7))
+
+  ## initialize list to save subject assessment data to
+  pit_data <- list()
+
+  for (session in c(1,2)) {
+
+    ses_str <- paste0("ses-", session)
+
+    pit_data[[ses_str]] <- list()
+
+    # Filter pit_source_files by session
+    pit_session_source_files <- pit_source_files[grepl(ses_str, pit_source_files)]
+
+    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include "sub-" and the next 3 characters)
+    pit_subs <- unique(stringr::str_extract(pit_session_source_files, "sub-..."))
+
+    # process sst task data and organize into bids/rawdata for each subject
+    for (sub_str in pit_subs) {
+
+      # get sub number from sub_str
+      sub <- as.numeric(gsub("sub-","", sub_str))
+
+      # process
+      sub_pit_data <- util_task_pit(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_pit, return_data = TRUE)
+
+      # add assessment data to pit_data
+      pit_data[[ses_str]][[sub_str]] <- sub_pit_data
+
+    }
+  }
 
 
   #### TO DO: Process Space Game data ####
@@ -255,6 +296,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
                 sst_data = sst_data,
                 rrv_data = rrv_data,
                 toolbox_data = toolbox_data,
+                pit_data = pit_data,
                 meta_data = meta_data
     ))
   }
