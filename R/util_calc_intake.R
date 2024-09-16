@@ -8,7 +8,19 @@
 
 util_calc_intake <- function(stacked_intake) {
 
-  #make dataframe with energy density data
+  # convert all intake columns to numeric -- anything entered as a string will be recoded as NA by coercian
+  intake_cols <- names(stacked_intake[, !names(stacked_intake) %in% c("participant_id", "session_id", "visit_protocol")])
+
+  classes <- sapply(stacked_intake[intake_cols], class)
+  for (i in 1:length(classes)) {
+    if (classes[i] != "numeric") {
+      print(paste(names(classes[i]), "contains non-numeric values. These will recoded as NA by coercion"))
+    }
+  }
+
+  stacked_intake[intake_cols] <- sapply(stacked_intake[intake_cols],as.numeric)
+
+  # make dataframe with energy density data
   ed_data <- util_gen_ed_data() #make dataframe with energy density data
 
   #### calculate grilled cheese energy density ####
