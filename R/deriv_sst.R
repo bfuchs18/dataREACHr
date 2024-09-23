@@ -59,9 +59,9 @@ deriv_sst <- function(data) {
     if (n_stop_fail == 0) {
 
       if (is.na(block_num)) {
-        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1]))
+        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "-- cannot check racehorse assumption"))
       } else {
-        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "block", block_num))
+        print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "block", block_num, "-- cannot check racehorse assumption"))
       }
 
       racehorse_check = NA
@@ -188,6 +188,7 @@ deriv_sst <- function(data) {
 
           # get dataframe row of summary metrics
           cond_summary_row <- get_summary_row(cond_jpeg_rows)
+          cond_summary_row$run_num <- NA # replace with NA, as this would reflect the first run_num, but there are multiple when assessing by condition
 
           # add row to dataframe
           if (nrow(summary_bycond_df) == 0) {
