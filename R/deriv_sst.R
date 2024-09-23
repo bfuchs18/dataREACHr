@@ -12,7 +12,7 @@
 #' \dontrun{
 #'
 #' # process task data
-#' base_dir = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+#' base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 #' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 #'
 #' # get deriv foodview data from processed task data
@@ -22,8 +22,12 @@
 ## To do: add summary metrics for behavioral runs
 deriv_sst <- function(data) {
 
-  # define function to get summary metrics for a given subset of data. Returns a dataframe with with summary values
+  # define function to get summary metrics for a given subset of data. ----
   get_summary_row <- function(jpeg_events){
+    #' get_summary_row (internal)
+    #' jpeg_events = dataframe of rows from SST events file(s) where stim_file_name contains "jpeg"
+    #' This subfunction returns a dataframe of 1 row containing summary values
+    #' @noRd
 
     # subset trials by signal
     go_trials <- jpeg_events[jpeg_events$signal == 0,]
@@ -158,6 +162,9 @@ deriv_sst <- function(data) {
       combined_data <- dplyr::bind_rows(combined_data, func_data)
     }
 
+    # convert response_time unit from seconds to milliseconds
+    combined_data$response_time <- combined_data$response_time*1000
+
     # for each data type (e.g., "beh", "func")
     for (type in unique(combined_data$type)) {
 
@@ -167,13 +174,38 @@ deriv_sst <- function(data) {
       # determine number of runs
       n_runs <- length(unique(type_data$run_num))
 
+      # get summary metrics across runs, by condition ----
+
+      # for each condition (toy, food)
+      for (cond in c("toy", "food")) {
+
+        # subset image rows for fiven cond
+        cond_jpeg_rows <- type_data[grepl("jpeg", type_data$stim_file_name) & type_data$run_cond == cond,]
+
+        # if there are jpeg events and there are no responses
+        if (nrow(cond_jpeg_rows) > 0 & sum(!is.na(cond_jpeg_rows$response_time))) { ## change this so we still get a row in DF if no responses?
+          # if (nrow(type_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
+
+          # get dataframe row of summary metrics
+          cond_summary_row <- get_summary_row(cond_jpeg_rows)
+
+          # add row to dataframe
+          if (nrow(summary_bycond_df) == 0) {
+            summary_bycond_df <- cond_summary_row
+          } else {
+            summary_bycond_df <- dplyr::bind_rows(summary_bycond_df, cond_summary_row)
+          }
+
+        }
+      }
+
+
+      # get summary metrics by run ----
+      # note: runs are specific to a condition (food, toy), so do not need to also subset by condition
       for (run in 1:n_runs) {
 
         # extract foodview data for given run
         run_data <- type_data[type_data$run_num == run,]
-
-        # convert response_time unit from seconds to milliseconds
-        run_data$response_time <- run_data$response_time*1000
 
         # subset image rows
         run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
@@ -194,6 +226,7 @@ deriv_sst <- function(data) {
 
         }
 
+        # get summary metrics by block ----
         for (block in unique(run_jpeg_rows$block)) {
 
           # subset images in block
@@ -218,6 +251,7 @@ deriv_sst <- function(data) {
   }
 
   return(list(summary_long_by_run = summary_byrun_df,
-              summary_long_by_block = summary_byblock_df))
+              summary_long_by_block = summary_byblock_df,
+              summary_long_by_cond = summary_bycond_df))
 }
 
