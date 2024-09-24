@@ -10,13 +10,13 @@
 #'
 #' @examples
 #'
+#' \dontrun{
 #' # organize task data for all tasks in untouchedRaw into sourcedata
 #' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
 #'
 #' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
 #' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_vector = c("spacegame", "nih_toolbox")
 #'
-#' \dontrun{
 #' }
 #'
 #'
