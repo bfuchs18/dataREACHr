@@ -27,8 +27,8 @@
 #' @examples
 #'
 #' \dontrun{
-#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-08-14_1521.csv"
-#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-08-14_1522.csv"
+#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-09-24_1156.csv"
+#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-09-16_0939.csv"
 #' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
 #' }

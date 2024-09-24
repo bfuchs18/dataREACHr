@@ -26,5 +26,4 @@ task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 # get deriv foodview data from processed task data
 sst_summary <- deriv_sst(task_data$sst)
 }
-
 }

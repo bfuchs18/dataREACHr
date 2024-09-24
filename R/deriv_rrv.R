@@ -16,7 +16,7 @@
 #' # get deriv foodview data from processed task data
 #' rrv_summary <- deriv_rrv(task_data$rrv)
 #' }
-#'
+#' @export
 
 deriv_rrv <- function(data) {
 

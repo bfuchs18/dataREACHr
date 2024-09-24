@@ -4,7 +4,19 @@
 #'
 #' @param task_data output returned by proc_task()
 #' @param export_dir string with absolute path to export directory (typically behavioral summary directory)
-
+#' @examples
+#'
+#' \dontrun{
+#'
+#' # process task data
+#' base_dir = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+#' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
+#'
+#' # export derivative databases
+#' proc_task_derivs(task_data, "path/to/export/")
+#' }
+#'
+#' @export
 
 proc_task_derivs <- function(task_data, export_dir) {
 

@@ -16,7 +16,7 @@
 #' # get deriv foodview data from processed task data
 #' sst_summary <- deriv_sst(task_data$sst)
 #' }
-#'
+#' @export
 
 ## To do: add summary metrics for behavioral runs
 deriv_sst <- function(data) {
