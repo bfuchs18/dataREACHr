@@ -3,9 +3,19 @@
 #' This function generates RRV derivative databases from participant-level RRV files
 #'
 #' @param data a list of dataframes, where 1 dataframe contains processed RRV data for 1 sub (output of util_task_rrv). A suitable list of dataframes is returned by proc_task, or can be gathered from files in bids/rawdata
-#' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) a dataframe with long summary data (by reinforcer schedule)
-#'  2) a dataframe with overall summary data
+#' @return a list with: 1) a dataframe with long summary data (by reinforcer schedule) and 2) a dataframe with overall summary data
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' # process task data
+#' base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+#' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
+#'
+#' # get deriv foodview data from processed task data
+#' rrv_summary <- deriv_rrv(task_data$rrv)
+#' }
 #'
 
 deriv_rrv <- function(data) {

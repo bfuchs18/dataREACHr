@@ -3,7 +3,6 @@
 #' This function generates FoodView derivative databases from participant-level FoodView files
 #'
 #' @param data a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata
-#' @param return_data If return_data is set to TRUE, will return a list including:
 #'  1) summary_long_by_cond = a long dataframe with summary data by commerical_condition (metrics calculated across runs)
 #'  2) summary_long_by_block = a long dataframe with summary data by block
 #'
