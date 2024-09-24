@@ -3,9 +3,7 @@
 #' This function generates SST derivative databases from participant-level beh and func SST files
 #'
 #' @param data a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata
-#' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) summary_long_by_run = a long dataframe with summary data by run
-#'  2) summary_long_by_block = a long dataframe with summary data by block
+#' @return a list with: 1) summary_long_by_run = a long dataframe with summary data by run and 2) summary_long_by_block = a long dataframe with summary data by block
 #'
 #' @examples
 #'
@@ -16,18 +14,18 @@
 #' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 #'
 #' # get deriv foodview data from processed task data
-#' food_view_summary <- deriv_foodview(task_data$sst)
+#' sst_summary <- deriv_sst(task_data$sst)
 #' }
+#'
 
 ## To do: add summary metrics for behavioral runs
 deriv_sst <- function(data) {
 
   # define function to get summary metrics for a given subset of data. ----
   get_summary_row <- function(jpeg_events){
-    #' get_summary_row (internal)
-    #' jpeg_events = dataframe of rows from SST events file(s) where stim_file_name contains "jpeg"
-    #' This subfunction returns a dataframe of 1 row containing summary values
-    #' @noRd
+    # get_summary_row (internal)
+    # jpeg_events = dataframe of rows from SST events file(s) where stim_file_name contains "jpeg"
+    # returns: a dataframe of 1 row containing summary values
 
     # subset trials by signal
     go_trials <- jpeg_events[jpeg_events$signal == 0,]

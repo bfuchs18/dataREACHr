@@ -8,12 +8,9 @@ deriv_sst(data)
 }
 \arguments{
 \item{data}{a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata}
-
-\item{return_data}{If return_data is set to TRUE, will return a list including:
-\enumerate{
-\item summary_long_by_run = a long dataframe with summary data by run
-\item summary_long_by_block = a long dataframe with summary data by block
-}}
+}
+\value{
+a list with: 1) summary_long_by_run = a long dataframe with summary data by run and 2) summary_long_by_block = a long dataframe with summary data by block
 }
 \description{
 This function generates SST derivative databases from participant-level beh and func SST files
@@ -23,10 +20,11 @@ This function generates SST derivative databases from participant-level beh and 
 \dontrun{
 
 # process task data
-base_dir = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 
 # get deriv foodview data from processed task data
-food_view_summary <- deriv_foodview(task_data$sst)
+sst_summary <- deriv_sst(task_data$sst)
 }
+
 }
