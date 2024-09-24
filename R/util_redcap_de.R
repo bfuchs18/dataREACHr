@@ -9,7 +9,7 @@
 
 util_redcap_de <- function(data, return_data = TRUE) {
 
-  #### 1. Set up/initial checks #####
+  #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
   data_arg <- methods::hasArg(data)
@@ -25,32 +25,93 @@ util_redcap_de <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
-  # take merged data only (remove rows with "--")
-  rows_to_remove <- grepl("--", data$participant_id)
-  data <- data[!rows_to_remove, ]
+  ## Extract merged and unmerged data ####
 
-#  data <- data[grepl('--1', data[['participant_id']]), ]
-#  data$participant_id <- gsub("--1", "", data$participant_id)
+  # get logical vector of rows that contain unmerged data (contain "--" in participant_id)
+  unmerged_rows <- grepl("--", data$participant_id)
+
+  # subset unmerged rows only
+  unmerged_data <- data[unmerged_rows, ]
+
+  # subset merged data only (remove rows with "--")
+  merged_data <- data[!unmerged_rows, ]
 
   # Make ID column bids compliant: add "sub_"
-  data$participant_id <- paste0("sub-", data$participant_id)
+  merged_data$participant_id <- paste0("sub-", merged_data$participant_id)
 
+  ## define function to compare unmerged data (i.e., do the double-entry verification) ----
+  compare_de <- function(unmerged_data) {
 
-  #reduce columns and update names
+    # get list of IDs
+    de_ids <- unmerged_data$participant_id
+    ids <- unique(gsub("--1|--2","",de_ids))
+
+    verified_data_list <- list()
+    discrepancy_log <- list()
+
+    for (i in 1:length(ids)) {
+
+      id = ids[i]
+
+      # subset participant rows
+      sub_de_data <- unmerged_data[grepl(id, unmerged_data$participant_id),]
+
+      # extract entries without participant_id
+      entry_1 <- sub_de_data[1,!names(sub_de_data) %in% c("participant_id")]
+      entry_2 <- sub_de_data[2,!names(sub_de_data) %in% c("participant_id")]
+
+      # if rows are equal
+      if ( isTRUE(all.equal(entry_1, entry_2, check.attributes = FALSE)) ) {
+
+        # add entry 1 row to list
+        verified_data_list[[i]] <- sub_de_data[1,]
+
+      } else {
+        print(paste("sub", id, "double entry discrepancy. Check discrepancy_log"))
+
+        # add discrepancy to discrepancy_log
+        discrepancy_log[[length(discrepancy_log) + 1]] <- paste("ID:", id, "Discrepancy:", all.equal(entry_1, entry_2, check.attributes = FALSE))
+      }
+
+    }
+
+    # create verified bids dataframe
+    verified_data <- dplyr::bind_rows(verified_data_list)
+    verified_data$participant_id <- gsub("--1", "", verified_data$participant_id)
+    verified_data$participant_id <- paste0("sub-", verified_data$participant_id)
+
+    return(list(verified_data = verified_data, discrepancy_log = discrepancy_log))
+  }
 
   ## DEXA data ####
 
   # visit 1 data
-  dexa_v1_data <- data[, grep("participant_id|^dxa.*v1$|^left.*v1$|right.*v1$|^v1.*v1$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
-  colnames(dexa_v1_data) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_data)) # Remove "v1_" and "_v1" from column names
+  dexa_v1_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v1|dxa_sex_v1|dxa_height_v1|dxa_weight_v1|dxa_age_v1|^left.*v1$|right.*v1$|^v1.*v1$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
+  colnames(dexa_v1_unmerged) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_unmerged)) # Remove "v1_" and "_v1" from column names
 
   # visit 5 data
-  dexa_v5_data <- data[, grep("participant_id|^dxa.*v5$|^left.*v5$|right.*v5$|^v1.*v5$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
-  colnames(dexa_v5_data) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_data)) # Remove "v1_" and "_v5" from column names
+  dexa_v5_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v5|dxa_sex_v5|dxa_height_v5|dxa_weight_v5|dxa_age_v5|^left.*v5$|right.*v5$|^v1.*v5$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
+  colnames(dexa_v5_unmerged) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_unmerged)) # Remove "v1_" and "_v5" from column names
 
-  # make height, weight, age, and dexa values numeric
-  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, 9:121, function(x) as.numeric(as.character(x)))
-  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, 9:121, function(x) as.numeric(as.character(x)))
+  # run comparison function
+  compared_v1_dexa <- compare_de(dexa_v1_unmerged)
+  compared_v5_dexa <- compare_de(dexa_v1_unmerged)
+
+  # extract verified dataframes
+  dexa_v1_data <- compared_v1_dexa$verified_data
+  dexa_v5_data <- compared_v5_dexa$verified_data
+
+  # # visit 1 data
+  # dexa_v1_data <- data[, grep("participant_id|dxa_scan_date_v1|dxa_sex_v1|dxa_height_v1|dxa_weight_v1|dxa_age_v1|^left.*v1$|right.*v1$|^v1.*v1$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
+  # colnames(dexa_v1_data) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_data)) # Remove "v1_" and "_v1" from column names
+  #
+  # # visit 5 data
+  # dexa_v5_data <- data[, grep("participant_id|dxa_scan_date_v5|dxa_sex_v5|dxa_height_v5|dxa_weight_v5|dxa_age_v5|^left.*v5$|right.*v5$|^v1.*v5$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
+  # colnames(dexa_v5_data) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_data)) # Remove "v1_" and "_v5" from column names
+
+  # make height, weight, and dexa values numeric
+  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, 4:length(dexa_v1_data), function(x) as.numeric(as.character(x)))
+  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, 4:length(dexa_v1_data), function(x) as.numeric(as.character(x)))
 
   # stack visit 1 and visit 5 data, add "visit_protocol" and "session_id" columns and reorder
   stacked_dexa <- dplyr::bind_rows(
@@ -58,8 +119,6 @@ util_redcap_de <- function(data, return_data = TRUE) {
     transform(dexa_v5_data, visit_protocol = "5", session_id = "ses-2")
   ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
 
-  # remove columns
-  stacked_dexa <- stacked_dexa[, -grep("dxa_visit_number|dxa_remove_name_check|dxa_id", names(stacked_dexa))]
 
   # update column names -- mostly to match names from food and brain to facilitate compiling
 
@@ -81,7 +140,7 @@ util_redcap_de <- function(data, return_data = TRUE) {
 
   ## intake data ####
 
-  intake_data <- data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(data))]
+  intake_data <- merged_data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(merged_data))]
   intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|consumed|ad_cond", names(intake_data))]
   colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
 
@@ -122,7 +181,9 @@ util_redcap_de <- function(data, return_data = TRUE) {
     return(
       list(
         dexa_data = stacked_dexa,
-        intake_data = stacked_intake
+        intake_data = stacked_intake,
+        discrepancies = list(v1_dexa = compared_v1_dexa$discrepancy_log,
+                             v5_dexa = compared_v5_dexa$discrepancy_log)
       )
     )
   }
