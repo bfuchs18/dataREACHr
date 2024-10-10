@@ -150,9 +150,6 @@ util_phenotype_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_
           na = "n/a" # use 'n/a' for missing values for BIDS compliance
         )
 
-        # if overwrite is not TRUE
-      } else {
-        print(paste("Data for", sub_str, ses_str, "already in phenotype/toolbox.tsv. Use overwrite = TRUE to write new data."))
       }
 
       # if sub and session not already in phenotype data
