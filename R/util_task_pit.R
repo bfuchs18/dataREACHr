@@ -65,7 +65,7 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
 
   # load data, abort processing no file or >1 file matches pattern
   if (length(csv_file) == 1) {
-    pit_data <- read.csv(csv_file, header = TRUE)
+    pit_data <- read.csv(csv_file, header = TRUE, na.strings=c("","NA")) # code "" and NA as NA
   } else if ( length(csv_file) == 0) {
     print(paste(sub_str, "has no PIT CSV. Aborting task processing for this sub."))
     return()
