@@ -27,10 +27,11 @@ This function copies task data from untouchedRaw into bids/sourcedata for the fo
 
 \dontrun{
 # organize task data for all tasks in untouchedRaw into sourcedata
-util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
+base_wd = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+util_task_untouched_to_source(base_wd = base_wd, all_tasks = TRUE)
 
 # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
-util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_vector = c("spacegame", "nih_toolbox")
+util_task_untouched_to_source(base_wd = base_wd, task_vector = c("spacegame", "nih_toolbox")
 
 }
 

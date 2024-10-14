@@ -12,10 +12,11 @@
 #'
 #' \dontrun{
 #' # organize task data for all tasks in untouchedRaw into sourcedata
-#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", all_tasks = TRUE)
+#' base_wd = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
+#' util_task_untouched_to_source(base_wd = base_wd, all_tasks = TRUE)
 #'
 #' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
-#' util_task_untouched_to_source(base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/", task_vector = c("spacegame", "nih_toolbox")
+#' util_task_untouched_to_source(base_wd = base_wd, task_vector = c("spacegame", "nih_toolbox")
 #'
 #' }
 #'
@@ -158,24 +159,44 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
   if (isTRUE(all_tasks) | "spacegame" %in% task_vector) {
     print("-- copying Space Game")
 
-    space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game')
-    space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = TRUE)
 
-    for (file in space_game_files) {
+    # Get list of subs with spacegame files in untouchedRaw Extract the characters between the first _ and the first -
+    space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game') # set spacegame dir
+    space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = FALSE) # get list of filenames without full path
+    subs <- sub("^[^_]*_([^\\-]*).*", "\\1", space_game_files) # Extract the characters between the first _ and the first -, which should correspond to subject ID
 
-      # extract file name
-      filename <- basename(file)
+    for (sub in subs) {
 
-      # extract subject from filename
-      temp <- sub("(^[^-]+)-.*", "\\1", filename) # extract characters before first "-"
-      sub_num <- sub('mbmfNovelStakes_', '', temp) # extract sub number (replace 'mbmfNovelStakes_' with "")
-      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+      # if valid sub ID (can be converted to numeric)
+      if (!is.na(as.numeric(sub))) {
 
-      # copy to sourcedata
-      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+        # set sub string
+        sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+        # get list of files for sub
+        sub_files <- list.files(space_game_dir, pattern = paste0('mbmfNovelStakes_', sub, '-'), full.names = TRUE)
+
+        # if only 1 file matches pattern
+        if ( length(sub_files) == 1) {
+
+          # copy to sourcedata
+          copy_to_source(sub_files, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+
+        } else if (length(sub_files) > 1 ) {
+
+            # print message
+            print(paste(sub_str, "has more than 1 SpaceGame file in untouchedRaw. Should only have 1. Files will not be copied to sourcedata. Check file names:" , sub_files))
+
+        }
+      } else {
+
+        # print message that file will not be copied to sourcedata
+        nonsub_files <- list.files(space_game_dir, pattern = paste0('mbmfNovelStakes_', sub, '-'), full.names = FALSE)
+        print(paste("WARNING: Not copying file", nonsub_files, "from untouchedRaw to sourcedata. Characters between first '_' and first '-' do not reflect a valid sub ID"))
+
+      }
     }
   }
-
 
   #### NIH toolbox ####
   if (isTRUE(all_tasks) | "nih_toolbox" %in% task_vector) {
