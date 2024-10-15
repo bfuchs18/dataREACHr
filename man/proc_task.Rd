@@ -20,7 +20,7 @@ proc_task(
 
 \item{overwrite_rawdata}{(logical) overwrite files in rawdata for all tasks (default = FALSE)}
 
-\item{overwrite_rawdata_vector}{(vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv", "pit").}
+\item{overwrite_rawdata_vector}{(vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv", "pit", "spacegame").}
 
 \item{overwrite_jsons}{overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)}
 
@@ -37,7 +37,7 @@ If return_data is set to TRUE, will return a list including:
 This function:
 \enumerate{
 \item copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)
-\item processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, using task-specific util_task_{task-name} functions
+\item processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions
 \item exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()
 }
 }
