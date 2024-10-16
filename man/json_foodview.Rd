@@ -7,7 +7,7 @@
 json_foodview()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the XXx
+A string with data stored in JSON format containing meta-data for the food view task
 }
 \description{
 This function generates a json file for cleaned food view task data collected during fmri (onsets, responses)
