@@ -176,7 +176,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   #### Process double-entry data ####
   processed_de_data <- util_redcap_de(redcap_de_data)
 
-  #### Stack visit data collected on multiple visits ####
+  #### Stack questionnaire and update data collected on multiple visits ####
 
   # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
 
@@ -299,8 +299,26 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   merged_intake <- merge(merged_intake, stacked_visit_intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # add intake -- for now, use visit data (not double entered)
   # merged_intake <- merge(merged_intake, processed_de_data$intake_data, by=c("participant_id","visit_protocol", "session_id"), all = TRUE) # uncomment when double-entered intake data is available
 
-  ## merge notes/visit data? update data?
+  #### Merge notes into notes database ----
 
+  # merge -- create wide database
+  researcher_notes <- merge(child_v1_data$visit_data_child[c("participant_id", "v1_notes", "dxa_notes", "rrv_task_notes")], child_v2_data$visit_data_child[c("participant_id", "v2_notes")], by=c("participant_id"), all = TRUE)
+  researcher_notes <- merge(researcher_notes, child_v3_data$visit_data_child[c("participant_id", "v3_notes", "space_game_notes", "pit_task_notes")], by=c("participant_id"), all = TRUE)
+  researcher_notes <- merge(researcher_notes, child_v4_data$visit_data_child[c("participant_id", "v4_notes", "wasi_notes", "pit_task_notes")], by=c("participant_id"), all = TRUE)
+  researcher_notes <- merge(researcher_notes, child_v5_data$visit_data_child[c("participant_id", "v5_post_check_notes", "dxa_notes")], by=c("participant_id"), all = TRUE)
+
+  # update names
+  names(researcher_notes)[names(researcher_notes) == "v1_notes"] <- "child_protocol_1_notes"
+  names(researcher_notes)[names(researcher_notes) == "v2_notes"] <- "child_protocol_2_notes"
+  names(researcher_notes)[names(researcher_notes) == "v3_notes"] <- "child_protocol_3_notes"
+  names(researcher_notes)[names(researcher_notes) == "v4_notes"] <- "child_protocol_4_notes"
+  names(researcher_notes)[names(researcher_notes) == "v5_post_check_notes"] <- "child_protocol_5_notes"
+  names(researcher_notes)[names(researcher_notes) == "dxa_notes.x"] <- "dexa_ses1_notes"
+  names(researcher_notes)[names(researcher_notes) == "dxa_notes.y"] <- "dexa_ses2_notes"
+  names(researcher_notes)[names(researcher_notes) == "pit_task_notes.x"] <- "pit_notes_v3"
+  names(researcher_notes)[names(researcher_notes) == "pit_task_notes.y"] <- "pit_notes_v4"
+
+  #### Merge MRI visit data ----
   # merge MRI visit data and cams/fullness data -- cams/fullness data may eventually be double entered, for now, take from child_v2_data
   merged_mri <- merge(child_v2_data$mri_notes, child_v2_data$mri_cams_ff, by = c("participant_id", "session_id"), all = TRUE)
 
@@ -513,8 +531,10 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     anthropometrics = merged_anthro,
     intake = merged_intake,
     mri_visit = merged_mri,
-    dexa = processed_de_data$dexa_data
+    dexa = processed_de_data$dexa_data,
 
+    researcher_notes = researcher_notes,
+    parent_updates = stacked_updates
   )
 
   # loop through data_to_export and export data and meta-data
