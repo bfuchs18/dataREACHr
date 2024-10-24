@@ -10,7 +10,7 @@ json_spacegame <- function() {
   spacegame_list <- list(
     'FileLevelMetadata' = list(
       Description = "Space Game: a 2-Stage Reinforcement Learning/Reward-Related Decision Making Task ",
-      TermURL: "https://www.cognitiveatlas.org/task/id/trm_5667451917a34/",
+      TermURL = "https://www.cognitiveatlas.org/task/id/trm_5667451917a34/",
       Sources = "bids::rawdata/sub*/ses-1/beh/sub*spacegame_beh.tsv"),
     sub = list(Description = 'participant id number'),
 
