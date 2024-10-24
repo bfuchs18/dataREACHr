@@ -31,26 +31,19 @@ write_task_jsons <- function(bids_wd, overwrite) {
     }
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('write_task_jsons.R has not been thoroughly tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
-  }
 
   #### Define paths for export ####
-  phenotype_wd <- paste0(bids_wd, slash, "phenotype", slash)
-  raw_wd <- paste0(bids_wd, slash, "rawdata", slash)
+  phenotype_wd <- file.path(bids_wd, "phenotype")
+  raw_wd <- file.path(bids_wd, "rawdata")
 
   # generate phenotype_wd if it doesn't exist
   if (!file.exists(phenotype_wd)){
-    dir.create(file.path(phenotype_wd))
+    dir.create(phenotype_wd)
   }
 
   # generate raw_wd if it doesn't exist
   if (!file.exists(raw_wd)){
-    dir.create(file.path(raw_wd))
+    dir.create(raw_wd)
   }
 
   #### Export meta-data #####
