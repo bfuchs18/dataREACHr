@@ -64,7 +64,7 @@ qc_redcap <- function(redcap_data) {
     df <- phenotype_data[[df_name]]
 
     # check participants dataframe for duplicate subs
-    if (df_name == "participants") {
+    if (df_name == "participants" | df_name == "researcher_notes") {
 
       # extract rows with duplicate subs
       duplicate_rows <- df[duplicated(df[c("participant_id")]), ]
@@ -93,6 +93,15 @@ qc_redcap <- function(redcap_data) {
 
       if (nrow(duplicate_rows) > 0) {
         cat(paste0("Warning: Duplicate participant_id+session_id+respondent rows in ", df_name))
+      }
+
+    } else if (df_name == "parent_updates") {
+
+      # extract rows with duplicate sub visit, and respondent combos
+      duplicate_rows <- df[duplicated(df[c("participant_id", "update_form_date")]), ]
+
+      if (nrow(duplicate_rows) > 0) {
+        cat(paste0("Warning: Duplicate participant_id+session_id+update_form_date rows in ", df_name))
       }
 
       # check all other dataframes for duplicate sub + ses combinations
