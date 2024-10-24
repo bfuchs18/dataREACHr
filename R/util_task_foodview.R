@@ -52,8 +52,8 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
 
   # get directory paths
   raw_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'func')
-  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', 'foodview_onsets-', sub_num, '.txt')
-  resp_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', 'foodview-', sub_num, '.txt')
+  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0('foodview_onsets-', sub_num, '.txt'))
+  resp_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0('foodview-', sub_num, '.txt'))
 
   #### Organize Data #####
 
