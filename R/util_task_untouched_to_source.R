@@ -6,7 +6,7 @@
 #' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
 #' @param overwrite logical indicating if data should be overwritten in /sourcedata Default = FALSE
 #' @param all_tasks logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector
-#' @param task_vector vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
+#' @param task_vector vector with tasks to process. Must be included if all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
 #'
 #' @examples
 #'
@@ -24,8 +24,6 @@
 #' @export
 
 util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector) {
-
-  # base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
 
   #### Set up/initial checks ####
 
@@ -67,15 +65,6 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     task_vector = c()
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_untouched_to_source.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
-
-
   #### Define copy_to_source() ####
   copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite) {
 
@@ -91,17 +80,17 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     prefix_arg <- methods::hasArg(sourcefile_prefix)
 
     # set sourcedata directory for task files
-    sub_task_source_dir <- paste0(base_wd, slash, 'bids', slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, "beh")
+    sub_task_source_dir <- file.path(base_wd, "bids", 'sourcedata', sub_str, ses_str, "beh")
 
     # get file name
     filename <- basename(file)
 
     # set sourcedata file
     if (isTRUE(prefix_arg)) {
-      sub_task_source_file <- paste0(sub_task_source_dir, slash, sourcefile_prefix, filename)
+      sub_task_source_file <- file.path(sub_task_source_dir, paste0(sourcefile_prefix, filename))
 
     } else {
-      sub_task_source_file <- paste0(sub_task_source_dir, slash, filename)
+      sub_task_source_file <- file.path(sub_task_source_dir, filename)
     }
 
     # create sub_task_source_dir if it doesnt exist
@@ -119,7 +108,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
   if (isTRUE(all_tasks) | "foodview" %in% task_vector) {
     print("-- copying Food View")
 
-    foodview_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'foodview_task')
+    foodview_dir <- file.path(base_wd, 'untouchedRaw', 'foodview_task')
     foodview_files <- list.files(foodview_dir, pattern = 'foodview', full.names = TRUE)
 
     for (file in foodview_files) {
@@ -139,7 +128,8 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
   if (isTRUE(all_tasks) | "sst" %in% task_vector) {
     print("-- copying SST")
 
-    sst_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'sst')
+    sst_dir <- file.path(base_wd, 'untouchedRaw', 'sst')
+
     sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
 
     for (file in sst_files) {
@@ -159,9 +149,8 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
   if (isTRUE(all_tasks) | "spacegame" %in% task_vector) {
     print("-- copying Space Game")
 
-
-    # Get list of subs with spacegame files in untouchedRaw Extract the characters between the first _ and the first -
-    space_game_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'space_game') # set spacegame dir
+    # Get list of subs with spacegame files in untouchedRaw based on filenames
+    space_game_dir <- file.path(base_wd, 'untouchedRaw', 'space_game') # set spacegame dir
     space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = FALSE) # get list of filenames without full path
     subs <- sub("^[^_]*_([^\\-]*).*", "\\1", space_game_files) # Extract the characters between the first _ and the first -, which should correspond to subject ID
 
@@ -208,9 +197,9 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
       # define directory with data
       if (ses_str == "ses-1") {
-        toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V1')
+        toolbox_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1')
       } else {
-        toolbox_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'nih-toolbox', slash, 'V5')
+        toolbox_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V5')
       }
 
       # get list of subject directories
@@ -234,6 +223,8 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
           for (file in toolbox_sub_files) {
             copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
           }
+        } else {
+          print(paste("warning: files in", sub_dir, "will not be organized into sourcedata. Folder name must begin with REACH"))
         }
       }
     }
@@ -245,7 +236,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
     print("-- copying RRV")
 
-    rrv_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'rrv_task')
+    rrv_dir <- file.path(base_wd, 'untouchedRaw', 'rrv_task')
     rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
 
     for (sub_dir in rrv_sub_dirs) {
@@ -291,9 +282,9 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
       # define directory with pit data
       if (ses_str == "ses-1") {
-        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V4_PIT')
+        pit_dir <- file.path(base_wd, 'untouchedRaw', 'pit_task', 'V4_PIT')
       } else {
-        pit_dir <- paste0(base_wd, slash, 'untouchedRaw', slash, 'pit_task', slash, 'V5_PIT')
+        pit_dir <- file.path(base_wd, 'untouchedRaw', 'pit_task', 'V5_PIT')
       }
 
       # get list of files in pit_dir
@@ -305,23 +296,34 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
       # for each sub
       for (sub in ses_subs) {
 
-        # extract subject files
-        sub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = TRUE)
+        # if valid sub ID (can be converted to numeric)
+        if (!is.na(as.numeric(sub))) {
 
-        # extract file extensions
-        extensions <- tools::file_ext(sub_files)
+          # extract subject files
+          sub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = TRUE)
 
-        # output warning if .csv not found
-        if ( !"csv" %in% extensions ) {
-          print(paste("warning: subject", sub, ses_str, "has PIT output files but no csv" ))
-        }
+          # extract file extensions
+          extensions <- tools::file_ext(sub_files)
 
-        # set subject string
-        sub_str <- sprintf("sub-%03d", as.numeric(sub))
+          # output warning if .csv not found
+          if ( !"csv" %in% extensions ) {
+            print(paste("warning: subject", sub, ses_str, "has PIT output files but no csv" ))
+          }
 
-        # copy files to sourcedata
-        for (file in sub_files) {
-          copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
+          # set subject string
+          sub_str <- sprintf("sub-%03d", as.numeric(sub))
+
+          # copy files to sourcedata
+          for (file in sub_files) {
+            copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
+          }
+
+        } else {
+
+          # print message that file will not be copied to sourcedata
+          nonsub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = FALSE)
+          print(paste("WARNING: Not copying file", nonsub_files, "to sourcedata. First 3 characters do not reflect a valid sub ID"))
+
         }
       }
     }

@@ -82,19 +82,11 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
     overwrite_rawdata_vector = c()
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_task.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
-
-  # define paths for processing
-  bids_wd <- paste0(base_wd, slash, "bids", slash)
-  untouchedRaw_wd <- paste0(base_wd, slash, "untouchedRaw", slash)
-  sourcedata_wd <- paste0(base_wd, slash, "bids", slash, "sourcedata", slash)
-  raw_wd <- paste0(base_wd, slash, "bids", slash, "rawdata", slash)
+  #### Define paths ####
+  bids_wd <- file.path(base_wd, "bids")
+  untouchedRaw_wd <- file.path(base_wd, "untouchedRaw")
+  sourcedata_wd <- file.path(base_wd, "bids", "sourcedata")
+  raw_wd <- file.path(base_wd, "bids", "rawdata")
 
   #### Copy data into to sourcedata ####
 
