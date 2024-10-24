@@ -41,13 +41,7 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
     stop("bids_wd must be entered as a string")
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_foodview.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
+  #### Define sub/ses vars and paths ####
 
   # Get subject number without leading zeros
   sub_num <- as.numeric(sub)
@@ -57,8 +51,8 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   ses_str <- paste0("ses-", ses)
 
   # get directory paths
-  source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
-  raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
+  source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
+  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
   assessment_source_file <- list.files(source_beh_wd, pattern = "Assessment Data", full.names = TRUE)
   registration_source_file <- list.files(source_beh_wd, pattern = "Registration Data", full.names = TRUE)
 

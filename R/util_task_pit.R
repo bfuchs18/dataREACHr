@@ -40,13 +40,7 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
     stop("bids_wd must be entered as a string")
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_pit.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
+  #### Define sub/ses vars ####
 
   # Get subject number with leading zeros
   sub <- sprintf("%03d", as.numeric(sub))
@@ -58,7 +52,7 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
   #### Import Data #####
 
   # get directory paths
-  source_beh_wd <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
+  source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
 
   # make list of csv pit files
   csv_file <- Sys.glob(paste0(source_beh_wd, "*Food-PIT*csv"))
@@ -81,7 +75,8 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
   #### Export Data  #####
 
   # make raw beh directory if it doesn't exist
-  raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
+  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
+
   if (!dir.exists(raw_beh_wd)) {
     dir.create(raw_beh_wd, recursive = TRUE)
   }

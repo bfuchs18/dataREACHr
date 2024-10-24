@@ -41,13 +41,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     stop("bids_wd must be entered as a string")
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_foodview.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
+  #### Define sub/ses vars and paths ####
 
   # Get subject number without leading zeros
   sub_num <- as.numeric(sub)
@@ -57,9 +51,9 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   ses_str <- paste0("ses-", ses)
 
   # get directory paths
-  raw_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'func', slash)
-  onset_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'foodview_onsets-', sub_num, '.txt')
-  resp_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'foodview-', sub_num, '.txt')
+  raw_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'func')
+  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', 'foodview_onsets-', sub_num, '.txt')
+  resp_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', 'foodview-', sub_num, '.txt')
 
   #### Organize Data #####
 
