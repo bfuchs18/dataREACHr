@@ -55,7 +55,7 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
   source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
 
   # make list of csv pit files
-  csv_file <- Sys.glob(paste0(source_beh_wd, "*Food-PIT*csv"))
+  csv_file <- Sys.glob(file.path(source_beh_wd, "*Food-PIT*csv"))
 
   # load data, abort processing no file or >1 file matches pattern
   if (length(csv_file) == 1) {
