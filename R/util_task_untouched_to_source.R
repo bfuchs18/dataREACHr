@@ -224,7 +224,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
             copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
           }
         } else {
-          print(paste("warning: files in", sub_dir, "will not be organized into sourcedata. Folder name must begin with REACH"))
+          print(paste("WARNING: files in", sub_dir, "will not be organized into sourcedata. Folder name must begin with REACH"))
         }
       }
     }
@@ -244,29 +244,58 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
       # extract directory name
       dirname <- basename(sub_dir)
 
-      # if directory starts with "REACH"
-      if (grepl("^REACH", dirname)) {
+      # if directory matches pattern REACH_???
+      if (stringr::str_detect(dirname, "^REACH_.{3}$")) {
 
         # extract subject ID
         sub <- gsub("REACH_", "", dirname)
-        sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
-        # get list of files in sub_dir (but not directories)
-        rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+        # if valid sub ID (can be converted to numeric)
+        if (!is.na(as.numeric(sub))) {
 
-        # define expected name of text file to copy
-        rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
+          sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
-        # print message if text file not found
-        if (!rrv_txt_file %in% rrv_sub_files) {
-          print(paste("RRV text file not found for", sub_str))
+          # get list of files in sub_dir (but not directories)
+          rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+
+          # define expected name of text file to copy
+          rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
+
+          # print message if text file not found
+          if (!rrv_txt_file %in% rrv_sub_files) {
+            print(paste("RRV text file not found for", sub_str))
+          }
+
+          # make list of acceptable file names
+          acc_file_names = c(
+            paste0("rrv_", sub, ".txt"),
+            paste0("rrv_", sub, "_summary.csv"),
+            paste0("rrv_", sub, "_game.csv"),
+            paste0("rrv_", sub, "-prac.txt"),
+            paste0("rrv_", sub, "-prac_summary.csv"),
+            paste0("rrv_", sub, "-prac_game.csv")
+          )
+
+          # copy files to sourcedata if they match expected naming conventions
+          for (file in rrv_sub_files) {
+            filename = basename(file)
+
+            # if filename is in the list of acceptable file names
+            if (filename %in% acc_file_names) {
+
+              #copy to sourcedata
+              copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
+
+            } else {
+                print(paste("WARNING: ",file, " will not be copied into sourcedata. File does not adhere to expected naming conventions for RRV"))
+            }
+          }
+
+        } else {
+          print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
         }
-
-        # copy all files to sourcedata
-        for (file in rrv_sub_files) {
-          copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
-        }
-
+      } else {
+          print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
       }
     }
   }
@@ -307,7 +336,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
           # output warning if .csv not found
           if ( !"csv" %in% extensions ) {
-            print(paste("warning: subject", sub, ses_str, "has PIT output files but no csv" ))
+            print(paste("WARNING: subject", sub, ses_str, "has PIT output files but no csv" ))
           }
 
           # set subject string
@@ -322,7 +351,7 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
           # print message that file will not be copied to sourcedata
           nonsub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = FALSE)
-          print(paste("WARNING: Not copying file", nonsub_files, "to sourcedata. First 3 characters do not reflect a valid sub ID"))
+          print(paste("WARNING:", nonsub_files, "will not be copied into sourcedata. First 3 characters do not reflect a valid sub ID"))
 
         }
       }
