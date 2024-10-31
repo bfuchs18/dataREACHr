@@ -23,20 +23,18 @@
 
 util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TRUE) {
 
-  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+  #### Check args #####
 
-  #### Set up/initial checks #####
+  # check that bids_wd_arg exist and is a string
+  bids_wd_arg <- methods::hasArg(bids_wd)
 
-  # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(bids_wd)
-
-  if (isTRUE(data_arg)) {
+  if (isTRUE(bids_wd_arg)) {
     if (!is.character(bids_wd)) {
       stop("bids_wd must be entered as a string")
     } else if (!file.exists(bids_wd)) {
       stop("bids_wd entered, but file does not exist. Check bids_wd string.")
     }
-  } else if (isFALSE(data_arg)) {
+  } else if (isFALSE(bids_wd)) {
     stop("bids_wd must be entered as a string")
   }
 
@@ -82,7 +80,7 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
   }
 
   # export files if don't exist or overwrite = TRUE
-  beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-pit_beh.tsv')
+  beh_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_ses-', ses, '_task-pit_beh.tsv'))
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
     utils::write.table(pit_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a")
   }

@@ -177,7 +177,7 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     run_label <- gsub('run', 'run-0', names(run_dfs)[runnum])
 
     # define output file with path
-    outfile <- paste0(raw_wd, sub_str, '_ses-', ses, '_task-foodview_', run_label, '_events.tsv')
+    outfile <- file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-foodview_', run_label, '_events.tsv'))
 
     # export file if doesn't exist or overwrite = TRUE
     if (!file.exists(outfile) | isTRUE(overwrite)) {

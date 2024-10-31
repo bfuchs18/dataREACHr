@@ -137,7 +137,7 @@ util_task_spacegame <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return
   }
 
   # define output file with path
-  outfile <- paste0(raw_beh_wd, sub_str, '_', ses_str, '_task-spacegame_beh.tsv')
+  outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-spacegame_beh.tsv'))
 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {

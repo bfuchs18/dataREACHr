@@ -259,7 +259,7 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       run_label <- paste0("run-0", run)
 
       # define output file with path
-      outfile <- paste0(raw_func_wd, sub_str, '_ses-', ses, '_task-sst_', run_label, '_events.tsv')
+      outfile <- file.path(raw_beh_wd, paste0(sub_str, '_ses-', ses, '_task-sst_', run_label, '_events.tsv'))
 
       # export file if doesn't exist or overwrite = TRUE
       if (!file.exists(outfile) | isTRUE(overwrite)) {
