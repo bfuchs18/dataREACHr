@@ -13,13 +13,78 @@
 #' base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 #' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 #'
-#' # get deriv foodview data from processed task data
-#' sst_summary <- deriv_sst(task_data$sst)
+#' # create deriv database from data RETURNED by proc_task
+#' sst_summary <- deriv_sst(data = task_data$sst)
+#'
+#' # create deriv database from files EXPORTED by proc_task, using a list of file names
+#' file_list <- list.files(file.path(base_dir, "bids", "rawdata"), pattern = "sst.*\\.tsv$", recursive = TRUE, full.names = TRUE) # include files across all subs/modalities/runs
+#' sst_summary <- deriv_sst(file_list = file_list)
+#'
 #' }
 #' @export
 
 ## To do: add summary metrics for behavioral runs
-deriv_sst <- function(data) {
+deriv_sst <- function(data, file_list) {
+
+
+  #### Check args #####
+
+  # user must enter data OR file_list argument
+
+  data_arg <- methods::hasArg(data)
+  file_list_arg <- methods::hasArg(file_list)
+
+  # if neither arg entered, exit
+  if ( sum(data_arg, file_list_arg) == 0 ) {
+    stop("Must enter data or file_list argument")
+
+    # if both args entered, exit
+  } else if ( sum(data_arg, file_list_arg) == 2 ) {
+    stop("Must enter data OR file_list argument - pick one!")
+
+  } # add checks of datatype for data (list of dataframes) and file_list (list of strings) ??
+
+
+  #### If data_list arg used, create data from data_list #####
+  # data is a list of dataframes named with sub_str
+
+  if (isTRUE(file_list_arg)) {
+
+    data <- list()
+    for (file in file_list){
+
+      # get sub_str ('sub-XXX')
+      sub_str <- substr(basename(file), 1, 7)
+
+      # get modality
+      modality <- basename(dirname(file))
+
+      if (modality == "func") {
+
+        # get run number
+        run_str <- substr(basename(file), 24, 29)
+
+        # save to data
+        data[[sub_str]][["func_data"]][[run_str]] <- read.table(file, sep='\t', header = TRUE, na.strings = 'n/a', colClasses = c("set"="character")) # use colClasses = c("set"="character") to avoid "F" in set leading to Logical data type
+
+      } else if (modality == "beh") {
+
+        # check if practice file
+        if (grepl("acq-practice_beh", file)) {
+
+          # save to data
+          data[[sub_str]][["prac_data"]] <- read.table(file, sep='\t', header = TRUE, na.strings = 'n/a')
+
+        } else {
+
+          # save to data
+          data[[sub_str]][["beh_data"]] <- read.table(file, sep='\t', header = TRUE, na.strings = 'n/a')
+        }
+      }
+    }
+  }
+
+  #### Create summary database ####
 
   # define function to get summary metrics for a given subset of data. ----
   get_summary_row <- function(jpeg_events){

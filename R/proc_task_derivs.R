@@ -2,7 +2,7 @@
 #'
 #' This function calls deriv_{task} functions and exports TSVs with summary behavioral metrics and associated meta-data
 #'
-#' @param task_data output returned by proc_task()
+#' @param task_data list of processed task data returned by proc_task()
 #' @param export_dir string with absolute path to export directory (typically behavioral summary directory)
 #' @examples
 #'
@@ -72,7 +72,7 @@ proc_task_derivs <- function(task_data, export_dir) {
   print("Creating RRV summary database")
 
   # process derivative data
-  rrv_deriv_data <- deriv_rrv(task_data$rrv_data)
+  rrv_deriv_data <- deriv_rrv(data = task_data$rrv_data)
 
   # process meta-data
   json_rrv_deriv <- json_deriv_rrv()
@@ -90,7 +90,7 @@ proc_task_derivs <- function(task_data, export_dir) {
   print("Creating SST summary database")
 
   # process derivative data
-  sst_deriv_data <- deriv_sst(task_data$sst)
+  sst_deriv_data <- deriv_sst(data = task_data$sst)
 
   # process meta-data
   json_sst_deriv <- json_deriv_sst()
@@ -109,7 +109,7 @@ proc_task_derivs <- function(task_data, export_dir) {
   print("Creating Foodview summary database")
 
   # process derivative data
-  foodview_deriv_data <- deriv_foodview(task_data$foodview)
+  foodview_deriv_data <- deriv_foodview(data = task_data$foodview)
 
   # process meta-data
   json_foodview_deriv <- json_deriv_foodview()
@@ -122,6 +122,12 @@ proc_task_derivs <- function(task_data, export_dir) {
   write(json_foodview_deriv[['foodview_bycond_json']], paste0(export_dir, "foodview_long_by_cond.json"))
   write(json_foodview_deriv[['foodview_byblock_json']], paste0(export_dir, "foodview_long_by_block.json"))
 
+  #### Spacegame derivatives  ----
+
+  #print("Creating Space Game summary database")
+
+  # process derivative data
+  #spacegame_deriv_data <- deriv_spacegame(task_data$spacegame)
 
 }
 

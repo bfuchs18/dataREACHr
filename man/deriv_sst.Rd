@@ -4,7 +4,7 @@
 \alias{deriv_sst}
 \title{deriv_sst: Generate derivative behavioral databases for SST analyses}
 \usage{
-deriv_sst(data)
+deriv_sst(data, file_list)
 }
 \arguments{
 \item{data}{a list of list of dataframes. The top-level list represents individual subjects, and each subject has a sublist of dataframes. Each dataframe contains events data for a specific run of the foodview task for a given sub. A suitable list is returned by proc_task, or can be gathered from files in bids/rawdata}
@@ -23,7 +23,12 @@ This function generates SST derivative databases from participant-level beh and 
 base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 
-# get deriv foodview data from processed task data
-sst_summary <- deriv_sst(task_data$sst)
+# create deriv database from data RETURNED by proc_task
+sst_summary <- deriv_sst(data = task_data$sst)
+
+# create deriv database from files EXPORTED by proc_task, using a list of file names
+file_list <- list.files(file.path(base_dir, "bids", "rawdata"), pattern = "sst.*\\\\.tsv$", recursive = TRUE, full.names = TRUE) # include files across all subs/modalities/runs
+sst_summary <- deriv_sst(file_list = file_list)
+
 }
 }

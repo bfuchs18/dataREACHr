@@ -1,26 +1,68 @@
 #' deriv_rrv: Generate derivative databases for RRV analyses
 #'
-#' This function generates RRV derivative databases from participant-level RRV files
+#' This function generates RRV derivative databases from participant-level RRV data
 #'
-#' @param data a list of dataframes, where 1 dataframe contains processed RRV data for 1 sub (output of util_task_rrv). A suitable list of dataframes is returned by proc_task, or can be gathered from files in bids/rawdata
+#' @param data a list of dataframes, where 1 dataframe contains processed RRV data for 1 sub (output of util_task_rrv). data OR file_list is required.
+#' @param file_list a list filenames, where 1 filename is full path to processed RRV data for 1 sub (exported by util_task_rrv). data OR file_list is required.
 #' @return a list with: 1) a dataframe with long summary data (by reinforcer schedule) and 2) a dataframe with overall summary data
 #'
 #' @examples
 #'
 #' \dontrun{
 #'
-#' # process task data
+#' # process task data - this returns and exports processed RRV data
 #' base_dir = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 #' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 #'
-#' # get deriv foodview data from processed task data
-#' rrv_summary <- deriv_rrv(task_data$rrv)
+#' # create deriv database from data RETURNED by proc_task
+#' rrv_summary <- deriv_rrv(data = task_data$rrv)
+#'
+#' # create deriv database from files EXPORTED by proc_task, using a list of file names
+#' file_list <- list.files(file.path(base_dir, "bids", "rawdata"), pattern = "task-rrv_beh.tsv", recursive = TRUE, full.names = TRUE)
+#' rrv_summary <- deriv_rrv(file_list = file_list)
+#'
 #' }
 #' @export
 
-deriv_rrv <- function(data) {
+deriv_rrv <- function(data, file_list) {
 
 
+  #### Check args #####
+
+  # user must enter data OR file_list argument
+
+  data_arg <- methods::hasArg(data)
+  file_list_arg <- methods::hasArg(file_list)
+
+  # if neither arg entered, exit
+  if ( sum(data_arg, file_list_arg) == 0 ) {
+    stop("Must enter data or file_list argument")
+
+    # if both args entered, exit
+  } else if ( sum(data_arg, file_list_arg) == 2 ) {
+    stop("Must enter data OR file_list argument - pick one!")
+
+  } # add checks of datatype for data (list of dataframes) and file_list (list of strings) ??
+
+
+  #### If data_list arg used, create data from data_list #####
+  # data is a list of dataframes named with sub_str
+
+  if (isTRUE(file_list_arg)) {
+
+    data <- list()
+    for (file in file_list){
+
+      # get sub_str ('sub-XXX')
+      sub_str <- substr(basename(file), 1, 7)
+
+      # save subject's dataframe to data, named with sub_str
+      data[[sub_str]] <- read.table(file, sep='\t', header = TRUE, na.strings = 'n/a')
+    }
+
+  }
+
+  #### Create summary data ####
   # create output dataframes
 
 #  summary_colnames <- c("participant_id", "pmax_responded_food", "pmax_completed_food", "pmax_responded_toy", "pmax_completed_toy", "rrv_food_responded", "rrv_food_completed", "total_responses_food", "total_responses_toy", "mean_response_rate_food", "mean_response_rate_toy")

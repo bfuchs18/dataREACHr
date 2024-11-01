@@ -7,7 +7,7 @@
 proc_task_derivs(task_data, export_dir)
 }
 \arguments{
-\item{task_data}{output returned by proc_task()}
+\item{task_data}{list of processed task data returned by proc_task()}
 
 \item{export_dir}{string with absolute path to export directory (typically behavioral summary directory)}
 }
