@@ -99,11 +99,9 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
   fhfi_data$fhfi_form_date <- lubridate::as_date(fhfi_data$fulkerson_home_food_inventory_timestamp) # add form date column
   fhfi_data <- fhfi_data[, -grep("missingcheck|timestamp", names(fhfi_data))] # remove extra columns
   fhfi_data <- fhfi_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  fhfi_data <- util_format_fhfi_data(fhfi_data)
 
-
-  # fhfi_data <- util_format_fhfi_data(fhfi_data) # need to deal with visible_27 and visible_28 before this function is ready
-
-  # fhfi_scored <- dataprepr::score_hfi(hfi_data, base_zero = TRUE, id = 'participant_id') # need to make sure data is ready to go into this
+  fhfi_scored <- dataprepr::score_hfi(fhfi_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("hfi_form_date", "hfi_extra_nondairy", "hfi_extra_accessible_fridge", "hfi_extra_cond"))
 
   ## CFPQ Data ####
   cfpq_data <- data[, grepl('participant_id|session_id|cfpq|comprehensive_feeding_practices_questionnaire_timestamp', names(data))]
@@ -124,8 +122,7 @@ util_redcap_parent_v4 <- function(data, return_data = TRUE) {
       # pmum_data = pmum_scored,
       cchip_data = cchip_scored,
       audit_data = audit_scored,
-      fhfi_data = fhfi_data,
-      # fhfi_data = fhfi_scored,
+      fhfi_data = fhfi_scored,
       cfpq_data = cfpq_scored
     ))
   }
