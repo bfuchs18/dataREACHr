@@ -88,30 +88,20 @@ util_redcap_de <- function(data, return_data = TRUE) {
   # visit 1 data
   dexa_v1_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v1|dxa_sex_v1|dxa_height_v1|dxa_weight_v1|dxa_age_v1|^left.*v1$|right.*v1$|^v1.*v1$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
   colnames(dexa_v1_unmerged) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_unmerged)) # Remove "v1_" and "_v1" from column names
+  dexa_v1_unmerged <- dexa_v1_unmerged %>% dplyr::mutate(across(-c(participant_id, dxa_scan_date,), as.numeric)) # convert cols to numeric
 
   # visit 5 data
   dexa_v5_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v5|dxa_sex_v5|dxa_height_v5|dxa_weight_v5|dxa_age_v5|^left.*v5$|right.*v5$|^v1.*v5$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
   colnames(dexa_v5_unmerged) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_unmerged)) # Remove "v1_" and "_v5" from column names
+  dexa_v5_unmerged <- dexa_v5_unmerged %>% dplyr::mutate(across(-c(participant_id, dxa_scan_date,), as.numeric)) # convert cols to numeric
 
   # run comparison function
   compared_v1_dexa <- compare_de(dexa_v1_unmerged)
-  compared_v5_dexa <- compare_de(dexa_v1_unmerged)
+  compared_v5_dexa <- compare_de(dexa_v5_unmerged)
 
   # extract verified dataframes
   dexa_v1_data <- compared_v1_dexa$verified_data
   dexa_v5_data <- compared_v5_dexa$verified_data
-
-  # # visit 1 data
-  # dexa_v1_data <- data[, grep("participant_id|dxa_scan_date_v1|dxa_sex_v1|dxa_height_v1|dxa_weight_v1|dxa_age_v1|^left.*v1$|right.*v1$|^v1.*v1$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
-  # colnames(dexa_v1_data) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_data)) # Remove "v1_" and "_v1" from column names
-  #
-  # # visit 5 data
-  # dexa_v5_data <- data[, grep("participant_id|dxa_scan_date_v5|dxa_sex_v5|dxa_height_v5|dxa_weight_v5|dxa_age_v5|^left.*v5$|right.*v5$|^v1.*v5$", names(data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
-  # colnames(dexa_v5_data) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_data)) # Remove "v1_" and "_v5" from column names
-
-  # make height, weight, and dexa values numeric
-  dexa_v1_data <- dplyr::mutate_at(dexa_v1_data, 4:length(dexa_v1_data), function(x) as.numeric(as.character(x)))
-  dexa_v5_data <- dplyr::mutate_at(dexa_v5_data, 4:length(dexa_v1_data), function(x) as.numeric(as.character(x)))
 
   # stack visit 1 and visit 5 data, add "visit_protocol" and "session_id" columns and reorder
   stacked_dexa <- dplyr::bind_rows(
