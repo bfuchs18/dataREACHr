@@ -27,8 +27,8 @@
 #' @examples
 #'
 #' \dontrun{
-#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-09-24_1156.csv"
-#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-09-16_0939.csv"
+#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-10-24_1625.csv"
+#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-10-24_1624.csv"
 #' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
 #'
 #' }
@@ -60,7 +60,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     slash <- '/'
   } else {
     slash <- "\\"
-    print('The proc_redcap.R has not been thoroughly tested on Windows systems, may have visit_data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    print('The proc_redcap.R has not been tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
   }
 
   # find location of slashes so can decompose filepaths
@@ -69,7 +69,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   # set paths for other directories
   base_wd <- substr(visit_data_path, 1, tail(slash_loc, 4))
   bids_wd <- substr(visit_data_path, 1, tail(slash_loc, 3))
-  phenotype_wd <- paste0(bids_wd, slash, 'phenotype', slash)
+  phenotype_wd <- file.path(bids_wd, 'phenotype')
 
   # add file ending if it is missing
   if (!grep('.csv', visit_data_path)) {
@@ -478,7 +478,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
   #### Export Data ####
 
-  # make a list dataframes to export, where the name is the corresponding json function without json_)
+  # make a list dataframes to export, where the name is the corresponding json function without "json_"
   data_to_export <- list(
 
     participants = participants_data,
@@ -504,7 +504,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     hfssm = parent_v4_data$hfssm_data$bids_phenotype,
     cchip = parent_v4_data$cchip_data$bids_phenotype,
     hfias = parent_v4_data$hfias_data$bids_phenotype,
-    fhfi = parent_v4_data$fhfi_data, # not in bids_phenotype yet
+    fhfi = parent_v4_data$fhfi_data$bids_phenotype,
     sleeplog = child_v3_data$sleeplog_data, # not in bids_phenotype yet
     pptq = child_v4_data$pptq_data$bids_phenotype,
     sic = child_v4_data$sic_data,
@@ -558,12 +558,12 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     # add extensions to phenotype_name
     if (phenotype_name == "participants") {
       # export participants into bids_wd
-      filename_tsv <- paste0(bids_wd, slash, "participants.tsv")
-      filename_json <- paste0(bids_wd, slash, "participants.json")
+      filename_tsv <- file.path(bids_wd, "participants.tsv")
+      filename_json <- file.path(bids_wd, "participants.json")
     } else {
       # export phenotype data into phenotype_wd
-      filename_tsv <- paste0(phenotype_wd, slash, phenotype_name, ".tsv")
-      filename_json <- paste0(phenotype_wd, slash, phenotype_name, ".json")
+      filename_tsv <- file.path(phenotype_wd, paste0(phenotype_name, ".tsv"))
+      filename_json <- file.path(phenotype_wd, paste0(phenotype_name, ".json"))
     }
 
     # write tsv
@@ -587,7 +587,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
 
 
   # export dataset_description.json
-  filename_json <- paste0(phenotype_wd, slash, "dataset_description.json")
+  filename_json <- file.path(phenotype_wd, "dataset_description.json")
   json <- json_phe_dataset_desc(visit_data_path, data_de_path)
   if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
     write(json, filename_json)
