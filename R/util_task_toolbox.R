@@ -121,7 +121,7 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   }
 
   # define output file with path
-  outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-toolbox_beh.tsv')
+  outfile <- file.path(raw_beh_wd, paste0(sub_str, '_ses-', ses, '_task-toolbox_beh.tsv'))
 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {
