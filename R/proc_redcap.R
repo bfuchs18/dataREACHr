@@ -97,6 +97,9 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   redcap_visit_data <- read.csv(visit_data_path, header = TRUE) # visit data
   redcap_de_data <- read.csv(data_de_path, header = TRUE) # double entry data
 
+  # replace "[not completed]" values with NA -- this appears in timestamp columns for uncompleted forms and leads to 'fail to parse" warnings when changing to datetype
+  redcap_visit_data[redcap_visit_data=="[not completed]"]<-NA
+
   #### Extract visit data ####
 
   # Make ID column bids compliant: Convert record_id to strings padded with zeros and add "sub_"

@@ -42,7 +42,6 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
   ## MRI behavioral assessment ####
   mri_assessment_data <- data[, grepl('participant_id|session_id|_familiarity|_recall|_liking|fmri_behavioral_assessment_timestamp', names(data))]
-  mri_assessment_data$fmri_behavioral_assessment_timestamp <- ifelse(mri_assessment_data$fmri_behavioral_assessment_timestamp == "[not completed]", "", mri_assessment_data$fmri_behavioral_assessment_timestamp)
   mri_assessment_data$mri_assessment_form_date <- lubridate::as_date(mri_assessment_data$fmri_behavioral_assessment_timestamp) # add form date column
   mri_assessment_data <- mri_assessment_data[, -grep("missingcheck|timestamp", names(mri_assessment_data))] # remove extra columns
   mri_assessment_data <- mri_assessment_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
