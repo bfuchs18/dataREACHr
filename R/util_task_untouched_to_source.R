@@ -189,12 +189,10 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
   #### NIH toolbox ####
   if (isTRUE(all_tasks) | "nih_toolbox" %in% task_vector) {
-
     print("-- copying NIH toolbox")
 
     # for each session
     for (ses_str in c("ses-1", 'ses-2')) {
-
       # define directory with data
       if (ses_str == "ses-1") {
         toolbox_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1')
@@ -209,22 +207,42 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
         # extract directory name
         dirname <- basename(sub_dir)
 
-        # if directory starts with "REACH"
-        if (grepl("^REACH", dirname)) {
-
+        # if directory matches pattern REACH_???
+        if (stringr::str_detect(dirname, "^REACH_.{3}$")) {
           # extract subject ID
           sub <- sub("REACH_", "", dirname)
-          sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
-          # get list of files
-          toolbox_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
+          # if valid sub ID (can be converted to numeric)
+          if (!is.na(as.numeric(sub))) {
+            sub_str <- sprintf("sub-%03d", as.numeric(sub))
 
-          # copy files to sourcedata
-          for (file in toolbox_sub_files) {
-            copy_to_source(file, sub_str, ses_str, sourcefile_prefix = "toolbox_", overwrite = overwrite)
+            # get list of files
+            toolbox_sub_files <- setdiff(
+              list.files(sub_dir, full.names = TRUE),
+              list.dirs(
+                sub_dir,
+                recursive = FALSE,
+                full.names = TRUE
+              )
+            )
+
+            # copy files to sourcedata
+            for (file in toolbox_sub_files) {
+              copy_to_source(
+                file,
+                sub_str,
+                ses_str,
+                sourcefile_prefix = "toolbox_",
+                overwrite = overwrite
+              )
+            }
+          } else {
+            print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
           }
         } else {
-          print(paste("WARNING: files in", sub_dir, "will not be organized into sourcedata. Folder name must begin with REACH"))
+          print(
+            paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. Folders in nih_toolbox/[V1 or V5] must follow pattern REACH_??? where ??? reflects a 3-digit ID")
+          )
         }
       }
     }
@@ -319,6 +337,13 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
       # get list of files in pit_dir
       pit_ses_files <- list.files(pit_dir, "Food-PIT")
 
+      # print warning for files named incorrectly
+      for (file in pit_ses_files) {
+        if (!stringr::str_detect(file, "^.{3}_Food-PIT_")) {
+          print(paste("WARNING:", file, "will not be copied into sourcedata. File must begin with ???_Food-PIT where ??? is a 3-digit ID"))
+        }
+      }
+
       # get list of subs: get first 3 characters in file name
       ses_subs <- unique(substr(pit_ses_files, 1, 3))
 
@@ -346,12 +371,6 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
           for (file in sub_files) {
             copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
           }
-
-        } else {
-
-          # print message that file will not be copied to sourcedata
-          nonsub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = FALSE)
-          print(paste("WARNING:", nonsub_files, "will not be copied into sourcedata. First 3 characters do not reflect a valid sub ID"))
 
         }
       }
