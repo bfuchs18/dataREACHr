@@ -79,12 +79,12 @@ write_task_jsons <- function(bids_wd, overwrite) {
     if (func_name == "json_toolbox_phenotype") {
 
       # define filename for export in phenotype_wd
-      filename <- paste0(phenotype_wd, json_functions[[func_name]])
+      filename <- file.path(phenotype_wd, json_functions[[func_name]])
 
     } else {
 
       # define filename for export in raw_wd
-      filename <- paste0(raw_wd, json_functions[[func_name]])
+      filename <- file.path(raw_wd, json_functions[[func_name]])
     }
 
     # If overwrite is false
