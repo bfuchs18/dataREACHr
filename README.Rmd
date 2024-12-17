@@ -22,11 +22,16 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-dataREACHr package contains tools to process data for Project REACH at Penn State. Project REACH is a longitudinal study of the effects of food marketing on children's eating behaviors and neural responses to food cues. Data are collected from children and parents across 5 visits. 
+dataREACHr package contains tools to process data for Project REACH at
+Penn State. Project REACH is a longitudinal study of the effects of food
+marketing on children's eating behaviors and neural responses to food
+cues. Data are collected from children and parents across 5 visits.
 
 dataREACHr functions can:
 
--   organize data and meta-data (JSONS) for surveys (REDCap) and behavioral tasks into the [Brain Imaging Data Structure](https://bids.neuroimaging.io/)
+-   organize data and meta-data (JSONS) for surveys (REDCap) and
+    behavioral tasks into the [Brain Imaging Data
+    Structure](https://bids.neuroimaging.io/)
 
 -   parse text files from the RRV task into CSVs
 
@@ -48,11 +53,9 @@ You can install the development version of dataREACHr from
 devtools::install_github("bfuchs18/dataREACHr")
 ```
 
-## Processing data with dataREACHr
+## Data organization
 
-The wrapper function to process survey data is **proc_redcap()**. The wrapper function to process task data is **proc_task()**.
-
-Using these functions requires a directory structure of:
+Using dataREACHr functions requires a directory structure of:
 
 base_dir/ (user defined)
 
@@ -60,48 +63,41 @@ base_dir/ (user defined)
 
 ├── bids/
 
-│ ├── phenotype/
-
 │ ├── sourcedata/
+
+│ \| ├── phenotype/
+
+and dataREACHr functions will create:
+
+base_dir/ (user defined)
+
+├── bids/
+
+│ ├── phenotype/
 
 │ ├── rawdata/
 
-Below is a basic example of how to process survey and task data:
+## Processing data with dataREACHr
 
-```{r example, eval=FALSE}
-library(dataREACHr)
+Primary user functions include:
 
-#### Set up variables ####
+-   **proc_redcap() -** processes visit and double-entry REDCap (survey)
+    data in bids/sourcedata/phenotype, exports processed data into
+    bids/phenotype
 
-# define path to the base_dir directory (contains untouchedRaw/ and bids/ sub-directories)
-base_dir = "/path/to/base_dir/"
+-   **qc_redcap() -** performs quality assessment checks on output of
+    proc_redcap()
 
-# define names of redcap files to process
-visit_file_name =  "visit_data.csv"
-double_entry_file_name = "double_entry_data.csv"
+-   **proc_task() -** copies cognitive and behavioral task data from
+    untouchedRaw/ to bids/sourcedata/, processes data and exports into
+    bids/rawdata/
 
-#### process redcap data ####
+-   **proc_task_derivs() -** creates and exports summary databases for
+    cognitive and behavioral tasks
 
-# assign paths to data downloaded from redcap
-visit_data_path = paste0(base_dir, "/bids/sourcedata/phenotype/", visit_file_name)
-data_de_path = paste0(base_dir, "/bids/sourcedata/phenotype/", double_entry_file_name)
-
-# process redcap data and export TSVs and JSONS into bids/; overwrite existing output
-proc_redcap(visit_data_path, data_de_path, overwrite = TRUE)
-
-#### process task data ####
-
-# process task data and export TSVs and JSONS into bids/; overwrite existing files in rawdata for all tasks
-proc_task(
-    base_wd = base_dir,
-    overwrite_sourcedata = FALSE,
-    overwrite_rawdata = TRUE,
-    overwrite_jsons = TRUE,
-    return_data = FALSE
-  )
-
-
-```
+The script used to process REACH data using the above dataREACHr
+functions can be found
+[here](https://github.com/bfuchs18/R01_Marketing/blob/master/ParticipantData/bids/code/beh_into_bids.R).
 
 This README was generated from README.Rmd using
 `devtools::build_readme()\`
