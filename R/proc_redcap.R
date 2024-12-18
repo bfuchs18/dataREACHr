@@ -507,7 +507,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     cchip = parent_v4_data$cchip_data$bids_phenotype,
     hfias = parent_v4_data$hfias_data$bids_phenotype,
     fhfi = parent_v4_data$fhfi_data$bids_phenotype,
-    sleeplog = child_v3_data$sleeplog_data, # not in bids_phenotype yet
+    sleeplog = child_v3_data$sleeplog_data,
     pptq = child_v4_data$pptq_data$bids_phenotype,
     sic = child_v4_data$sic_data,
 
