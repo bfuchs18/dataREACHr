@@ -18,7 +18,7 @@ util_task_untouched_to_source(
 
 \item{all_tasks}{logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector}
 
-\item{task_vector}{vector with tasks to process. Must be included in all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")}
+\item{task_vector}{vector with tasks to process. Must be included if all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")}
 }
 \description{
 This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task, nih toolbix
