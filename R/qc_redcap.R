@@ -38,6 +38,7 @@
 #' qc_redcap(redcap_data)
 #'
 #' }
+#' @export
 qc_redcap <- function(redcap_data) {
 
   #### Set up/initial checks #####
