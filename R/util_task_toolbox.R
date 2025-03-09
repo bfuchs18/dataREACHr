@@ -1,13 +1,12 @@
-#' util_task_toolbox: Clean and organize NIH toolbox assessment data into rawdata
+#' util_task_nihtoolbox: Clean and organize NIH toolbox assessment data into rawdata
 #'
 #' This function formats and organizes NIH toolbox assessment data from bids/sourcedata into rawdata for a given subject. Assessment data includes responses to each trial in the NIH toolbox.
 #'
 #'
-#' @param sub subject label used in sub-label. Leading zeros not required (integer)
-#' @param ses session label used in ses-label (integer)
-#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = FALSE
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_task_foodview
+#' @inheritParams util_task_foodview
 #'
 #' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
 #'
@@ -15,16 +14,16 @@
 #'
 #' \dontrun{
 #' # process assessment (response) data for the NIH toolbox
-#' sub001_toolbox_responses <- util_task_toolbox(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#' util_task_nihtoolbox(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
 #'
 #' }
 #'
 #' @importFrom utils read.csv
 #' @export
 
-util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TRUE) {
+util_task_nihtoolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TRUE) {
 
-  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+  print(sub_str)
 
   #### Set up/initial checks #####
 
@@ -41,60 +40,57 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
     stop("bids_wd must be entered as a string")
   }
 
-  #### Define sub/ses vars and paths ####
-
-  # Get subject number without leading zeros
-  sub_num <- as.numeric(sub)
-
-  # Set sub and ses strings
-  sub_str <- sprintf("sub-%03d", sub_num)
-  ses_str <- paste0("ses-", ses)
-
   # get directory paths
   source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
   raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
-  assessment_source_file <- list.files(source_beh_wd, pattern = "Assessment Data", full.names = TRUE)
-  registration_source_file <- list.files(source_beh_wd, pattern = "Registration Data", full.names = TRUE)
 
-  #### Generate file for rawdata #####
+  if (sum(grepl('events', list.files(bids_wd, 'sourcedata', sub_str, ses_str, 'beh'))) > 0){
 
-  # load data, abort processing no file or >1 file matches pattern
+  } else {
+    data_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_data.tsv'))
+    score_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_scores.tsv'))
+    registration_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_registration_data.tsv'))
 
-  if (length(assessment_source_file) == 1) {
-    assessment_dat <- read.csv(assessment_source_file, header = TRUE)
-  } else if ( length(assessment_source_file) == 0) {
-    print(paste(sub_str, "has no NIH toolbox assessment data. Aborting task processing for this sub."))
-    return()
-  } else if (length(assessment_source_file) > 1) {
-    print(paste(sub_str, "has more than 1 NIH toolbox assessment data. Should only have 1. Aborting task processing for this sub."))
-    return()
+    if (file.exists(data_source_file)) {
+      data <- read.table(data_source_file, header = TRUE)
+    } else {
+      print(paste(sub_str, "has no sst assessment data file. Aborting task processing for this sub."))
+      return()
+    }
+
+    if (file.exists(score_source_file)) {
+      scores <- read.table(score_source_file, header = TRUE)
+    } else {
+      print(paste(sub_str, "has no sst assessment scorese file. Aborting task processing for this sub."))
+      return()
+    }
+
+    if (file.exists(registration_source_file)) {
+      reg_data <- read.table(registration_source_file, header = TRUE)
+    } else {
+      print(paste(sub_str, "has no sst assessment scorese file. Aborting task processing for this sub."))
+      return()
+    }
   }
 
-  if (length(registration_source_file) == 1) {
-    registrant_dat <- read.csv(registration_source_file, header = TRUE)
-  } else if ( length(registration_source_file) == 0) {
-    print(paste(sub_str, "has no NIH toolbox registration data. Aborting task processing for this sub."))
-    return()
-  } else if (length(registration_source_file) > 1) {
-    print(paste(sub_str, "has more than 1 NIH toolbox registration data. Should only have 1. Aborting task processing for this sub."))
-    return()
-  }
+
+
 
   # Add registration data to assessment data
-  assessment_dat$registration_age <- registrant_dat$Age
-  assessment_dat$registration_education <- registrant_dat$Education
-  assessment_dat$registration_mothers_education <- registrant_dat$MothersEducation
-  assessment_dat$registration_gender <- registrant_dat$Gender
-  assessment_dat$registration_handedness <- registrant_dat$Handedness
-  assessment_dat$registration_race <- registrant_dat$Race
-  assessment_dat$registration_ethnicity <- registrant_dat$Ethnicity
+  data$registration_age <- reg_data$Age
+  data$registration_education <- reg_data$Education
+  data$registration_mothers_education <- reg_data$MothersEducation
+  data$registration_gender <- reg_data$Gender
+  data$registration_handedness <- reg_data$Handedness
+  data$registration_race <- reg_data$Race
+  data$registration_ethnicity <- reg_data$Ethnicity
 
   # make separate columns for task (e.g., "Flanker Inhibitory Control") and test ages (e.g., "Ages 8-11 v2.1") from Inst (e.g., "NIH Toolbox Flanker Inhibitory Control and Attention Test Ages 8-11 v2.1") ??
   # Separate the 'Inst' column into 'Test' and 'Ages' columns
-  assessment_dat <- tidyr::separate(assessment_dat, Inst, into = c("Test", "Test_Ages"), sep = "Test", remove = FALSE)
+  data <- tidyr::separate(data, Inst, into = c("Test", "Test_Ages"), sep = "Test", remove = FALSE)
 
   # Replace values in the 'Test' column
-  assessment_dat <- assessment_dat %>%
+  data <- data %>%
     dplyr::mutate(Test = dplyr::case_when(
       stringr::str_detect(Test, "Flanker Inhibitory Control") ~ "FLANKER",
       stringr::str_detect(Test, "Dimensional Change Card Sort") ~ "CARDSORT",
@@ -103,15 +99,15 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
     ))
 
   # remove columns where Test = other
-  assessment_dat <- assessment_dat[!(assessment_dat$Test %in% "other"),]
+  data <- data[!(data$Test %in% "other"),]
 
   # add subject column
-  assessment_dat$participant_id <- sub_str
-  assessment_dat <- assessment_dat %>% dplyr::relocate("participant_id") # move sub to first column
+  data$participant_id <- sub_str
+  data <- data %>% dplyr::relocate("participant_id") # move sub to first column
 
   # add session column
-  assessment_dat$session_id <- ses_str
-  assessment_dat <- assessment_dat %>% dplyr::relocate("session_id", .after = 1) # after col 1
+  data$session_id <- ses_str
+  data <- data %>% dplyr::relocate("session_id", .after = 1) # after col 1
 
   #### Save in rawdata #####
 
@@ -126,7 +122,7 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {
     utils::write.table(
-      assessment_dat,
+      data,
       outfile,
       sep = '\t',
       quote = FALSE,
@@ -138,7 +134,7 @@ util_task_toolbox <- function(sub, ses, bids_wd, overwrite = FALSE, return_data 
 
   #### Return data #####
   if (isTRUE(return_data)){
-    return(assessment_data = assessment_dat
+    return(dataa = data
     )
   }
 }

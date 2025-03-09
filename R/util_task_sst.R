@@ -3,30 +3,25 @@
 #' This function formats and organizes Stop Signal Task data from bids/sourcedata into bids/rawdata for a given subject
 #' Data from practice and behavioral runs will be organized into bids/rawdata/sub-label/beh, while data from fmri runs will be organized into bids/rawdata/sub-label/func.
 #'
-#' @param sub subject label used in sub-label. Leading zeros not required
-#' @param ses session label used in ses-label. Default = 1
-#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = TRUE
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_task_foodview
+#' @inheritParams util_task_foodview
 #'
 #' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
 #'
 #' @examples
 #'
 #' \dontrun{
-#' bids_wd = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids"
 #' # process task data for the Food View Task
-#' list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = bids_wd, return = TRUE)
+#' util_task_sst(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
 #'
 #' }
-#' @importFrom utils read.table
-#' @importFrom rlang .data
 #' @export
 
-util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
+util_task_sst <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
 
-  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
-
+  print(sub_str)
   #### Set up/initial checks #####
 
   # check that bids_wd exist and is a string
@@ -42,28 +37,16 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     stop("bids_wd must be entered as a string")
   }
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_sst.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
-  }
+  # get directory paths
+  raw_func_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'func')
+  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
+  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'func', paste0(sub_str, '_', ses_str, '_task-sst_onsets.tsv'))
+  fmri_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'func', paste0(sub_str, '_', ses_str, '_task-sst_fmri.tsv'))
 
-  # Get subject number without leading zeros
-  sub_num <- as.numeric(sub)
-
-  # Set sub and ses strings
-  sub_str <- sprintf("sub-%03d", sub_num)
-  ses_str <- paste0("ses-", ses)
+  beh_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0(sub_str, '_', ses_str, '_task-sst_beh.tsv'))
+  prac_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0(sub_str, '_', ses_str, '_task-sst_prac.tsv'))
 
   #### Load Data #####
-
-  # get file paths
-  prac_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_prac-', sub_num, '.txt')
-  beh_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_beh-', sub_num, '.txt')
-  onset_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_onsets-', sub_num, '.txt')
-  fmri_source_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'stop_fmri-', sub_num, '.txt')
 
   # load data
   ## all subs should have prac_source_file and beh_source_file
@@ -100,13 +83,11 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   #### Clean and Export Beh Data (prac_dat and beh_dat) #####
 
   # beh data
+
   beh_dfs <- list(prac_dat, beh_dat)
 
-  for (i in seq_along(beh_dfs)) {
-
-    # Get the data frame from the list
-    dataframe <- beh_dfs[[i]]
-
+  # function to process behavioral data
+  beh_dat_proc <- function(dataframe){
     # update column names
     names(dataframe)[names(dataframe) == "stimName"] <- "stim_file_name"
     names(dataframe)[names(dataframe) == "resp1"] <- "response"
@@ -124,21 +105,20 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
 
     # reorder columns
     dataframe <- dataframe[c('sub', 'type', 'run', 'set', 'run_cond', 'block',
-                         'stim_file_name', 'img_cat', 'go_stim', 'signal', 'reqSSD' ,
-                         'correct', 'response', 'response_time', 'trueSSD')]
+                             'stim_file_name', 'img_cat', 'go_stim', 'signal', 'reqSSD' ,
+                             'correct', 'response', 'response_time', 'trueSSD')]
 
     # rename run column
     names(dataframe)[names(dataframe) == "run"] <- "run_num"
 
-    # split beh by run?
-
-    # assign the modified dataframe back to the list
-    beh_dfs[[i]] <- dataframe
-
+    return(dataframe)
   }
 
+  # split data by run, process onset and duration, save into run_dfs
+  beh_dfs <- sapply(seq(1, length(beh_dfs)), function(x) beh_dat_proc(beh_dfs[[x]]), simplify = FALSE)
+  names(run_dfs) <- sapply(unique(dat$run), function(x) paste0("run-0", x))
+
   # make raw beh directory if it doesn't exist
-  raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
   if (!dir.exists(raw_beh_wd)) {
     dir.create(raw_beh_wd, recursive = TRUE)
   }
@@ -146,13 +126,15 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
   # export files if don't exist or overwrite = TRUE
 
   ## practice data
-  prac_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-sst_acq-practice_beh.tsv')
+  prac_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-sst_acq-practice_beh.tsv'))
+
   if (!file.exists(prac_outfile) | isTRUE(overwrite)) {
     utils::write.table(beh_dfs[[1]], prac_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   }
 
   ## task data
-  beh_outfile <- paste0(raw_beh_wd, sub_str, '_ses-', ses, '_task-sst_beh.tsv')
+  beh_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-sst_beh.tsv'))
+
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
     utils::write.table(beh_dfs[[2]], beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   }
@@ -168,12 +150,6 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     func_run_dfs = paste(sub_str, " does not have fmri response data or onset data. sst bold_events data was not processed")
 
   } else if (have_fmri_dat == 1 & have_onset_dat == 1) {
-
-    # make raw func directory if it doesn't exist
-    raw_func_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'func', slash)
-    if (!dir.exists(raw_func_wd)) {
-      dir.create(raw_func_wd, recursive = TRUE)
-    }
 
     # update columns names
     names(onset_dat)[names(onset_dat) == "stim"] <- "stim_file_name"
@@ -204,10 +180,9 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
     names(func_dat)[names(func_dat) == "resp1"] <- "response"
     names(func_dat)[names(func_dat) == "stim"] <- "go_stim"
 
-    # split data by run, process onset and duration, save into func_run_dfs, and export
-    func_run_dfs <- list()
-    unique_runs <- unique(func_dat$run)
-    for (run in unique_runs) {
+
+    # function to process data by run
+    run_proc <- function(run, func_dat){
 
       run_label <- paste0("run", run)
       run_dat <- func_dat[(func_dat$run == run),]
@@ -252,29 +227,43 @@ util_task_sst <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data 
       # rename run column
       names(run_dat)[names(run_dat) == "run"] <- "run_num"
 
-      # append to func_run_dfs
-      func_run_dfs[[run_label]] <- run_dat
+      return(run_dat)
+    }
 
-      # format run_label for output file
-      run_label <- paste0("run-0", run)
+    # split data by run, process onset and duration, save into run_dfs
+    run_dfs <- sapply(unique(func_dat$run), function(x) run_proc(x, func_dat), simplify = FALSE)
+    names(run_dfs) <- sapply(unique(func_dat$run), function(x) paste0("run-0", x))
 
-      # define output file with path
-      outfile <- file.path(raw_beh_wd, paste0(sub_str, '_ses-', ses, '_task-sst_', run_label, '_events.tsv'))
+    #### Save in rawdata #####
 
-      # export file if doesn't exist or overwrite = TRUE
-      if (!file.exists(outfile) | isTRUE(overwrite)) {
-        utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+    # create bids/rawdata directory if it doesn't exist
+    if (!dir.exists(raw_func_wd)) {
+      dir.create(raw_func_wd, recursive = TRUE)
+    }
+
+    # define output file with path
+    outfiles <- file.path(raw_func_wd, paste0(sub_str, '_', ses_str, '_task-sst_', names(run_dfs), '_events.tsv'))
+
+    # save function
+    save_run <- function(run_label, data_list, outfile){
+      run_dat <- data_list[[run_label]]
+      utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+    }
+
+    if (!file.exists(outfiles[1]) | isTRUE(overwrite)){
+
+      mapply(save_run, run_label = names(run_dfs), outfile = outfiles, MoreArgs = list(run_dfs))
+
+      if (isTRUE(overwrite)){
+        return('overwrote with new version')
+      } else {
+        return('complete')
       }
+    } else {
+      return('exists')
     }
   }
 
 
-
-  #### Return data #####
-  if (isTRUE(return_data)) {
-    return(list(prac_data = beh_dfs[[1]],
-                beh_data = beh_dfs[[2]],
-                func_data = func_run_dfs))
-  }
 }
 

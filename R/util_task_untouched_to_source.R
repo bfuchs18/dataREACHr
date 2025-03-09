@@ -1,29 +1,32 @@
-#' util_task_untouched_to_source: Move task data from untouchedRaw into bids/sourcedata
+#' proc_task: Process task data from untouchedRaw to create bids compliant files
 #'
-#' This function copies task data from untouchedRaw into bids/sourcedata for the following tasks: sst, foodview task, space game, pit task, nih toolbix
+#' This function: \{itemize
+#' \item{1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)}
+#' \item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions}
+#' \item{3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()}
+#' }
 #'
-#'
-#' @param base_wd string with full path to base directory -- this is the directory that contains untouchedraw/ and bids/sourcedata/
-#' @param overwrite logical indicating if data should be overwritten in /sourcedata Default = FALSE
-#' @param all_tasks logical indicating if all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector
-#' @param task_vector vector with tasks to process. Must be included if all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit")
+#' @param base_wd (string) full path to directory that contains both the touchedRaw and bids directories
+#' @param overwrite (logical) data should be overwritten. Default = FALSE
+#' @param all_tasks (logical) all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector
+#' @param task_vector (vector) tasks to process. Must be included if all_tasks = FALSE. Options include: c("sst", "foodview", "spacegame", "nih_toolbox", "rrv", "pit") (optional)
+#' @param overwrite_jsons (logical) overwrite existing jsons in rawdata. Default = FALSE
 #'
 #' @examples
 #'
 #' \dontrun{
 #' # organize task data for all tasks in untouchedRaw into sourcedata
-#' base_wd = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
-#' util_task_untouched_to_source(base_wd = base_wd, all_tasks = TRUE)
+#' proc_task(base_wd = base_wd, all_tasks = TRUE)
 #'
 #' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
-#' util_task_untouched_to_source(base_wd = base_wd, task_vector = c("spacegame", "nih_toolbox")
+#' proc_task(base_wd = base_wd, task_vector = c("spacegame", "nih_toolbox")
 #'
 #' }
 #'
 #'
 #' @export
 
-util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector) {
+proc_task <- function(base_wd, overwrite = FALSE, all_tasks = FALSE, task_vector, overwrite_jsons = FALSE) {
 
   #### Set up/initial checks ####
 
@@ -65,43 +68,6 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     task_vector = c()
   }
 
-  #### Define copy_to_source() ####
-  copy_to_source <- function(file, sub_str, ses_str, sourcefile_prefix, overwrite) {
-
-    # copy_to_source: A function to copy a file into sourcedata
-    #
-    # @param file path to file to be copied into sourcedata. Include full file path and filename (e.g., "path/to/filename.txt") (string)
-    # @param sub_str bids-formatted subject string. e.g., "sub-001" (string)
-    # @param ses_str bids-formatted session string. e.g., "ses-1" (string)
-    # @param sourcefile_prefix (optional) string to prefix filename with in sourcedata (string)
-    # @param overwrite logical indicating whether file should be overwritten in sourcedata (logical)
-
-    # check for sourcefile_prefix arg
-    prefix_arg <- methods::hasArg(sourcefile_prefix)
-
-    # set sourcedata directory for task files
-    sub_task_source_dir <- file.path(base_wd, "bids", 'sourcedata', sub_str, ses_str, "beh")
-
-    # get file name
-    filename <- basename(file)
-
-    # set sourcedata file
-    if (isTRUE(prefix_arg)) {
-      sub_task_source_file <- file.path(sub_task_source_dir, paste0(sourcefile_prefix, filename))
-
-    } else {
-      sub_task_source_file <- file.path(sub_task_source_dir, filename)
-    }
-
-    # create sub_task_source_dir if it doesnt exist
-    if (!dir.exists(sub_task_source_dir)) {
-      dir.create(sub_task_source_dir, recursive = TRUE)
-    }
-
-    # copy file into sub_task_source_dir
-    file.copy(from = file, to = sub_task_source_file, overwrite = overwrite)
-
-  }
 
   #### FoodView task ####
 
@@ -109,18 +75,23 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     print("-- copying Food View")
 
     foodview_dir <- file.path(base_wd, 'untouchedRaw', 'foodview_task')
-    foodview_files <- list.files(foodview_dir, pattern = 'foodview', full.names = TRUE)
 
-    for (file in foodview_files) {
+    # get list of available subjects
+    foodview_list <- list.files(foodview_dir, pattern = '.txt')
+    foodview_list <- as.data.frame(foodview_list[!(grepl('onsets', foodview_list))])
+    names(foodview_list) <- 'filename'
 
-      # extract subject from file
-      temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
-      sub_num <- sub('.txt', '', temp) # extract sub number (replace .txt with "")
-      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+    #get list of subject IDs
+    foodview_list[['id']] <- as.numeric(sapply(foodview_list[['filename']], function(x) substr(x, unlist(gregexpr('-', x))+1, unlist(gregexpr('.txt', x))-1), simplify = TRUE))
 
-      # copy to sourcedata
-      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
-    }
+    foodview_list[['sub_str']] <- sapply(foodview_list[['id']], function(x) sprintf("sub-%03d", x), simplify = TRUE)
+
+    #organize data into BIDS sourcedata
+    foodview_list[['sourcedata_done']] <- sapply(foodview_list[['id']], function(x) util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_id = x, ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
+
+    #process raw data
+    foodview_list[['rawproc_done']] <- sapply(foodview_list[['sub_str']], function(x) util_task_foodview(sub_str = x, ses_str = 'ses-1', bids_wd = file.path(base_wd, 'bids'), overwrite = overwrite), simplify = TRUE)
+
   }
 
 
@@ -130,18 +101,26 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
 
     sst_dir <- file.path(base_wd, 'untouchedRaw', 'sst')
 
-    sst_files <- list.files(sst_dir, pattern = 'stop', full.names = TRUE)
+    # get list of available subjects
+    sst_list <- list.files(sst_dir, pattern = '.txt')
+    sst_list <- as.data.frame(sst_list[(grepl('prac', sst_list))])
+    names(sst_list) <- 'filename'
 
-    for (file in sst_files) {
+    #get list of subject IDs
+    sst_list[['id']] <- sapply(sst_list[['filename']], function(x) ifelse(grepl('37_1st', x), '37-1', substr(x, unlist(gregexpr('-', x))+1, unlist(gregexpr('.txt', x))-1)), simplify = TRUE)
 
-      # extract subject from file
-      temp <- sub('.*-', '', file) # extract characters after final "-" (replace everything up to and including the last occurrence of a hyphen in the string with "")
-      sub_num <- gsub('.txt|_1st.txt', '', temp) # extract sub number (replace '.txt' or '_1st.txt' with "")
-      sub_str <- sprintf("sub-%03d", as.numeric(sub_num))
+    sst_list[['sub_str']] <- sapply(sst_list[['id']], function(x) ifelse(grepl('37-1', x), 'sub-037-1', ifelse(grepl('37', x), 'sub-037-2', sprintf("sub-%03d", as.numeric(x)))), simplify = TRUE)
 
-      # copy to sourcedata
-      copy_to_source(file, sub_str, ses_str = 'ses-1', overwrite = overwrite)
-    }
+    sst_list[sst_list['id'] == '37-1', 'id'] <- '37'
+
+    sst_list['id'] <- as.numeric(sst_list[['id']])
+
+    #organize data into BIDS sourcedata
+    sst_list[['sourcedata_done']] <- sapply(sst_list[['id']], function(x) util_copy_to_source(task_dir = sst_dir, task_str = 'stop', sub_id = x, ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
+
+    #process raw data
+    sst_list[['rawproc_done']] <- sapply(sst_list[['sub_str']], function(x) util_task_sst(sub_str = x, ses_str = 'ses-1', bids_wd = file.path(base_wd, 'bids'), overwrite = overwrite), simplify = TRUE)
+
   }
 
 
@@ -150,101 +129,58 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     print("-- copying Space Game")
 
     # Get list of subs with spacegame files in untouchedRaw based on filenames
-    space_game_dir <- file.path(base_wd, 'untouchedRaw', 'space_game') # set spacegame dir
-    space_game_files <- list.files(space_game_dir, pattern = 'mbmfNovelStakes', full.names = FALSE) # get list of filenames without full path
-    subs <- sub("^[^_]*_([^\\-]*).*", "\\1", space_game_files) # Extract the characters between the first _ and the first -, which should correspond to subject ID
+    space_dir <- file.path(base_wd, 'untouchedRaw', 'space_game') # set spacegame dir
 
-    for (sub in subs) {
+    # get list of available subjects
+    space_list <- as.data.frame(list.files(space_dir, pattern = 'mbmfNovelStakes', full.names = FALSE))
+    names(space_list) <- 'filename'
 
-      # if valid sub ID (can be converted to numeric)
-      if (!is.na(as.numeric(sub))) {
+    #get list of subject IDs
+    space_list[['id']] <- sapply(space_list[['filename']], function(x) ifelse(grepl('026cancelled', x), '26-1', ifelse(grepl('059-01', x), '059', ifelse(grepl('069-09', x), '069', ifelse(grepl('117-09', x), '117', substr(x, unlist(gregexpr('_', x))[1]+1, unlist(gregexpr('-', x))[1] -1))))), simplify = TRUE)
 
-        # set sub string
-        sub_str <- sprintf("sub-%03d", as.numeric(sub))
+    space_list[['sub_str']] <- sapply(space_list[['id']], function(x) ifelse(grepl('26-1', x), 'sub-026-1', paste0('sub-', x)), simplify = TRUE)
 
-        # get list of files for sub
-        sub_files <- list.files(space_game_dir, pattern = paste0('mbmfNovelStakes_', sub, '-'), full.names = TRUE)
+    space_list[space_list['id'] == '26-1', 'id'] <- '26'
 
-        # if only 1 file matches pattern
-        if ( length(sub_files) == 1) {
+    space_list['id'] <- as.numeric(space_list[['id']])
 
-          # copy to sourcedata
-          copy_to_source(sub_files, sub_str, ses_str = 'ses-1', overwrite = overwrite)
+    #organize data into BIDS sourcedata
+    space_list[['sourcedata_done']] <- sapply(space_list[['id']], function(x) util_copy_to_source(task_dir = space_dir, task_str = 'mbmfNovelStakes', sub_id = x, ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
 
-        } else if (length(sub_files) > 1 ) {
+    #process raw data
+    #foodrating_list[['rawproc_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_foodrating(sub_str = x, ses = 'basel ine', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
 
-            # print message
-            print(paste(sub_str, "has more than 1 SpaceGame file in untouchedRaw. Should only have 1. Files will not be copied to sourcedata. Check file names:" , sub_files))
-
-        }
-      } else {
-
-        # print message that file will not be copied to sourcedata
-        nonsub_files <- list.files(space_game_dir, pattern = paste0('mbmfNovelStakes_', sub, '-'), full.names = FALSE)
-        print(paste("WARNING: Not copying file", nonsub_files, "from untouchedRaw to sourcedata. Characters between first '_' and first '-' do not reflect a valid sub ID"))
-
-      }
-    }
   }
 
   #### NIH toolbox ####
   if (isTRUE(all_tasks) | "nih_toolbox" %in% task_vector) {
     print("-- copying NIH toolbox")
 
+
     # for each session
     for (ses_str in c("ses-1", 'ses-2')) {
       # define directory with data
       if (ses_str == "ses-1") {
-        toolbox_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1')
+        nih_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1')
       } else {
-        toolbox_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V5')
+        nih_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V5')
       }
 
       # get list of subject directories
-      toolbox_sub_dirs <- list.dirs(toolbox_dir, full.names = TRUE, recursive = FALSE)
+      nih_list <- as.data.frame(list.dirs(nih_dir, recursive = FALSE, full.names = FALSE))
+      names(nih_list) <- 'id_folder'
 
-      for (sub_dir in toolbox_sub_dirs) {
-        # extract directory name
-        dirname <- basename(sub_dir)
+      #get list of subject IDs
+      nih_list[['id']] <- as.numeric(sapply(nih_list[['id_folder']], function(x) substr(x, unlist(gregexpr('_', x))+1, nchar(x)), simplify = TRUE))
 
-        # if directory matches pattern REACH_???
-        if (stringr::str_detect(dirname, "^REACH_.{3}$")) {
-          # extract subject ID
-          sub <- sub("REACH_", "", dirname)
+      nih_list[['sub_str']] <- sapply(nih_list[['id']], function(x) sprintf("sub-%03d", as.numeric(x)), simplify = TRUE)
 
-          # if valid sub ID (can be converted to numeric)
-          if (!is.na(as.numeric(sub))) {
-            sub_str <- sprintf("sub-%03d", as.numeric(sub))
+      #organize data into BIDS sourcedata
+      nih_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = nih_list[['id']], task_dir = file.path(nih_dir, nih_list[['id_folder']]), MoreArgs = list(task_str = 'nih', ses_str = ses_str, overwrite = overwrite))
 
-            # get list of files
-            toolbox_sub_files <- setdiff(
-              list.files(sub_dir, full.names = TRUE),
-              list.dirs(
-                sub_dir,
-                recursive = FALSE,
-                full.names = TRUE
-              )
-            )
+      #process raw data
+      nih_list[['rawproc_done']] <- sapply(nih_list[['sub_str']], function(x) util_task_nihtoolbox(sub_str = x, ses_str = ses_str, bids_wd = file.path(base_wd, 'bids'), overwrite = overwrite), simplify = TRUE)
 
-            # copy files to sourcedata
-            for (file in toolbox_sub_files) {
-              copy_to_source(
-                file,
-                sub_str,
-                ses_str,
-                sourcefile_prefix = "toolbox_",
-                overwrite = overwrite
-              )
-            }
-          } else {
-            print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
-          }
-        } else {
-          print(
-            paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. Folders in nih_toolbox/[V1 or V5] must follow pattern REACH_??? where ??? reflects a 3-digit ID")
-          )
-        }
-      }
     }
   }
 
@@ -255,67 +191,21 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
     print("-- copying RRV")
 
     rrv_dir <- file.path(base_wd, 'untouchedRaw', 'rrv_task')
-    rrv_sub_dirs <- list.dirs(rrv_dir, full.names = TRUE, recursive = FALSE)
 
-    for (sub_dir in rrv_sub_dirs) {
+    # get list of subject directories
+    rrv_list <- as.data.frame(list.dirs(rrv_dir, recursive = FALSE, full.names = FALSE))
+    names(rrv_list) <- 'id_folder'
 
-      # extract directory name
-      dirname <- basename(sub_dir)
+    #get list of subject IDs
+    rrv_list[['id']] <- as.numeric(sapply(rrv_list[['id_folder']], function(x) substr(x, unlist(gregexpr('_', x))+1, nchar(x)), simplify = TRUE))
 
-      # if directory matches pattern REACH_???
-      if (stringr::str_detect(dirname, "^REACH_.{3}$")) {
+    rrv_list[['sub_str']] <- sapply(rrv_list[['id']], function(x) sprintf("sub-%03d", as.numeric(x)), simplify = TRUE)
 
-        # extract subject ID
-        sub <- gsub("REACH_", "", dirname)
+    #organize data into BIDS sourcedata
+    rrv_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = rrv_list[['id']], task_dir = file.path(rrv_dir, rrv_list[['id_folder']]), MoreArgs = list(task_str = 'rrv', ses_str = 'ses-1', overwrite = overwrite))
 
-        # if valid sub ID (can be converted to numeric)
-        if (!is.na(as.numeric(sub))) {
-
-          sub_str <- sprintf("sub-%03d", as.numeric(sub))
-
-          # get list of files in sub_dir (but not directories)
-          rrv_sub_files <- setdiff(list.files(sub_dir, full.names = TRUE), list.dirs(sub_dir, recursive = FALSE, full.names = TRUE))
-
-          # define expected name of text file to copy
-          rrv_txt_file <- paste0(rrv_dir, "/" ,dirname, "/rrv_", sub, ".txt")
-
-          # print message if text file not found
-          if (!rrv_txt_file %in% rrv_sub_files) {
-            print(paste("RRV text file not found for", sub_str))
-          }
-
-          # make list of acceptable file names
-          acc_file_names = c(
-            paste0("rrv_", sub, ".txt"),
-            paste0("rrv_", sub, "_summary.csv"),
-            paste0("rrv_", sub, "_game.csv"),
-            paste0("rrv_", sub, "-prac.txt"),
-            paste0("rrv_", sub, "-prac_summary.csv"),
-            paste0("rrv_", sub, "-prac_game.csv")
-          )
-
-          # copy files to sourcedata if they match expected naming conventions
-          for (file in rrv_sub_files) {
-            filename = basename(file)
-
-            # if filename is in the list of acceptable file names
-            if (filename %in% acc_file_names) {
-
-              #copy to sourcedata
-              copy_to_source(file, sub_str, ses_str = "ses-1", overwrite = overwrite)
-
-            } else {
-                print(paste("WARNING: ",file, " will not be copied into sourcedata. File does not adhere to expected naming conventions for RRV"))
-            }
-          }
-
-        } else {
-          print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
-        }
-      } else {
-          print(paste("WARNING: files in", sub_dir, "will not be copied into sourcedata. RRV data folders must follow pattern REACH_??? where ??? reflects a 3-digit ID"))
-      }
-    }
+    #process raw data
+    #foodrating_list[['rawproc_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_foodrating(sub_str = x, ses = 'basel ine', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
   }
 
 
@@ -334,46 +224,20 @@ util_task_untouched_to_source <- function(base_wd, overwrite = FALSE, all_tasks 
         pit_dir <- file.path(base_wd, 'untouchedRaw', 'pit_task', 'V5_PIT')
       }
 
-      # get list of files in pit_dir
-      pit_ses_files <- list.files(pit_dir, "Food-PIT")
+      # get list of available subjects
+      pit_list <- as.data.frame(list.files(pit_dir, pattern = '.psydat'))
+      names(pit_list) <- 'filename'
 
-      # print warning for files named incorrectly
-      for (file in pit_ses_files) {
-        if (!stringr::str_detect(file, "^.{3}_Food-PIT_")) {
-          print(paste("WARNING:", file, "will not be copied into sourcedata. File must begin with ???_Food-PIT where ??? is a 3-digit ID"))
-        }
-      }
+      #get list of subject IDs
+      pit_list[['id']] <- as.numeric(sapply(pit_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))[1]-1), simplify = TRUE))
 
-      # get list of subs: get first 3 characters in file name
-      ses_subs <- unique(substr(pit_ses_files, 1, 3))
+      pit_list[['sub_str']] <- sapply(pit_list[['id']], function(x) sprintf("sub-%03d", x), simplify = TRUE)
+      #organize data into BIDS sourcedata
+      pit_list[['sourcedata_done']] <- sapply(pit_list[['id']], function(x) util_copy_to_source(task_dir = pit_dir, task_str = 'pit', sub_id = x, ses_str = ses_str, overwrite = overwrite), simplify = TRUE)
 
-      # for each sub
-      for (sub in ses_subs) {
+      #process raw data
+      #foodrating_list[['rawproc_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_foodrating(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
 
-        # if valid sub ID (can be converted to numeric)
-        if (!is.na(as.numeric(sub))) {
-
-          # extract subject files
-          sub_files <- list.files(pit_dir, pattern = (paste0(sub, "_Food-PIT")), full.names = TRUE)
-
-          # extract file extensions
-          extensions <- tools::file_ext(sub_files)
-
-          # output warning if .csv not found
-          if ( !"csv" %in% extensions ) {
-            print(paste("WARNING: subject", sub, ses_str, "has PIT output files but no csv" ))
-          }
-
-          # set subject string
-          sub_str <- sprintf("sub-%03d", as.numeric(sub))
-
-          # copy files to sourcedata
-          for (file in sub_files) {
-            copy_to_source(file, sub_str, ses_str, overwrite = overwrite)
-          }
-
-        }
-      }
     }
   }
 }

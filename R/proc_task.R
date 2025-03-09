@@ -1,16 +1,18 @@
 #' proc_task: Process task data from untouchedRaw to bids/rawdata
 #'
-#' This function:
-#' 1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)
-#' 2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions
-#' 3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()
+#' This function: \{itemize
+#' \item{1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)}
+#' \item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions}
+#' \item{3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()}
+#' }
+#'
 #'
 #' To use this function, the correct path to the directory containing untouchedRaw/ and bids/ must be supplied to base_wd
 #'
-#' @param base_wd (string) full path to directory that contains untouchedRaw/ and bids/
-#' @param overwrite_sourcedata (logical) overwrite files in sourcedata for all tasks (default = FALSE)
+#' @inheritParams util_task_untouched_to_source
+#' @inheritParams util_task_untouched_to_source
 #' @param overwrite_rawdata (logical) overwrite files in rawdata for all tasks (default = FALSE)
-#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c("sst", "foodview", "nih_toolbox", "rrv", "pit", "spacegame").
+#' @param overwrite_rawdata_vector (vector) vector with names of tasks for which rawdata should be overwritten. Options include: c('sst', 'foodview', 'nih_toolbox', 'rrv', 'pit', 'spacegame').
 #' @param overwrite_jsons overwrite existing jsons in rawdata. Applies to all tasks (default = FALSE) (logical)
 
 #' @param return_data return BIDS data (i.e., data ready for bids/rawdata) for each task to console (default = FLASE) (logical)
@@ -23,13 +25,13 @@
 #' \dontrun{
 #'
 #' # set base_wd
-#' base_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/"
+#' base_wd = '/Users/baf44/projects/Keller_Marketing/ParticipantData/'
 #'
 #' # process task data without overwriting any existing files, return processed data
 #' task_data <- proc_task(base_wd = base_wd, return_data = TRUE)
 #'
 #' # process task data and overwrite rawdata for foodview task only
-#' proc_task(base_wd = base_wd, overwrite_rawdata_vector = c("foodview"))
+#' proc_task(base_wd = base_wd, overwrite_rawdata_vector = c('foodview'))
 #'
 #' # process task data and overwrite all sourcedata, rawdata, and meta-data
 #' proc_task(base_wd = base_wd, overwrite_sourcedata = TRUE, overwrite_rawdata = TRUE, overwrite_jsons = TRUE)
@@ -48,21 +50,21 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   if (isTRUE(path_arg)) {
     if (!is.character(base_wd)) {
-      stop("base_wd must be entered as a string")
+      stop('base_wd must be entered as a string')
     } else if (!file.exists(base_wd)) {
-      stop("base_wd entered, but path does not exist. Check base_wd string.")
+      stop('base_wd entered, but path does not exist. Check base_wd string.')
     }
   } else if (isFALSE(path_arg)) {
-    stop("base_wd must be entered as a string")
+    stop('base_wd must be entered as a string')
   }
 
   # check that overwrite_all[] options are logical
   if (!is.logical(overwrite_sourcedata)) {
-    stop("overwrite_sourcedata must be logical. Enter TRUE or FALSE")
+    stop('overwrite_sourcedata must be logical. Enter TRUE or FALSE')
   }
 
   if (!is.logical(overwrite_rawdata)) {
-    stop("overwrite_rawdata must be logical. Enter TRUE or FALSE")
+    stop('overwrite_rawdata must be logical. Enter TRUE or FALSE')
   }
 
   # check overwrite_rawdata_vector input
@@ -70,11 +72,11 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   if (isTRUE(rawdata_vector_arg)) {
     if (!is.vector(overwrite_rawdata_vector)) {
-      stop("Input to overwrite_rawdata_vector must be vector (e.g., overwrite_rawdata_vector = c('rrv')")
+      stop('Input to overwrite_rawdata_vector must be vector (e.g., overwrite_rawdata_vector = c("rrv")')
     } else {
       for (task in overwrite_rawdata_vector) {
-        if (!task %in% c("sst", "foodview", "nih_toolbox", "rrv")) {
-          stop(paste(task, "is not an option for overwrite_sourcedata_vector"))
+        if (!(task %in% c('sst', 'foodview', 'nih_toolbox', 'rrv'))) {
+          stop(paste0(task, 'is not an option for overwrite_sourcedata_vector'))
         }
       }
     }
@@ -83,33 +85,35 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   }
 
   #### Define paths ####
-  bids_wd <- file.path(base_wd, "bids")
-  untouchedRaw_wd <- file.path(base_wd, "untouchedRaw")
-  sourcedata_wd <- file.path(base_wd, "bids", "sourcedata")
-  raw_wd <- file.path(base_wd, "bids", "rawdata")
+  bids_wd <- file.path(base_wd, 'bids')
+  untouchedRaw_wd <- file.path(base_wd, 'untouchedRaw')
+  sourcedata_wd <- file.path(base_wd, 'bids', 'sourcedata')
+  raw_wd <- file.path(base_wd, 'bids', 'rawdata')
 
   #### Copy data into to sourcedata ####
 
-  print("Copying task data from untouchedRaw in to sourcedata")
+  print('Copying task data from untouchedRaw in to sourcedata')
 
   # copy task data from untouchedRaw in to sourcedata
   util_task_untouched_to_source(base_wd, overwrite = overwrite_sourcedata, all_tasks = TRUE)
 
   #### To do ####
-  # reduce repetition in processing tasks by looping?
+  # add checks to skip if file exisits and overwrite is FALSE
 
   #### Process food view data ####
 
-  print("Processing Food View Task Data")
+  print('Processing Food View Task Data')
 
   ## get foodview overwrite arg
-  overwrite_fv <- "foodview" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_fv <- 'foodview' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of foodview files in sourcedata
-  foodview_source_files <- list.files(sourcedata_wd, pattern = "foodview", recursive = TRUE)
+  foodview_list <- list.files(sourcedata_wd, pattern = 'foodview', recursive = TRUE)
+  foodview_list <- as.data.frame(foodview_list[!grepl('onsets', foodview_list)])
 
+  names(foodrating_list) <- 'filename'
   # get list of subjects with food view files in sourcedata
-  foodview_subs <- unique(substr(foodview_source_files, 1, 7))
+  foodview_subs <- data.frame(unique(substr(foodview_source_files, 1, 7)))
 
   ## initialize list to save subject data to
   foodview_data <- list()
@@ -118,7 +122,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   for (sub_str in foodview_subs) {
 
     # get sub num
-    sub <- as.numeric(gsub("sub-","", sub_str))
+    sub <- as.numeric(gsub('sub-','', sub_str))
 
     # process
     sub_foodview_data <- util_task_foodview(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_fv, return_data = TRUE)
@@ -130,13 +134,13 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   #### Process SST data ####
 
-  print("Processing SST Data")
+  print('Processing SST Data')
 
   ## get SST overwrite arg
-  overwrite_sst <- "sst" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_sst <- 'sst' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of files in sourcedata
-  sst_source_files <- list.files(sourcedata_wd, pattern = "stop", recursive = TRUE)
+  sst_source_files <- list.files(sourcedata_wd, pattern = 'stop', recursive = TRUE)
 
   # get list of subjects with files in sourcedata
   sst_subs <- unique(substr(sst_source_files, 1, 7))
@@ -148,7 +152,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   for (sub_str in sst_subs) {
 
     # get sub number from sub_str
-    sub <- as.numeric(gsub("sub-","", sub_str))
+    sub <- as.numeric(gsub('sub-','', sub_str))
 
     # process
     sub_sst_data <- util_task_sst(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_sst, return_data = TRUE)
@@ -160,34 +164,34 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   #### Process NIH toolbox data ####
 
-  print("Processing NIH toolbox Data")
+  print('Processing NIH toolbox Data')
 
   ## get toolbox overwrite arg
-  overwrite_toolbox <- "nih_toolbox" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_toolbox <- 'nih_toolbox' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   # list all toolbox files (ses-1 and ses-2) with full path
-  toolbox_source_files <- list.files(sourcedata_wd, pattern = "toolbox", recursive = TRUE, full.names = TRUE)
+  toolbox_source_files <- list.files(sourcedata_wd, pattern = 'toolbox', recursive = TRUE, full.names = TRUE)
 
   ## initialize list to save subject assessment data to
   toolbox_data <- list()
 
   for (session in c(1,2)) {
 
-    ses_str <- paste0("ses-", session)
+    ses_str <- paste00('ses-', session)
 
     toolbox_data[[ses_str]] <- list()
 
     # Filter toolbox_source_files by session
     toolbox_session_source_files <- toolbox_source_files[grepl(ses_str, toolbox_source_files)]
 
-    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include "sub-" and the next 3 characters)
-    toolbox_subs <- unique(stringr::str_extract(toolbox_session_source_files, "sub-..."))
+    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include 'sub-' and the next 3 characters)
+    toolbox_subs <- unique(stringr::str_extract(toolbox_session_source_files, 'sub-...'))
 
     # process sst task data and organize into bids/rawdata for each subject
     for (sub_str in toolbox_subs) {
 
       # get sub number from sub_str
-      sub <- as.numeric(gsub("sub-","", sub_str))
+      sub <- as.numeric(gsub('sub-','', sub_str))
 
       # process assessment (response data)
       sub_toolbox_assessment_data <- util_task_toolbox(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_toolbox, return_data = TRUE)
@@ -203,13 +207,13 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   #### Process RRV data ####
 
-  print("Processing RRV Data")
+  print('Processing RRV Data')
 
   ## get RRV overwrite arg
-  overwrite_rrv <- "rrv" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_rrv <- 'rrv' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   ## get list of files in sourcedata
-  rrv_source_files <- list.files(sourcedata_wd, pattern = "rrv", recursive = TRUE)
+  rrv_source_files <- list.files(sourcedata_wd, pattern = 'rrv', recursive = TRUE)
 
   # get list of subjects with files in sourcedata
   rrv_subs <- unique(substr(rrv_source_files, 1, 7))
@@ -221,7 +225,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   for (sub_str in rrv_subs) {
 
     # get sub number from sub_str
-    sub <- as.numeric(gsub("sub-","", sub_str))
+    sub <- as.numeric(gsub('sub-','', sub_str))
 
     # process
     sub_rrv_data <- util_task_rrv(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_rrv, return_data = TRUE)
@@ -234,13 +238,13 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   #### Process PIT data ####
 
-  print("Processing PIT Data")
+  print('Processing PIT Data')
 
   ## get pit overwrite arg
-  overwrite_pit <- "pit" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_pit <- 'pit' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   # get list of pit files in sourcedata
-  pit_source_files <- list.files(sourcedata_wd, pattern = "Food-PIT", recursive = TRUE)
+  pit_source_files <- list.files(sourcedata_wd, pattern = 'Food-PIT', recursive = TRUE)
 
   # get list of subjects with sst files in sourcedata
   pit_subs <- unique(substr(pit_source_files, 1, 7))
@@ -250,21 +254,21 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   for (session in c(1,2)) {
 
-    ses_str <- paste0("ses-", session)
+    ses_str <- paste00('ses-', session)
 
     pit_data[[ses_str]] <- list()
 
     # Filter pit_source_files by session
     pit_session_source_files <- pit_source_files[grepl(ses_str, pit_source_files)]
 
-    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include "sub-" and the next 3 characters)
-    pit_subs <- unique(stringr::str_extract(pit_session_source_files, "sub-..."))
+    # get list of subjects with toolbox files (subset the toolbox_session_source_files to include 'sub-' and the next 3 characters)
+    pit_subs <- unique(stringr::str_extract(pit_session_source_files, 'sub-...'))
 
     # process data and organize into bids/rawdata for each subject
     for (sub_str in pit_subs) {
 
       # get sub number from sub_str
-      sub <- as.numeric(gsub("sub-","", sub_str))
+      sub <- as.numeric(gsub('sub-','', sub_str))
 
       # process
       sub_pit_data <- util_task_pit(sub = sub, ses = session, bids_wd = bids_wd, overwrite = overwrite_pit, return_data = TRUE)
@@ -278,13 +282,13 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
 
   #### Process Space Game data ####
 
-  print("Processing Space Game Data")
+  print('Processing Space Game Data')
 
   ## get pit overwrite arg
-  overwrite_spacegame <- "spacegame" %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
+  overwrite_spacegame <- 'spacegame' %in% overwrite_rawdata_vector | isTRUE(overwrite_rawdata)
 
   # get list of files in sourcedata
-  spacegame_source_files <- list.files(sourcedata_wd, pattern = "mbmfNovelStakes_", recursive = TRUE)
+  spacegame_source_files <- list.files(sourcedata_wd, pattern = 'mbmfNovelStakes_', recursive = TRUE)
 
   # get list of subjects with files in sourcedata
   spacegame_subs <- unique(substr(spacegame_source_files, 1, 7))
@@ -296,7 +300,7 @@ proc_task <- function(base_wd, overwrite_sourcedata = FALSE, overwrite_rawdata =
   for (sub_str in spacegame_subs) {
 
     # get sub number from sub_str
-    sub <- as.numeric(gsub("sub-","", sub_str))
+    sub <- as.numeric(gsub('sub-','', sub_str))
 
     # process
     sub_spacegame_data <- util_task_spacegame(sub = sub, ses = 1, bids_wd = bids_wd, overwrite = overwrite_spacegame, return_data = TRUE)

@@ -3,26 +3,25 @@
 #' This function formats, cleans, and organizes spacegame data (.mat) from bids/sourcedata into rawdata for a given subject
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the participant number.
 #' Function adapted from Alaina Pearce dataBRAKEr package (https://github.com/alainapearce/dataBRAKEr/tree/main/R)
-#' @param sub subject label used in sub-label. Leading zeros not required
-#' @param ses session label used in ses-label. Default = 1
-#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = TRUE
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_task_foodview
+#' @inheritParams util_task_foodview
 #'
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'
 #' @examples
 #' \dontrun{
 #' # process task data
-#' bids_wd = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids"
-#' spacegame_task_pardat <- util_task_spacegame(sub = 001, ses = 1, bids_wd = bids_wd, return = TRUE)
+#'
+#' spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
 #'
 #' }
 #'
 #'
 #' @export
 
-util_task_spacegame <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = FALSE) {
+util_task_spacegame <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -38,15 +37,6 @@ util_task_spacegame <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return
   } else if (isFALSE(data_arg)) {
     stop("bids_wd must be entered as a string")
   }
-
-  #### Define sub/ses vars and paths ####
-
-  # Get subject number without leading zeros
-  sub_num <- as.numeric(sub)
-
-  # Set sub and ses strings
-  sub_str <- sprintf("sub-%03d", sub_num)
-  ses_str <- paste0("ses-", ses)
 
   # get directory paths
   source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
@@ -141,17 +131,15 @@ util_task_spacegame <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return
 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {
-    utils::write.table(
-      dat,
-      outfile,
-      sep = '\t',
-      quote = FALSE,
-      row.names = FALSE,
-      na = "n/a" # use 'n/a' for missing values for BIDS compliance
-    )
+    utils::write.table( dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a")
+
+    if (isTRUE(overwrite)){
+      return('overwrote with new version')
+    } else {
+      return('complete')
+    }
+  } else {
+    return('exists')
   }
 
-  if (isTRUE(return_data)){
-    return(dat)
-  }
 }

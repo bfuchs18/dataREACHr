@@ -3,11 +3,10 @@
 #' This function formats and organizes Food View task data from bids/sourcedata into bids/rawdata for a given subject
 #'
 #'
-#' @param sub subject label used in sub-label. Leading zeros not required
-#' @param ses session label used in ses-label. Default = 1
-#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
+#' @param bids_wd string with full path to bids directory that contains the sourcedata/ and rawdata/ directories
 #' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = FALSE
 #'
 #' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
 #'
@@ -15,16 +14,14 @@
 #'
 #' \dontrun{
 #' # process task data for the Food View Task
-#' list_of_cleaned_data <- util_task_foodview_orgraw(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#' util_task_foodview_orgraw(sub_id = 'sub-001', ses = 1, bids_wd = bids_wd)
 #'
 #' }
 #'
 #'
 #' @export
 
-util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE) {
-
-  # bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids"
+util_task_foodview <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -43,24 +40,17 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
 
   #### Define sub/ses vars and paths ####
 
-  # Get subject number without leading zeros
-  sub_num <- as.numeric(sub)
-
-  # Set sub and ses strings
-  sub_str <- sprintf("sub-%03d", sub_num)
-  ses_str <- paste0("ses-", ses)
-
   # get directory paths
   raw_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'func')
-  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0('foodview_onsets-', sub_num, '.txt'))
-  resp_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh', paste0('foodview-', sub_num, '.txt'))
+  onset_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'func', paste0(sub_str, '_', ses_str, '_task-foodview_onsets.tsv'))
+  resp_source_file <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'func', paste0(sub_str, '_', ses_str, '_task-foodview.tsv'))
 
   #### Organize Data #####
 
   # load data, abort processing if file does not exist
 
   if (file.exists(onset_source_file)) {
-    onset_dat <- read.table(onset_source_file, header = TRUE, colClasses = c("commercial_condfood_cond"="character"))
+    onset_dat <- read.table(onset_source_file, sep = '\t', header = TRUE, colClasses = c("commercial_condfood_cond"="character"))
   } else {
     print(paste(sub_str, "has no Food View task onset data. Aborting task processing for this sub."))
     return()
@@ -114,11 +104,9 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
   names(dat)[names(dat) == "resp"] <- "response"
   names(dat)[names(dat) == "onset_time"] <- "sys_onset_time"
 
-  # split data by run, process onset and duration, save into run_dfs
-  run_dfs <- list()
-  unique_runs <- unique(dat$run)
-  for (run in unique_runs) {
 
+  # function to clean dat by run
+  run_proc <- function(run, dat){
     run_label <- paste0("run", run)
     run_dat <- dat[(dat$run == run),]
 
@@ -155,10 +143,12 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     # rename run column
     names(run_dat)[names(run_dat) == "run"] <- "run_num"
 
-    # append to run_dfs
-    run_dfs[[run_label]] <- run_dat
+    return(run_dat)
   }
 
+  # split data by run, process onset and duration, save into run_dfs
+  run_dfs <- sapply(unique(dat$run), function(x) run_proc(x, dat), simplify = FALSE)
+  names(run_dfs) <- sapply(unique(dat$run), function(x) paste0("run-0", x))
 
   #### Save in rawdata #####
 
@@ -167,27 +157,27 @@ util_task_foodview <- function(sub, ses = 1, bids_wd, overwrite = FALSE, return_
     dir.create(raw_wd, recursive = TRUE)
   }
 
-  # for each run in run_dfs, export data
-  for (runnum in 1:length(run_dfs)) {
-
-    # extract data for run
-    run_dat <- run_dfs[[runnum]]
-
-    # format run_label for output file
-    run_label <- gsub('run', 'run-0', names(run_dfs)[runnum])
-
-    # define output file with path
-    outfile <- file.path(raw_wd, paste0(sub_str, '_ses-', ses, '_task-foodview_', run_label, '_events.tsv'))
-
-    # export file if doesn't exist or overwrite = TRUE
-    if (!file.exists(outfile) | isTRUE(overwrite)) {
-      utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" ) # specify BIDS-compliant NA string
-    }
+  # save function
+  save_run <- function(run_label, data_list, outfile){
+    run_dat <- data_list[[run_label]]
+    utils::write.table(run_dat, outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
   }
 
-  #### Return data #####
-  if (isTRUE(return_data)){
-    return(run_dfs)
+
+  # define output file with path
+  outfiles <- file.path(raw_wd, paste0(sub_str, '_', ses_str, '_task-foodview_', names(run_dfs), '_events.tsv'))
+
+  if (!file.exists(outfiles[1]) | isTRUE(overwrite)){
+
+    mapply(save_run, run_label = names(run_dfs), outfile = outfiles, MoreArgs = list(run_dfs))
+
+    if (isTRUE(overwrite)){
+      return('overwrote with new version')
+    } else {
+      return('complete')
+    }
+  } else {
+    return('exists')
   }
 }
 
