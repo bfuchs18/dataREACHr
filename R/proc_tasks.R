@@ -15,10 +15,10 @@
 #' @examples
 #'
 #' \dontrun{
-#' # organize task data for all tasks in untouchedRaw into sourcedata
+#' # organize task data for all tasks in untouchedRaw into sourcedata and rawdata
 #' proc_task(base_wd = base_wd, all_tasks = TRUE)
 #'
-#' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata
+#' # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata and raw data
 #' proc_task(base_wd = base_wd, task_vector = c("spacegame", "nih_toolbox")
 #'
 #' }
