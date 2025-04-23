@@ -4,24 +4,15 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study REACH REDCap}
 \usage{
-proc_redcap(
-  visit_data_path,
-  data_de_path,
-  overwrite = FALSE,
-  return_data = FALSE
-)
+proc_redcap(base_wd, overwrite = FALSE, return_data = FALSE)
 }
 \arguments{
-\item{visit_data_path}{full path to the redcap visit data in bids/sourcedata/phenotype directory}
+\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
-\item{data_de_path}{full path to the redcap double entry data in bids/sourcedata/phenotype directory}
-
-\item{overwrite}{overwrite existing files (default = FALSE)}
-
-\item{return_data}{return raw and processed data to console (default = FALSE)}
+\item{overwrite}{(logical) data should be overwritten. Default = FALSE}
 }
 \value{
-If return_data is set to TRUE, will return a list including:
+Will return a list including:
 \enumerate{
 \item input_data: list with 2 dataframes with raw data (visit_data, de_data (double_entered data))
 \item visit_data: list of 10 dataframes with intermediate-processed visit data (child_v1_data, child_v2_data, child_v3_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
@@ -51,9 +42,7 @@ To use this function, the correct path must be used. The path must be the full p
 \examples{
 
 \dontrun{
-data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-10-24_1625.csv"
-visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-10-24_1624.csv"
-redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
+redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
 
 }
 

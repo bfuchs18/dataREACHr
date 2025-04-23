@@ -18,7 +18,7 @@ json_lbc <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    lbc_form_date = list( Description = 'Date (YYYY-MM-DD) LBC form was completed on redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     lbc1 = list( Description = 'To what extent has this behavior been a problem for you with your child?: My child eats too quickly',
                  Levels = list ('0' = '1 - Not at all',
                                 '1' = '2',

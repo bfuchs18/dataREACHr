@@ -4,24 +4,14 @@
 \alias{util_task_spacegame}
 \title{util_task_spacegame: Process raw data from the Space Game (2-stage reinforcement learning task)}
 \usage{
-util_task_spacegame(
-  sub,
-  ses = 1,
-  bids_wd,
-  overwrite = FALSE,
-  return_data = FALSE
-)
+util_task_spacegame(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
 }
 \arguments{
-\item{sub}{subject label used in sub-label. Leading zeros not required}
+\item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
-\item{ses}{session label used in ses-label. Default = 1}
+\item{bids_wd}{string with full path to bids directory that contains the sourcedata/ and rawdata/ directories}
 
-\item{bids_wd}{string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/}
-
-\item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
-
-\item{return_data}{logical indicating if data should be returned. Default = TRUE}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten in sourcedata}
 }
 \value{
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
@@ -34,8 +24,8 @@ Function adapted from Alaina Pearce dataBRAKEr package (https://github.com/alain
 \examples{
 \dontrun{
 # process task data
-bids_wd = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids"
-spacegame_task_pardat <- util_task_spacegame(sub = 001, ses = 1, bids_wd = bids_wd, return = TRUE)
+
+spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
 
 }
 

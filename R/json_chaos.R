@@ -19,7 +19,7 @@ json_chaos <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    chaos_form_date = list( Description = 'Date (YYYY-MM-DD) CHAOS form was completed on redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     chaos1 = list( Description = 'There is very little commotion in our home.',
                   Levels = list ('0' = '1 - Very much like your own home',
                                  '1' = '2 - Somewhat like your own home',

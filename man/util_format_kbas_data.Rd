@@ -2,13 +2,25 @@
 % Please edit documentation in R/util_format_kbas_data.R
 \name{util_format_kbas_data}
 \alias{util_format_kbas_data}
-\title{util_format_kbas_data: process kbas data (called within util_redcap_child_v1 and util_redcap_child_v5)}
+\title{util_format_kbas_data: format Kids Brand Awareness Survey data data}
 \usage{
 util_format_kbas_data(kbas_data)
 }
 \arguments{
-\item{kbas_data}{kbas extracted from data from REDCap events util_redcap_child_v1 and util_redcap_child_v5}
+\item{kbas_data}{Kids Brand Awareness Survey from util_redcap_child_v1 and util_redcap_child_v5}
+}
+\value{
+formatted kbas_data
 }
 \description{
-This function process kbas data
+This function formats Kids Brand Awareness Survey data
+}
+\examples{
+
+# process kbas data
+child_visit1_list <- util_redcap_child_v1(data)
+
+}
+\seealso{
+\code{\link[=util_redcap_child_v1]{util_redcap_child_v1()}}, \code{\link[=util_redcap_child_v5]{util_redcap_child_v5()}}
 }

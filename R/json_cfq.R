@@ -19,7 +19,7 @@ json_cfq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    cfq_form_date = list( Description = 'Date (YYYY-MM-DD) CFQ form was completed on redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     cfq1 = list( Description = 'When your child is home, how often are you responsible for feeding him/her?',
                  Levels = list ('0' = 'Never',
                                 '1' = 'Seldom',

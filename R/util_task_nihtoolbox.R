@@ -116,6 +116,8 @@ util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite 
   scores <- proc_nih(scores)
 
   #update names
+  names(data)[names(data) == 'sub'] <- 'participant_id'
+  names(data)[names(data) == 'ses'] <- 'session_id'
   names(data)[names(data) == 'instordr'] <- 'inst_ordr'
   names(data)[names(data) == 'instsctn'] <- 'inst_sctn'
   names(data)[names(data) == 'itmordr'] <- 'itm_ordr'
@@ -127,6 +129,8 @@ util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite 
   names(data)[names(data) == 'instended'] <- 'inst_ended'
 
 
+  names(scores)[names(scores) == 'sub'] <- 'participant_id'
+  names(scores)[names(scores) == 'ses'] <- 'session_id'
   names(scores) <- gsub('standard_score', 'ss', names(scores))
   names(scores)[names(scores) == 'datefinished'] <- 'date_finished'
   names(scores)[names(scores) == 'national_percentile__age_adjusted_'] <- 'national_percentile_age_adjusted'

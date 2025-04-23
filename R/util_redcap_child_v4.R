@@ -4,6 +4,9 @@
 #'
 #' @param data data from REDCap event child_visit_4_arm_1
 #' @param return_data If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, eah_wanting, freddy_data, intake_data, loc_data, pptq_data, sic_data
+#'
+#'
+#' @export
 
 util_redcap_child_v4 <- function(data, return_data = TRUE) {
 

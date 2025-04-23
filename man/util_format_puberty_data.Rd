@@ -14,3 +14,6 @@ util_format_puberty_data(puberty_data, respondent)
 \description{
 This function prepares parent-reported puberty data for scoring with dataprepr::score_puberty()
 }
+\seealso{
+\code{\link[=util_redcap_parent_v1]{util_redcap_parent_v1()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}
+}

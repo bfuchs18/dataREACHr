@@ -9,6 +9,8 @@
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
 #' @importFrom rlang .data
+#'
+#' @export
 util_redcap_parent_v2 <- function(data, agesex_data, return_data = TRUE) {
 
   #### 1. Set up/initial checks #####

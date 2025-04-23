@@ -13,12 +13,11 @@
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
-#' @param visit_data_path full path to the redcap visit data in bids/sourcedata/phenotype directory
-#' @param data_de_path full path to the redcap double entry data in bids/sourcedata/phenotype directory
-#' @param overwrite overwrite existing files (default = FALSE)
-#' @param return_data return raw and processed data to console (default = FALSE)
+#' @inheritParams proc_tasks
+#' @inheritParams proc_tasks
+#' @inheritParams proc_tasks
 #'
-#' @return If return_data is set to TRUE, will return a list including:
+#' @return Will return a list including:
 #'  1) input_data: list with 2 dataframes with raw data (visit_data, de_data (double_entered data))
 #'  2) visit_data: list of 10 dataframes with intermediate-processed visit data (child_v1_data, child_v2_data, child_v3_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
 #'  3) double_entry_data: list of dataframes with intermediate-processed double entry data
@@ -27,9 +26,7 @@
 #' @examples
 #'
 #' \dontrun{
-#' data_de_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/REACHDataDoubleEntry_DATA_2024-10-24_1625.csv"
-#' visit_data_path = "/Users/baf44/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids/sourcedata/phenotype/FoodMarketingResilie_DATA_2024-10-24_1624.csv"
-#' redcap_data <- proc_redcap(visit_data_path, data_de_path, return = TRUE)
+#' redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
 #'
 #' }
 #'
@@ -37,73 +34,50 @@
 #' @importFrom rlang .data
 #' @export
 
-proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return_data = FALSE) {
+proc_redcap <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
-  # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(visit_data_path)
+  # redcap_visit_data <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
+  #                                            token = Sys.getenv("reach_redcap_key"))
+
+  # check that base_wd exist and is a string
+  data_arg <- methods::hasArg(base_wd)
 
   if (isTRUE(data_arg)) {
-    if (!is.character(visit_data_path)) {
-      stop("visit_data_path must be entered as a string")
-    } else if (!file.exists(visit_data_path)) {
-      stop("visit_data_path entered, but file does not exist. Check visit_data_path string.")
+    if (!is.character(base_wd)) {
+      stop("base_wd must be entered as a string")
+    } else if (!file.exists(base_wd)) {
+      stop("base_wd entered, but file does not exist. Check base_wd string.")
     }
   } else if (isFALSE(data_arg)) {
-    stop("visit_data_path must be entered as a string")
+    stop("base_wd must be entered as a string")
   }
 
+  # get data from REDCap directly (only will work for Alaina right now)
+  Sys.setenv(reach_redcap_key = keyring::key_get("reach_redcap_key"))
+  redcap_visit <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
+                                             token = Sys.getenv("reach_redcap_key"))
 
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('The proc_redcap.R has not been tested on Windows systems. Contact Bari at baf44@psu.edu if there are errors')
-  }
 
-  # find location of slashes so can decompose filepaths
-  slash_loc <- unlist(gregexpr(slash, visit_data_path))
+  Sys.setenv(reach_de_redcap_key = keyring::key_get("reach-de_redcap_key"))
+  redcap_de <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
+                                             token = Sys.getenv("reach_de_redcap_key"))
 
   # set paths for other directories
-  base_wd <- substr(visit_data_path, 1, tail(slash_loc, 4))
-  bids_wd <- substr(visit_data_path, 1, tail(slash_loc, 3))
-  phenotype_wd <- file.path(bids_wd, 'phenotype')
+  phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
 
-  # add file ending if it is missing
-  if (!grep('.csv', visit_data_path)) {
-    visit_data_file <- paste0(visit_data_path, '.csv')
-  } else {
-    visit_data_file <- visit_data_path
-  }
+  #### Process data ####
+  redcap_visit_data <- redcap_visit[['data']]
+  redcap_visit_dict <- redcap_visit[['dictionary']]
 
-  if (!grep('.csv', data_de_path)) {
-    data_de_file <- paste0(data_de_path, '.csv')
-  } else {
-    data_de_file <- data_de_path
-  }
-
-  # check file existis
-  if (!file.exists(visit_data_file)) {
-    stop ('entered visit_data_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
-  }
-
-  if (!file.exists(data_de_file)) {
-    stop ('entered data_de_path is not an existing file - be sure it is entered as a string and contains the full data path and file name')
-  }
-
-  #### Load data ####
-  redcap_visit_data <- read.csv(visit_data_path, header = TRUE) # visit data
-  redcap_de_data <- read.csv(data_de_path, header = TRUE) # double entry data
-
-  # replace "[not completed]" values with NA -- this appears in timestamp columns for uncompleted forms and leads to 'fail to parse" warnings when changing to datetype
-  redcap_visit_data[redcap_visit_data=="[not completed]"]<-NA
+  # remove '.factor'
+  redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
 
   #### Extract visit data ####
 
   # Make ID column bids compliant: Convert record_id to strings padded with zeros and add "sub_"
-  redcap_visit_data$record_id <- sprintf("sub-%03d", redcap_visit_data$record_id)
+  redcap_visit_data['record_id'] <- sprintf("sub-%03d", redcap_visit_data[['record_id']])
 
   # # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){
@@ -112,7 +86,7 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
     sub_dat <- data[data[['redcap_event_name']] == event_name, ]
 
     #remove empty columns
-    sub_dat <- sub_dat[, !colSums(is.na(sub_dat) | sub_dat == "") == nrow(sub_dat)]
+    sub_dat <- sub_dat[, !colSums(is.na(sub_dat)) == nrow(sub_dat)]
     #return
     return(sub_dat)
   }
@@ -129,43 +103,14 @@ proc_redcap <- function(visit_data_path, data_de_path, overwrite = FALSE, return
   child_visit_5_arm_1 <- redcap_long_wide('child_visit_5_arm_1', redcap_visit_data)
   parent_visit_5_arm_1 <- redcap_long_wide('parent_visit_5_arm_1', redcap_visit_data)
 
-  #### Generate date_data with visit dates/ages and sex ####
-
-  # Make dataframe of visit dates and ages
-  date_data <- merge(child_visit_1_arm_1[, c("record_id", "v1_date")], child_visit_2_arm_1[, c("record_id", "v2_date")], by = "record_id", all = TRUE)
-  date_data <- merge(date_data, child_visit_3_arm_1[, c("record_id", "v3_date")], by = "record_id", all = TRUE)
-  date_data <- merge(date_data, child_visit_4_arm_1[, c("record_id", "v4_date")], by = "record_id", all = TRUE)
-  date_data <- merge(date_data, child_visit_5_arm_1[, c("record_id", "v5_date")], by = "record_id", all = TRUE)
-  date_data <- merge(date_data, parent_visit_2_arm_1[, c("record_id", "behavior_rating_inventory_of_executive_function_timestamp")], by = "record_id", all = TRUE)
-
-  # add child sex and dob to date_data
-  date_data <- merge(date_data, parent_visit_1_arm_1[, c("record_id", "prs_sex", "demo_child_birthdate")], by = "record_id", all = TRUE)
-
-  # add ages to date_data
-  date_data[['v1_date']] <- lubridate::as_date(date_data[['v1_date']])
-  date_data[['v2_date']] <- lubridate::as_date(date_data[['v2_date']])
-  date_data[['v3_date']] <- lubridate::as_date(date_data[['v3_date']])
-  date_data[['v4_date']] <- lubridate::as_date(date_data[['v4_date']])
-  date_data[['v5_date']] <- lubridate::as_date(date_data[['v5_date']])
-  date_data[['brief_date']] <- lubridate::as_date(date_data[['behavior_rating_inventory_of_executive_function_timestamp']])
-  date_data[['demo_child_birthdate']] <- lubridate::as_date(date_data[['demo_child_birthdate']])
-  date_data[['v1_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v1_date']])/lubridate::years(1), 1)
-  date_data[['v2_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v2_date']])/lubridate::years(1), 1)
-  date_data[['v3_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v3_date']])/lubridate::years(1), 1)
-  date_data[['v4_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v4_date']])/lubridate::years(1), 1)
-  date_data[['v5_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['v5_date']])/lubridate::years(1), 1)
-  date_data[['brief_age']] <- round(lubridate::interval(date_data[['demo_child_birthdate']], date_data[['brief_date']])/lubridate::years(1),1)
-
-  # re-label sex var and save to sex
-  date_data$sex <- ifelse(date_data$prs_sex == 0, "female", ifelse(date_data$prs_sex == 1, "male", NA))
-  date_data <- date_data[,!(names(date_data) %in% c("prs_sex"))] # remove prs_sex
-
-  #update column names in date_data
-  names(date_data)[names(date_data) == "record_id"] <- "participant_id"
-
   #### Process visit data ####
+
+  # make data.frame of dates, ages, and sex
+  date_data <- util_redcap_dates(child_v1 = child_visit_1_arm_1, child_v2 = child_visit_2_arm_1, child_v3 = child_visit_3_arm_1, child_v4 = child_visit_4_arm_1, child_v5 = child_visit_5_arm_1, parent_v1 = parent_visit_1_arm_1)
+
+  # visit survey data
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
-  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1)
+  parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, date_data)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
   parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
   child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)

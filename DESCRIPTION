@@ -29,6 +29,7 @@ Imports:
     tidyr,
     tools,
     utils,
-    varhandle
+    varhandle,
+    REDCapDM
 Remotes:
     alainapearce/dataprepr

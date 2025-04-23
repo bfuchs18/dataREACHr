@@ -5,6 +5,8 @@
 #' @param data data from REDCap event child_visit_2_arm_1
 #' @param return_data If return_data is set to TRUE, returns a list of the following dataframes: visit_data_child, mri_notes, mri_assessment_data, mri_cams_ff
 #'
+#'
+#' @export
 
 util_redcap_child_v2 <- function(data, return_data = TRUE) {
 

@@ -15,7 +15,6 @@ json_kbas <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    kbas_form_date = list( Description = 'Date (YYYY-MM-DD) the KBAS was completed on Redcap'),
     kbas_version = list( Description = 'Version of KBAS adminisered',
                          Derivative = TRUE,
                          Levels = list ('A' = 'Version A: food items 1-25 then toy items 1-25',

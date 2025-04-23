@@ -8,9 +8,8 @@
 #' @param overwrite (logical) logical indicating whether file should be overwritten in sourcedata
 #'
 #' @examples
+#' util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_id = 'sub-001', ses_str = 'ses-1', overwrite = TRUE)
 #'
-#'
-#' @export
 
 
 util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_prefix, overwrite) {

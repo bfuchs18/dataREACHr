@@ -6,6 +6,7 @@
 #' @param data double-entry data
 #' @param return_data If return_data is set to TRUE, will return a list including: dexa_data, intake_data
 #'
+#' @export
 
 util_redcap_de <- function(data, return_data = TRUE) {
 

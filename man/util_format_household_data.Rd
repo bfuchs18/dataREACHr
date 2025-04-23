@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_format_household_data.R
 \name{util_format_household_data}
 \alias{util_format_household_data}
-\title{util_format_household_data: process household data (called within util_redcap_parent_v1 and util_redcap_parent_v5)}
+\title{util_format_household_data: process household data}
 \usage{
 util_format_household_data(household_data)
 }
@@ -11,4 +11,7 @@ util_format_household_data(household_data)
 }
 \description{
 This function process household data
+}
+\seealso{
+\code{\link[=util_redcap_parent_v1]{util_redcap_parent_v1()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}
 }

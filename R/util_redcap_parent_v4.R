@@ -8,6 +8,8 @@
 #'  1) clean raw parent 1 datasets
 #'  2) meta-data/.json for each dataset
 #'
+#' @export
+#'
 util_redcap_parent_v4 <- function(data, return_data = TRUE) {
 
   #### 1. Set up/initial checks #####

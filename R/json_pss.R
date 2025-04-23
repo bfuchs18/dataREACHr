@@ -19,7 +19,7 @@ json_pss <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    pss_form_date = list( Description = 'Date (YYYY-MM-DD) the PSS form was completed on Redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     pss1 = list( Description = 'In the last month, how often have you been upset because of something that happened unexpectedly?',
                   Levels = list ('0' = '0 = Never',
                                  '1' = '1 = Almost Never',

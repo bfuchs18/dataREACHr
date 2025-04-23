@@ -4,18 +4,14 @@
 \alias{util_task_sst}
 \title{util_task_sst: Clean and organize Stop Signal Task data into BIDS rawdata}
 \usage{
-util_task_sst(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE)
+util_task_sst(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
 }
 \arguments{
-\item{sub}{subject label used in sub-label. Leading zeros not required}
+\item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
-\item{ses}{session label used in ses-label. Default = 1}
+\item{bids_wd}{string with full path to bids directory that contains the sourcedata/ and rawdata/ directories}
 
-\item{bids_wd}{string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/}
-
-\item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
-
-\item{return_data}{logical indicating if data should be returned. Default = TRUE}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten in sourcedata}
 }
 \value{
 If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
@@ -27,9 +23,8 @@ Data from practice and behavioral runs will be organized into bids/rawdata/sub-l
 \examples{
 
 \dontrun{
-bids_wd = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/bids"
 # process task data for the Food View Task
-list_of_cleaned_data <- util_task_sst(sub = 001, ses = 1, bids_wd = bids_wd, return = TRUE)
+util_task_sst(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
 
 }
 }

@@ -1,15 +1,44 @@
-#' util_redcap_parent_v1: Organize parent visit 1 data from REDCap (called within proc_redcap.R)
+#' util_redcap_parent_v1: Organize parent visit 1 data from REDCap
 #'
 #' This function organizes REDCap data from REDCap visit data, event parent_visit_1_arm_1
 #'
 #'
 #' @param data data from REDCap event parent_visit_1_arm_1
-#' @param return_data If return_data is set to TRUE, will return a list including:
-#'  1) clean raw parent 1 datasets
-#'  2) meta-data/.json for each dataset
+#' @param data_data date data for all REDCap visits
 #'
+#' Will return a list including:
+#' \itemize{
+#'  \item{clean raw and scored parent visit 1 datasets}
+#'  \item{meta-data formated as json for each dataset}
+#'  }
+#'
+#'  Returned data includes:
+#'  \itemize{
+#'    \item{demo_data}
+#'    \item{infancy_data}
+#'    \item{household_data}
+#'    \item{rank_data}
+#'    \item{puberty_data}
+#'    \item{cfq_data}
+#'    \item{cebq_data}
+#'    \item{efcr_data}
+#'    \item{chaos_data}
+#'    \item{pss_data}
+#'    \item{lbc_data}
+#'  }
+#' @examples
+#'
+#' # process REDCap data
+#' parent_visit1_list <- util_redcap_parent_v1(data, data_data)
+#'
+#' \dontrun{
+#' }
+#'
+#' @seealso [proc_redcap()]
+#'
+#' @export
 
-util_redcap_parent_v1 <- function(data, return_data = TRUE) {
+util_redcap_parent_v1 <- function(data, data_data) {
 
   #### 1. Set up/initial checks #####
 
@@ -18,143 +47,155 @@ util_redcap_parent_v1 <- function(data, return_data = TRUE) {
 
   if (isTRUE(data_arg)) {
     if (!is.data.frame(data)) {
-      stop("data must be a data.frame")
+      stop('data must be a data.frame')
     }
   } else if (isFALSE(data_arg)) {
   }
 
   # update name of participant ID column
-  names(data)[names(data) == "record_id"] <- "participant_id"
+  names(data)[names(data) == 'record_id'] <- 'participant_id'
 
   # add session column
-  data$session_id <- "ses-1"
+  data['session_id'] <- 'ses-1'
+
+  # merge with date data for V1
+  data <- merge(data, date_data[c('participant_id', 'visit_date')], by = 'participant_id', all.x = TRUE)
+  names(data)[names(data) == 'visit_date'] <- 'visit_date'
+  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
 
   #reduce columns and update names
 
   ## demographics data ####
   # this data will be split into 3 dataframes:
-    # (1) demo_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into participants.tsv (or demographics.tsv) file
-    # (2) infancy_data: data collected as part of the "Visit 1 Demographics" qualtrics form that will go into infancy.tsv file
-    # (3) household_data: data collected as part of the "Parent Household Demographics" qualtrics form
+    # (1) demo_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into participants.tsv (or demographics.tsv) file
+    # (2) infancy_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into infancy.tsv file
+    # (3) household_data: data collected as part of the 'Parent Household Demographics' qualtrics form
 
   # select all demo variables
-  demo_data_all <- data[, grepl('participant_id|session_id|demo', names(data))]
+  demo_data_all <- data[, grepl('participant_id|session_id|demo|visit_date', names(data))]
 
-  # add date columns
-  demo_data_all$demo_form_date <- lubridate::as_date(demo_data_all$visit_1_demographics_timestamp)
-  demo_data_all$household_form_date <- lubridate::as_date(demo_data_all$parent_household_demographics_questionnaire_timestamp)
+  demo_data_all <- demo_data_all[c('participant_id', 'session_id', names(demo_data_all)[grepl('demo|visit_date', names(demo_data_all))])]
 
   # select columns for participants_data
-  demo_data <- demo_data_all[c("participant_id", "demo_ethnicity", "demo_race")]
+  demo_data <- demo_data_all[c('participant_id', 'demo_ethnicity', 'demo_race')]
 
   # select columns for infancy_data
-  infancy_data <- demo_data_all[c("participant_id","session_id", "demo_form_date", "demo_birth_length", "demo_birthweight_pounds", "demo_birthweight_ounces", "demo_premature", "demo_premature_weeks", "demo_feeding", "demo_exclusive_feeding", "demo_tot_breastfeeding", "demo_solid_food")]
+  infancy_data <- demo_data_all[c('participant_id','session_id', 'demo_birth_length', 'demo_birthweight_pounds', 'demo_birthweight_ounces', 'demo_premature', 'demo_premature_weeks', 'demo_feeding', 'demo_exclusive_feeding', 'demo_tot_breastfeeding', 'demo_solid_food')]
 
   # derive total birthweight in ounces from lb and oz components
-  infancy_data$birthweight_ounces_total <- (infancy_data$demo_birthweight_pounds)*16 + infancy_data$demo_birthweight_ounces
+  infancy_data['birthweight_ounces_total'] <- (infancy_data[['demo_birthweight_pounds']])*16 + infancy_data[['demo_birthweight_ounces']]
+
+  infancy_json <- json_v1_infancy()
 
   # select columns for household_data
-  household_data <- demo_data_all[, !(names(demo_data_all) %in% c('demo_v1_missingcheck',
-                                                                    'visit_1_demographics_complete',
-                                                                    'parent_household_demographics_questionnaire_timestamp', 'demo_child_birthdate',
-                                                                    'demo_missingcheck', 'demo_missingcheck_2', 'demo_missingcheck_3',
-                                                                    'parent_household_demographics_questionnaire_complete',
-                                                                  names(demo_data[2:ncol(demo_data)]), names(infancy_data[3:ncol(infancy_data)])))]
+  household_data <- demo_data_all[, !(names(demo_data_all) %in% c(names(demo_data_all[grepl('missing|timestamp|complete|demo_child_birthdate', names(demo_data_all))]), names(demo_data[!grepl('_id', names(demo_data))]), names(infancy_data[!grepl('_id', names(infancy_data))])))]
 
   # process household data
   household_data <- util_format_household_data(household_data)
+  household_data <- household_data[c('participant_id', 'session_id', 'visit_date', names(household_data)[grepl('demo', names(household_data))])]
+
+  household_json <- json_household()
 
   ## RANK Data (ranking food item questionnaire) ####
-  rank_data <- data[, grepl('participant_id|session_id|rank', names(data))]
-  rank_data$rank_form_date <- lubridate::as_date(rank_data$ranking_food_item_questionnaire_timestamp) # add form date column
-  rank_data <- rank_data[, -grep("missingcheck|timestamp|complete", names(rank_data))] # remove extra columns
-  rank_data <- rank_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("rank_form_date", .after = 2) # relocate columns
+  rank_data <- data[, grepl('participant_id|session_id|rank|visit_date', names(data))]
+  rank_data <- rank_data[c('participant_id', 'session_id', 'visit_date', names(rank_data)[grepl('rank', names(rank_data))])]
 
+  # process household data
+  rank_data <- util_format_rank_data(rank_data)
+
+  rank_json <- json_rank
   # score?
 
   ## Puberty Data ####
-  puberty_data <-data[, grep("participant_id|session_id|^prs|tanner_|parental_rating_scale_for_pubertal_development_timestamp", names(data))]
-  puberty_data$puberty_form_date <- lubridate::as_date(puberty_data$parental_rating_scale_for_pubertal_development_timestamp) # add form date column
-  puberty_data <- puberty_data[, -grep("missingcheck|timestamp", names(puberty_data))] # remove extra columns
-  puberty_data <- puberty_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  puberty_data <-data[, grep('participant_id|session_id|visit_date|^prs|tanner_|parental_rating_scale_for_pubertal_development_timestamp', names(data))]
 
-  puberty_data_for_scoring <- util_format_puberty_data(puberty_data, respondent = "parent")
-  puberty_scored <- dataprepr::score_pds(puberty_data_for_scoring, base_zero = FALSE, respondent = 'parent', male = "male", female = "female", id = 'participant_id')
+  # process puberty data
+  puberty_data <- util_format_puberty_data(puberty_data, respondent = 'parent')
+  puberty_data['respondent'] <- 'parent'
+
+  puberty_data <- puberty_data[c('participant_id', 'session_id', 'visit_date', 'respondent', 'sex', names(puberty_data)[grepl('pds|tanner', names(puberty_data))])]
+
+  puberty_scored <- dataprepr::score_pds(puberty_data, base_zero = TRUE, respondent = 'parent', male = 'male', female = 'female', id = 'participant_id')
+
+  puberty_json <- json_puberty()
 
   ## CFQ Data ####
-  cfq_data <- data[, grepl('participant_id|session_id|cfq|child_feeding_questionnaire_timestamp', names(data))]
-  cfq_data$cfq_form_date <- lubridate::as_date(cfq_data$child_feeding_questionnaire_timestamp)
-  cfq_data <- cfq_data[, -grep("missingcheck|timestamp", names(cfq_data))] # remove extra columns
-  cfq_data <- cfq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  cfq_data <- data[, grepl('participant_id|session_id|cfq|visit_date', names(data))]
 
-  # recode 5s ("not applicable") in perceived child weight items as 99 to
+  cfq_data <- cfq_data[, -grep('missingcheck|timestamp', names(cfq_data))] # remove extra columns
+  cfq_data <- cfq_data[c('participant_id', 'session_id', 'visit_date', names(cfq_data)[grepl('cfq', names(cfq_data))])]
+
+  # recode 5s ('not applicable') in perceived child weight items as 99 to
   pcw_vars <- c('cfq_8', 'cfq_9', 'cfq_10', 'cfq_11', 'cfq_12')
-  cfq_data[pcw_vars] <- lapply(cfq_data[pcw_vars], function(x) ifelse(x == 5, 99, x))
+  cfq_data[pcw_vars] <- sapply(cfq_data[pcw_vars], function(x) ifelse(x == 5, 99, x))
 
-  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id', extra_scale_cols = c("cfq_form_date"), pcw_na_value = 99)
+  cfq_scored <- dataprepr::score_cfq(cfq_data, base_zero = TRUE, restriction_split = FALSE, id = 'participant_id', pcw_na_value = 99, extra_scale_cols = 'visit_date')
+
+  cfq_json <- json_cfq()
 
   ## CEBQ Data ####
-  cebq_data <- data[, grepl('participant_id|session_id|cebq|child_eating_behavior_questionnaire_timestamp', names(data))]
-  cebq_data$cebq_form_date <- lubridate::as_date(cebq_data$child_eating_behavior_questionnaire_timestamp)
-  cebq_data <- cebq_data[, -grep("missingcheck|timestamp", names(cebq_data))] # remove extra columns
-  cebq_data <- cebq_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  cebq_data <- data[, grepl('participant_id|session_id|cebq|visit_date', names(data))]
+  cebq_data <- cebq_data[c('participant_id', 'session_id', 'visit_date', names(cebq_data)[grepl('cebq', names(cebq_data))])]
 
-  cebq_scored <- dataprepr::score_cebq(cebq_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("cebq_form_date"))
+  cebq_scored <- dataprepr::score_cebq(cebq_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c('visit_date'))
+
+  cebq_json <- json_cebq()
 
   ## EFCR Data ####
-  efcr_data <- data[, grepl('participant_id|session_id|efcr|external_food_cues_responsiveness_timestamp', names(data))]
-  efcr_data$efcr_form_date <- lubridate::as_date(efcr_data$external_food_cues_responsiveness_timestamp)
-  efcr_data <- efcr_data[, -grep("missingcheck|timestamp", names(efcr_data))] # remove extra columns
-  efcr_data <- efcr_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  efcr_data <- data[, grepl('participant_id|session_id|efcr|visit_date', names(data))]
+  efcr_data <- efcr_data[c('participant_id', 'session_id', 'visit_date', names(efcr_data)[grepl('efcr', names(efcr_data))])]
 
-  efcr_scored <- dataprepr::score_efcr(efcr_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("efcr_form_date"))
+  efcr_scored <- dataprepr::score_efcr(efcr_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c('visit_date'))
+
+  efcr_json <- json_efcr()
 
   ## CHAOS Data  ####
-  chaos_data <- data[, grepl('participant_id|session_id|chaos', names(data))]
-  chaos_data$chaos_form_date <- lubridate::as_date(chaos_data$confusion_hubbub_and_order_scale_chaos_timestamp)
-  chaos_data <- chaos_data[, -grep("missingcheck|timestamp|complete", names(chaos_data))] # remove extra columns
-  chaos_data <- chaos_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  chaos_data <- data[, grepl('participant_id|session_id|chaos|visit_date', names(data))]
+  chaos_data <- chaos_data[c('participant_id', 'session_id', 'visit_date', names(chaos_data)[grepl('chaos', names(chaos_data))])]
 
   # need to develop score script
-  chaos_scored <- dataprepr::score_chaos(chaos_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("chaos_form_date"))
+  chaos_scored <- dataprepr::score_chaos(chaos_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c('visit_date'))
+
+  chaos_json <- json_chaos()
 
 
   ## PSS Data  (percieved stress scale) ####
-  pss_data <- data[, grepl('participant_id|session_id|pss|perceived_stress_scale_timestamp', names(data))]
-  pss_data$pss_form_date <- lubridate::as_date(pss_data$perceived_stress_scale_timestamp)
-  pss_data <- pss_data[, -grep("missingcheck|timestamp", names(pss_data))] # remove extra columns
-  pss_data <- pss_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  pss_data <- data[, grepl('participant_id|session_id|pss|visit_date', names(data))]
+  pss_data <- pss_data[c('participant_id', 'session_id', 'visit_date', names(pss_data)[grepl('pss', names(pss_data))])]
 
-  pss_scored <- dataprepr::score_pss(pss_data, base_zero = TRUE, id = "participant_id", extra_scale_cols = c("pss_form_date"))
+  pss_scored <- dataprepr::score_pss(pss_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c('visit_date'))
+
+  pss_json <- json_pss()
 
   ## LBC Data  ####
-  lbc_data <- data[, grepl('participant_id|session_id|lbc|lifestyle_behavior_checklist_timestamp', names(data))]
+  lbc_data <- data[, grepl('participant_id|session_id|lbc|visit_date', names(data))]
 
   # rename columns
   names(lbc_data) <- gsub('lbc_', 'lbc', names(lbc_data))
   names(lbc_data) <- gsub('_a', '_conf', names(lbc_data))
 
   # add date column
-  lbc_data$lbc_form_date <- lubridate::as_date(lbc_data$lifestyle_behavior_checklist_timestamp)
-  lbc_data <- lbc_data[, -grep("missingcheck|timestamp", names(lbc_data))] # remove extra columns
-  lbc_data <- lbc_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  lbc_data <- lbc_data[, -grep('missingcheck|timestamp', names(lbc_data))] # remove extra columns
+  lbc_data <- lbc_data[c('participant_id', 'session_id', 'visit_date', names(lbc_data)[grepl('lbc', names(lbc_data))])]
 
-  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c("lbc_form_date")) # need to debug
+  lbc_scored <- dataprepr::score_lbc(lbc_data, base_zero = TRUE, id = 'participant_id', extra_scale_cols = c('visit_date')) # need to debug
+
+  lbc_json <- json_lbc()
 
   ## return data ####
   if (isTRUE(return_data)){
     return(list(
-      demo_data = demo_data,
-      infancy_data = infancy_data,
-      household_data = household_data,
-      rank_data = rank_data,
-      puberty_data = puberty_scored,
-      cfq_data = cfq_scored,
-      cebq_data = cebq_scored,
-      efcr_data = efcr_scored,
-      chaos_data = chaos_scored,
-      pss_data = pss_scored,
-      lbc_data = lbc_scored))
+      demo_data = list(date = demo_data),
+      infancy_data = list(date = infancy_data, meta = infancy_json),
+      household_data = list(date = household_data, meta = household_json),
+      rank_data = list(date = rank_data, meta = rank_json),
+      puberty_data = list(date = puberty_scored, meta = puberty_json),
+      cfq_data = list(date = cfq_scored, meta = cfq_json),
+      cebq_data = list(date = cebq_scored, meta = cebq_json),
+      efcr_data = list(date = efcr_scored, meta = efcr_json),
+      chaos_data = list(date = chaos_scored, meta = chaos_json),
+      pss_data = list(date = pss_scored, meta = pss_json),
+      lbc_data = list(date = lbc_scored, meta = lbc_json)))
   }
 }
 
