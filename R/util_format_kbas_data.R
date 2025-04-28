@@ -13,7 +13,7 @@
 #'
 #' @seealso [util_redcap_child_v1()], [util_redcap_child_v5()]
 #'
-#'
+#' @export
 
 util_format_kbas_data <- function(kbas_data) {
 

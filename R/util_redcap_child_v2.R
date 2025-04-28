@@ -1,12 +1,33 @@
-#' util_redcap_child_v2: Organize child visit 2 data from REDCap (called within proc_redcap.R)
+#' util_redcap_child_v2: Organize child visit 2 data from REDCap
 #'
 #' This function organizes REDCap data from REDCap visit data, event child_visit_2_arm_1
 #'
 #' @param data data from REDCap event child_visit_2_arm_1
-#' @param return_data If return_data is set to TRUE, returns a list of the following dataframes: visit_data_child, mri_notes, mri_assessment_data, mri_cams_ff
 #'
+#' @return Will return a list including:
+#' \itemize{
+#'  \item{clean raw child visit 1 datasets}
+#'  \item{meta-data formated as json for each dataset}
+#'  }
+#'
+#'  Returned data includes:
+#'  \itemize{
+#'    \item{visit_data_child}
+#'    \item{mri_info}
+#'    \item{mri_assessment_data}
+#'  }
+#' @examples
+#'
+#' # process REDCap data
+#' child_visit2_list <- util_redcap_child_v2(data)
+#'
+#' \dontrun{
+#' }
+#'
+#' @seealso [proc_redcap()]
 #'
 #' @export
+
 
 util_redcap_child_v2 <- function(data, return_data = TRUE) {
 
@@ -26,40 +47,48 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
   # update name of participant ID column
   names(data)[names(data) == "record_id"] <- "participant_id"
 
+  # update date
+  names(data)[names(data) == "v2_date"] <- "visit_date"
+
   # add session column
-  data$session_id <- "ses-1"
+  data['session_id'] <- 'ses-1'
 
   #reduce columns and update names
 
   ## visit data ####
-  visit_data_child <- data[c('participant_id', 'v2_post_check_notes', 'v2_date')]
+  visit_data_child <- data[c('participant_id', 'v2_post_check_notes', 'visit_date')]
   names(visit_data_child)[names(visit_data_child) == "v2_post_check_notes"] <- "v2_notes"
 
   ## MRI notes ####
-  mri_notes <- data[, grepl('^mri_', names(data)) |
-                      names(data) %in% c('participant_id', "session_id", 'v2_date', 'mock_fmri_complete_check', 'mock_fmri_notes')]
-  mri_notes <- mri_notes[, !(names(mri_notes) %in% c('mri_resting_complete_check', 'mri_resting_state_notes'))]
-  mri_notes <- mri_notes %>% dplyr::relocate("session_id", .after = 1) # relocate columns
+  mri_info <- data[, grepl('_id|mri|cams|freddy|date', names(data))]
+  mri_info <- mri_info[, !grepl('resting|freddy_visit_number', names(mri_info))]
 
+  # fix names
+  names(mri_info) <- gsub('run_', 'run', names(mri_info))
+  names(mri_info) <- gsub('snack_1', 'snack', names(mri_info))
+  names(mri_info) <- gsub('snack_2', 'snack2', names(mri_info))
+  names(mri_info) <- gsub('_check', '', names(mri_info))
+
+  names(mri_info)[names(mri_info) == 'post_snack_1_freddy_check'] <- 'post_snack_freddy_check'
+
+  # Replace 'freddy' with 'fullness'
+  names(mri_info) <- gsub('freddy', 'fullness', names(mri_info))
+
+  mri_info <- mri_info[c('participant_id', 'session_id', 'visit_date', names(mri_info)[grepl('mri|cams|fullness', names(mri_info))])]
+
+  mri_info_json <- json_mri_v2()
 
   ## MRI behavioral assessment ####
-  mri_assessment_data <- data[, grepl('participant_id|session_id|_familiarity|_recall|_liking|fmri_behavioral_assessment_timestamp', names(data))]
-  mri_assessment_data$mri_assessment_form_date <- lubridate::as_date(mri_assessment_data$fmri_behavioral_assessment_timestamp) # add form date column
-  mri_assessment_data <- mri_assessment_data[, -grep("missingcheck|timestamp", names(mri_assessment_data))] # remove extra columns
-  mri_assessment_data <- mri_assessment_data %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate(dplyr::contains("form_date"), .after = 2) # relocate columns
+  mri_assessment_data <- data[, grepl('_id|_familiarity|_recall|_liking|visit_date', names(data))]
+  mri_assessment_data <- mri_assessment_data[c('participant_id', 'session_id', 'visit_date', names(mri_assessment_data)[grepl('_familiarity|_recall|_liking', names(mri_assessment_data))])]
 
   # score this data?
 
-  # CAMS and Freddy Fullness data
-  mri_cams_ff <- data[, grepl('participant_id|session_id|pre_cams_score|post_cams_score|freddy_score', names(data))]
-  mri_cams_ff <- mri_cams_ff %>% dplyr::relocate("session_id", .after = 1) # relocate columns
+  mri_assessmnet_json <- json_mri_assessment()
 
   ## return data ####
-  if (isTRUE(return_data)){
-    return(list(visit_data_child = visit_data_child,
-                mri_notes = mri_notes,
-                mri_assessment_data = mri_assessment_data,
-                mri_cams_ff = mri_cams_ff))
-  }
+  return(list(visit_data_child = visit_data_child,
+              mri_info = list(data = mri_info, meta = mri_info_json),
+              mri_assessment_data = list(data = mri_assessment_data, meta = mri_assessmnet_json)))
 }
 

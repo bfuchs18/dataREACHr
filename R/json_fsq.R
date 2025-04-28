@@ -19,7 +19,7 @@ json_fsq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    fsq_form_date = list( Description = 'Date (YYYY-MM-DD) the Feeding Strategies Questionnaire was completed on Redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     fsq1 = list( Description = 'I used the serving size from the Nutrition Facts Label.'),
     fsq2 = list( Description = 'I served an amount of food that looks appropriate on the plate.'),
     fsq3 = list( Description = 'I served the amount of food my child usually eats.'),

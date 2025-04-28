@@ -7,6 +7,7 @@
 #'
 #' @seealso [util_redcap_parent_v1()], [util_redcap_parent_v5()]
 #'
+#' @export
 
 util_format_household_data <- function(household_data) {
 

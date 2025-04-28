@@ -4,7 +4,7 @@
 #'
 #'
 #' @param data data from REDCap event parent_visit_1_arm_1
-#' @param data_data date data for all REDCap visits
+#' @param date_data date data for REDCap visit
 #'
 #' Will return a list including:
 #' \itemize{
@@ -29,7 +29,7 @@
 #' @examples
 #'
 #' # process REDCap data
-#' parent_visit1_list <- util_redcap_parent_v1(data, data_data)
+#' parent_visit1_list <- util_redcap_parent_v1(data, date_data)
 #'
 #' \dontrun{
 #' }
@@ -38,7 +38,7 @@
 #'
 #' @export
 
-util_redcap_parent_v1 <- function(data, data_data) {
+util_redcap_parent_v1 <- function(data, date_data) {
 
   #### 1. Set up/initial checks #####
 
@@ -59,17 +59,17 @@ util_redcap_parent_v1 <- function(data, data_data) {
   data['session_id'] <- 'ses-1'
 
   # merge with date data for V1
-  data <- merge(data, date_data[c('participant_id', 'visit_date')], by = 'participant_id', all.x = TRUE)
-  names(data)[names(data) == 'visit_date'] <- 'visit_date'
+  data <- merge(data, date_data[c('participant_id', 'v1_date')], by = 'participant_id', all.x = TRUE)
+  names(data)[names(data) == 'v1_date'] <- 'visit_date'
   data['visit_date'] <- lubridate::as_date(data[['visit_date']])
 
   #reduce columns and update names
 
   ## demographics data ####
   # this data will be split into 3 dataframes:
-    # (1) demo_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into participants.tsv (or demographics.tsv) file
-    # (2) infancy_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into infancy.tsv file
-    # (3) household_data: data collected as part of the 'Parent Household Demographics' qualtrics form
+  # (1) demo_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into participants.tsv (or demographics.tsv) file
+  # (2) infancy_data: data collected as part of the 'Visit 1 Demographics' qualtrics form that will go into infancy.tsv file
+  # (3) household_data: data collected as part of the 'Parent Household Demographics' qualtrics form
 
   # select all demo variables
   demo_data_all <- data[, grepl('participant_id|session_id|demo|visit_date', names(data))]
@@ -107,7 +107,7 @@ util_redcap_parent_v1 <- function(data, data_data) {
   # score?
 
   ## Puberty Data ####
-  puberty_data <-data[, grep('participant_id|session_id|visit_date|^prs|tanner_|parental_rating_scale_for_pubertal_development_timestamp', names(data))]
+  puberty_data <-data[, grep('participant_id|session_id|visit_date|^prs|tanner_', names(data))]
 
   # process puberty data
   puberty_data <- util_format_puberty_data(puberty_data, respondent = 'parent')
@@ -183,19 +183,17 @@ util_redcap_parent_v1 <- function(data, data_data) {
   lbc_json <- json_lbc()
 
   ## return data ####
-  if (isTRUE(return_data)){
-    return(list(
-      demo_data = list(date = demo_data),
-      infancy_data = list(date = infancy_data, meta = infancy_json),
-      household_data = list(date = household_data, meta = household_json),
-      rank_data = list(date = rank_data, meta = rank_json),
-      puberty_data = list(date = puberty_scored, meta = puberty_json),
-      cfq_data = list(date = cfq_scored, meta = cfq_json),
-      cebq_data = list(date = cebq_scored, meta = cebq_json),
-      efcr_data = list(date = efcr_scored, meta = efcr_json),
-      chaos_data = list(date = chaos_scored, meta = chaos_json),
-      pss_data = list(date = pss_scored, meta = pss_json),
-      lbc_data = list(date = lbc_scored, meta = lbc_json)))
-  }
+  return(list(
+    demo_data = list(date = demo_data),
+    infancy_data = list(date = infancy_data, meta = infancy_json),
+    household_data = list(date = household_data, meta = household_json),
+    rank_data = list(date = rank_data, meta = rank_json),
+    puberty_data = list(date = puberty_scored, meta = puberty_json),
+    cfq_data = list(date = cfq_scored, meta = cfq_json),
+    cebq_data = list(date = cebq_scored, meta = cebq_json),
+    efcr_data = list(date = efcr_scored, meta = efcr_json),
+    chaos_data = list(date = chaos_scored, meta = chaos_json),
+    pss_data = list(date = pss_scored, meta = pss_json),
+    lbc_data = list(date = lbc_scored, meta = lbc_json)))
 }
 

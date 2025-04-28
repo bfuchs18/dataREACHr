@@ -19,7 +19,7 @@ json_ffbs <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    ffbs_form_date = list( Description = 'Date (YYYY-MM-DD) FFBS form was completed on redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     ffbs1 = list( Description = 'I decide how many snacks my child has',
                   Levels = list ('0' = '0 = Never True',
                                  '1' = '1',

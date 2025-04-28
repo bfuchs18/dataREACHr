@@ -8,6 +8,7 @@
 #'
 #' @seealso [util_redcap_parent_v1()], [util_redcap_parent_v5()]
 #'
+#' @export
 
 
 util_format_puberty_data <- function(puberty_data, respondent) {

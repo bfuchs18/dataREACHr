@@ -7,6 +7,7 @@
 #'
 #' @seealso [util_redcap_parent_v1()]
 #'
+#' @export
 
 
 util_format_rank_data <- function(rank_data) {

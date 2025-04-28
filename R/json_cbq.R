@@ -19,7 +19,7 @@ json_cbq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    cbq_form_date = list( Description = 'Date (YYYY-MM-DD) CBQ form was completed on redcap'),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
     cbq1 = list( Description = 'Seems always in a big hurry to get from one place to another.',
                  Levels = list ('0' =	'extremely untrue of your child',
                                 '1'	= 'quite untrue of your child',

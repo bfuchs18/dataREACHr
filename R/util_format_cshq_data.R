@@ -1,10 +1,16 @@
-#' util_format_cshq_data: process cshq data (called within util_redcap_parent_v2 and util_redcap_parent_v5)
+#' util_format_cshq_data: formats Child Sleep Habits Questionnaire data to score
 #'
-#' This function prepares cshq data for scoring with dataprepr::score_cshq by re-leveling scored items to have numeric values 1-3: (3 - Usually, 2 - Sometimes, 1 - Rarely or 1 - not sleepy, 2 - very sleepy, 3 - falls asleep)
+#' This function prepares Child Sleep Habits Questionnaire data for scoring with dataprepr::score_cshq by re-leveling scored items to have numeric values 1-3: (3 - Usually, 2 - Sometimes, 1 - Rarely or 1 - not sleepy, 2 - very sleepy, 3 - falls asleep)
 #'
 #'
 #' @param cshq_data cshq extracted from data from REDCap events util_redcap_parent_v2 and util_redcap_parent_v5
 #'
+#'#' @seealso [util_redcap_parent_v2()], [util_redcap_parent_v5()]
+#'
+#' @export
+#'
+
+
 util_format_cshq_data <- function(cshq_data) {
 
   #### Rename columns ####
@@ -12,17 +18,12 @@ util_format_cshq_data <- function(cshq_data) {
   # rename columns for items asking if a behavior is a problem
   names(cshq_data) <- gsub('_a', '_prob', names(cshq_data))
 
-  # rename columns with _component
-  names(cshq_data)[names(cshq_data) == "cshq_sleep_total_hours"] <- "cshq_night_sleep_amount_hrs_component"
-  names(cshq_data)[names(cshq_data) == "cshq_sleep_total_mins"] <- "cshq_night_sleep_amount_min_component"
-  names(cshq_data)[names(cshq_data) == "cshq_nap_hours"] <- "cshq_nap_amount_hrs_component"
-  names(cshq_data)[names(cshq_data) == "cshq_nap_mins"] <- "cshq_nap_amount_min_component"
-
   #### Compute total sleep amounts from hr and min components ####
+  cshq_data[, grepl('hour|min', names(cshq_data))] <- sapply(cshq_data[, grepl('hour|min', names(cshq_data))], function(x) as.numeric(x))
 
   # if min component is NA, calculate with hrs component only, else, calculate with min and hrs components
-  cshq_data$cshq_night_sleep_amount_total_mins <- ifelse(is.na(cshq_data$cshq_night_sleep_amount_min_component), cshq_data$cshq_night_sleep_amount_hrs_component* 60, (cshq_data$cshq_night_sleep_amount_hrs_component* 60 + cshq_data$cshq_night_sleep_amount_min_component))
-  cshq_data$cshq_nap_amount_total_mins <- ifelse(is.na(cshq_data$cshq_nap_amount_min_component), cshq_data$cshq_nap_amount_hrs_component* 60, (cshq_data$cshq_nap_amount_hrs_component* 60 + cshq_data$cshq_nap_amount_min_component))
+  cshq_data['cshq_night_sleep_dur_mins'] <- ifelse(is.na(cshq_data[['cshq_sleep_total_mins']]), cshq_data[['cshq_sleep_total_hours']]* 60, (cshq_data[['cshq_sleep_total_hours']]* 60 + cshq_data[['cshq_sleep_total_mins']]))
+  cshq_data['cshq_nap_dur_mins'] <- ifelse(is.na(cshq_data[['cshq_nap_mins']]), cshq_data[['cshq_nap_hours']]* 60, (cshq_data[['cshq_nap_hours']]* 60 + cshq_data[['cshq_nap_mins']]))
 
   #### Update Usually/Sometimes/Rarely ('usr') columns ####
 
@@ -31,23 +32,9 @@ util_format_cshq_data <- function(cshq_data) {
   usr_nums <- all_nums[all_nums != 7 & all_nums != 8]
   usr_cols <- paste0("cshq_", usr_nums)
 
-  # update values to be (3 - Usually, 2 - Sometimes, 1 - Rarely) rather than (0 - Usually, 1 - Sometimes, 2 - Rarely)
-  for (col_name in usr_cols) {
-    # Replace values in the specified columns
-    cshq_data[[col_name]] <- ifelse(cshq_data[[col_name]] == 0, 3, ifelse(cshq_data[[col_name]] == 1, 2, ifelse(cshq_data[[col_name]] == 2 ,1 , NA)))
-  }
-
-  #### Update Not Sleepy/Sleepy/Falls Asleep ('nsf') columns ####
-
-  # specify 'nsf' columns to update
-  nsf_cols <- c("cshq_7", "cshq_8")
-
-  # update values to be (1 - Not Sleepy, 2 - Sleepy, 3 - Falls Asleep) rather than (0 - Not Sleepy, 1 - Sleepy, 2 - Falls Asleep)
-  for (col_name in nsf_cols) {
-    # Replace values in the specified columns
-    cshq_data[[col_name]] <- ifelse(cshq_data[[col_name]] == 0, 1, ifelse(cshq_data[[col_name]] == 1, 2, ifelse(cshq_data[[col_name]] == 2,3 , NA)))
-  }
-
+  # update values to be (2 - Usually, 1 - Sometimes, 0 - Rarely) rather than (0 - Usually, 1 - Sometimes, 2 - Rarely)
+  recod_cols <- paste0('cshq_', seq(1,8,1))
+  cshq_data[recod_cols] <- sapply(recod_cols, function(x)  ifelse(cshq_data[[x]] == 0, 2, ifelse(cshq_data[[x]] == 2 , 1, (cshq_data[[x]]))))
 
   # return data
   return(cshq_data)

@@ -1,4 +1,4 @@
-#' util_redcap_child_v1: Organize child visit 1 data from REDCap (called within proc_redcap.R)
+#' util_redcap_child_v1: Organize child visit 1 data from REDCap
 #'
 #' This function organizes REDCap data from REDCap visit data, event child_visit_1_arm_1
 #'
@@ -108,8 +108,6 @@ util_redcap_child_v1 <- function(data) {
 
   ## stq data ####
   stq_data <-data[, grep('participant_id|session_id|stq', names(data))]
-
-  stq_data <- stq_data[, -grep('missingcheck|timestamp', names(stq_data))] # remove extra columns
   stq_data <- stq_data[c('participant_id', 'session_id', names(stq_data)[grepl('stq', names(stq_data))])]
 
   #score?
