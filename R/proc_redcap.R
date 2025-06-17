@@ -38,9 +38,6 @@ proc_redcap <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
-  # redcap_visit_data <- REDCapDM::redcap_data(uri = "https://redcap.ctsi.psu.edu/api/",
-  #                                            token = Sys.getenv("reach_redcap_key"))
-
   # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
 
@@ -112,13 +109,13 @@ proc_redcap <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   child_v1_data <- util_redcap_child_v1(child_visit_1_arm_1)
   parent_v1_data <- util_redcap_parent_v1(parent_visit_1_arm_1, date_data)
   child_v2_data <- util_redcap_child_v2(child_visit_2_arm_1)
-  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, agesex_data = date_data)
+  parent_v2_data <- util_redcap_parent_v2(parent_visit_2_arm_1, date_data)
   child_v3_data <- util_redcap_child_v3(child_visit_3_arm_1)
-  parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1)
+  parent_v3_data <- util_redcap_parent_v3(parent_visit_3_arm_1, date_data)
   child_v4_data <- util_redcap_child_v4(child_visit_4_arm_1)
-  parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1)
+  parent_v4_data <- util_redcap_parent_v4(parent_visit_4_arm_1, date_data)
   child_v5_data <- util_redcap_child_v5(child_visit_5_arm_1)
-  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1)
+  parent_v5_data <- util_redcap_parent_v5(parent_visit_5_arm_1, date_data)
 
 
   #### Process double-entry data ####

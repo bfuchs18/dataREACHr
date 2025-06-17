@@ -14,6 +14,8 @@ json_v1_food_paradigm <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     test_meal_book = list( Description = 'Book the child selected to listen to during the test meal'),
     test_meal_start_time = list( Description = 'Meal start time',
                                  Unit = "hh:mm"),

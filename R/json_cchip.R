@@ -1,7 +1,6 @@
 #' json_cchip: Generates a json file for the Community Childhood Hunger Identification Project
 #'
 #' This function generates a json file for the scored Community Childhood Hunger Identification Project and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cchip function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Community Childhood Hunger Identification Project
 #'
@@ -19,7 +18,8 @@ json_cchip <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    cchip_form_date = list( Description = 'Date (YYYY-MM-DD) CCHIP form was completed on redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     cchip1 = list( Description = 'Thinking about the past 12 months, did your household ever run out of money to buy food to make a meal?',
                   Levels = list ('0' = 'No',
                                  '1' = 'Yes')),

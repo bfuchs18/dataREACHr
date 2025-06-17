@@ -3,9 +3,14 @@
 #' This function prepares Child Sleep Habits Questionnaire data for scoring with dataprepr::score_cshq by re-leveling scored items to have numeric values 1-3: (3 - Usually, 2 - Sometimes, 1 - Rarely or 1 - not sleepy, 2 - very sleepy, 3 - falls asleep)
 #'
 #'
-#' @param cshq_data cshq extracted from data from REDCap events util_redcap_parent_v2 and util_redcap_parent_v5
+#' @param cshq_data cshq extracted from data from REDCap events
 #'
-#'#' @seealso [util_redcap_parent_v2()], [util_redcap_parent_v5()]
+#' @examples
+#'
+#' # process data
+#' cshq_data_formatted <- util_format_household_data(cshq_data)
+#'
+#' @seealso [util_redcap_parent_v2()], [util_redcap_parent_v5()]
 #'
 #' @export
 #'

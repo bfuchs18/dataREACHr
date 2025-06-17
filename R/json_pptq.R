@@ -1,7 +1,6 @@
 #' json_pptq: Generates a json file for the Pictorial Personality Traits Questionnaire for Children
 #'
 #' This function generates a json file for the scored Pictorial Personality Traits Questionnaire for Children  and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_pptq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Pictorial Personality Traits Questionnaire for Children
 #'
@@ -19,6 +18,8 @@ json_pptq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit this child-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     pptq1 = list( Description = 'I usually play...',
                   Levels = list ('1' =	'On my own',
                                  '2'	= 'It depends',

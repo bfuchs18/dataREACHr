@@ -1,7 +1,6 @@
 #' json_hfssm: Generates a json file for the U.S. Household Food Security Survey Module
 #'
 #' This function generates a json file for the scored U.S. Household Food Security Survey Module and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_hfssm function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the U.S. Household Food Security Survey Module
 #'
@@ -19,7 +18,8 @@ json_hfssm <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    hfssm_form_date = list( Description = 'Date (YYYY-MM-DD) the HFSSM form was completed on Redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     hfssm_hh1 = list( Description = 'Which of these statements best describes the food eaten in your household in the last 12 months:',
                       Levels = list ('0' = 'Enough of the kinds of food we want to eat',
                                      '1' = 'Enough but not always the kinds of food we want',

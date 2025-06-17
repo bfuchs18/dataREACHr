@@ -2,15 +2,39 @@
 % Please edit documentation in R/util_redcap_child_v2.R
 \name{util_redcap_child_v2}
 \alias{util_redcap_child_v2}
-\title{util_redcap_child_v2: Organize child visit 2 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_child_v2: Organize child visit 2 data from REDCap}
 \usage{
 util_redcap_child_v2(data, return_data = TRUE)
 }
 \arguments{
 \item{data}{data from REDCap event child_visit_2_arm_1}
+}
+\value{
+Will return a list including:
+\itemize{
+\item{clean raw child visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
 
-\item{return_data}{If return_data is set to TRUE, returns a list of the following dataframes: visit_data_child, mri_notes, mri_assessment_data, mri_cams_ff}
+Returned data includes:
+\itemize{
+\item{visit_data_child}
+\item{mri_info}
+\item{mri_assessment_data}
+}
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event child_visit_2_arm_1
+}
+\examples{
+
+# process REDCap data
+child_visit2_list <- util_redcap_child_v2(data)
+
+\dontrun{
+}
+
+}
+\seealso{
+\code{\link[=proc_redcap]{proc_redcap()}}
 }

@@ -1,10 +1,8 @@
 #' json_puberty: Generates a json file for Pubertal Development Scale
 #'
-#' This function generates a json file for the scored Pubertal Development Scale and and raw participant responses.
-#' This function provides accurate json files ONLY if data is child-report and adult-reported ratings are processed using score_pds function in dataprepr and combined using proc_redcap() in dataREACHr.
-#' This is only accurate for data collected in Study BREAK
+#' This function generates a json file for the scored Pubertal Development Scale, Tanner, and raw participant responses.
 #'
-#' @return A string with data stored in JSON format containing meta-data for the Pubertal Development Score.
+#' @return A string with data stored in JSON format containing meta-data for the Pubertal Development Score and Tanner.
 #'
 #' @export
 #'
@@ -19,7 +17,8 @@ json_puberty <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     sex = list( Description = 'child sex',
                 Levels = list ('female' = 'female',
                                'male' = 'male')),

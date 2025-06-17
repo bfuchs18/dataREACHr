@@ -16,6 +16,8 @@ json_v1_infancy <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected; except: for stable demo variables collected only at baseline (ethnicity, race) and risk_status (determined at baseline), values are repeated for ses-1 and ses-2)',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     demo_birth_length = list( Description = 'What was your childs birth length, in inches?',
                               Unit = 'in'),
     demo_birthweight_pounds = list( Description = 'Childs birth weight (pounds):',

@@ -1,7 +1,6 @@
 #' json_chaos: Generates a json file for the Confusion, Hubbub, and Order Scale
 #'
 #' This function generates a json file for the scored Confusion, Hubbub, and Order Scale and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_chaos function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Confusion, Hubbub, and Order Scale
 #'
@@ -19,7 +18,8 @@ json_chaos <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     chaos1 = list( Description = 'There is very little commotion in our home.',
                   Levels = list ('0' = '1 - Very much like your own home',
                                  '1' = '2 - Somewhat like your own home',

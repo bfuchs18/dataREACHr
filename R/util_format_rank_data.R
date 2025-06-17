@@ -1,11 +1,11 @@
-#' util_format_rank_data: process Ranking Food Item Questionnaire data
+#' util_format_rank_data: process Ranking Food Item Questionnaire data for REACH visit 1 and 5
 #'
 #' This function process Ranking Food Item Questionnaire data
 #'
 #'
-#' @param rank_data rank extracted from data from REDCap events util_redcap_parent_v1
+#' @param rank_data rank extracted from data from REDCap events
 #'
-#' @seealso [util_redcap_parent_v1()]
+#' @seealso [util_redcap_parent_v1()], [util_redcap_parent_v5()]
 #'
 #' @export
 

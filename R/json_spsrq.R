@@ -1,7 +1,6 @@
 #' json_spsrq: Generates a json file for the Sensitivity to Punishment and Sensitivity to Reward Questionnaire
 #'
 #' This function generates a json file for the scored Sensitivity to Punishment and Sensitivity to Reward Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_spsrq function in dataprepr and is only accurate for data collected in Study REACH.
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Sensitivity to Punishment and Sensitivity to Reward Questionnaire
 #'
@@ -19,7 +18,8 @@ json_spsrq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    spsrq_form_date = list( Description = 'Date (YYYY-MM-DD) the spsrq form was completed on Redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     spsrq1 = list( Description = 'Your child often refrains from doing something because he/she is afraid of getting into trouble',
                    Levels = list ('0' = 'Strongly Disagree',
                                   '1' = 'Disagree',

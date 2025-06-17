@@ -4,12 +4,12 @@
 \alias{util_redcap_parent_v1}
 \title{util_redcap_parent_v1: Organize parent visit 1 data from REDCap}
 \usage{
-util_redcap_parent_v1(data, data_data)
+util_redcap_parent_v1(data, date_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_1_arm_1}
 
-\item{data_data}{date data for all REDCap visits
+\item{date_data}{date data for REDCap visit
 
 Will return a list including:
 \itemize{
@@ -38,7 +38,7 @@ This function organizes REDCap data from REDCap visit data, event parent_visit_1
 \examples{
 
 # process REDCap data
-parent_visit1_list <- util_redcap_parent_v1(data, data_data)
+parent_visit1_list <- util_redcap_parent_v1(data, date_data)
 
 \dontrun{
 }

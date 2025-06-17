@@ -2,14 +2,14 @@
 #'
 #' This function formats Kids Brand Awareness Survey data
 #'
-#' @param kbas_data Kids Brand Awareness Survey from util_redcap_child_v1 and util_redcap_child_v5
+#' @param kbas_data Kids Brand Awareness Survey extracted from data from REDCap events
 #'
 #' @return formatted kbas_data
 #'
 #' @examples
 #'
 #' # process kbas data
-#' child_visit1_list <- util_redcap_child_v1(data)
+#' kbas_data_formatted <- util_format_kbas_data(kbas_data)
 #'
 #' @seealso [util_redcap_child_v1()], [util_redcap_child_v5()]
 #'
@@ -18,7 +18,7 @@
 util_format_kbas_data <- function(kbas_data) {
 
   # relabel version a and b items
-  names(kbas_data)[!grepl('_b|_vb|_id', names(kbas_data))] <- paste0('va_', names(kbas_data)[!grepl('_b|_vb|_id', names(kbas_data))])
+  names(kbas_data)[!grepl('_b|_vb|_id|visit_date', names(kbas_data))] <- paste0('va_', names(kbas_data)[!grepl('_b|_vb|_id|visit_date', names(kbas_data))])
   names(kbas_data)[grepl('_b|_vb', names(kbas_data))] <- paste0('vb_', names(kbas_data)[grepl('_b|_vb', names(kbas_data))])
 
   # remove _b and _vb from end of column names
@@ -40,7 +40,7 @@ util_format_kbas_data <- function(kbas_data) {
   kbas_data$kbas_toy_score <- ifelse(kbas_data[['kbas_version']] == 'A', kbas_data[['va_toy_score_kbas']], ifelse(kbas_data[['kbas_version']] == 'B', kbas_data[['vb_toy_score_kbas']], NA))
 
   #remove columns
-  kbas_data <- kbas_data[, !grepl('timestamp|va_toy_score|vb_toy_score|va_food_score|vb_food_score|va_q16_score_2', names(kbas_data))]
+  kbas_data <- kbas_data[, !grepl('va_toy_score|vb_toy_score|va_food_score|vb_food_score|va_q16_score_2', names(kbas_data))]
 
   #### combine q_*score columns between versions ####
 
@@ -52,7 +52,7 @@ util_format_kbas_data <- function(kbas_data) {
   new_col_vb <- c(toy_qs, food_qs) #version b order: toys then food
 
   # process version A data - data[select version A rows, remove 'vb_' columns]
-  kbas_va_data <- kbas_data[kbas_data[['kbas_version']] == 'A' & !is.na(kbas_data[['kbas_version']]), -grep('^vb_', colnames(kbas_data))]
+  kbas_va_data <- kbas_data[kbas_data[['kbas_version']] == 'A' & !is.na(kbas_data[['kbas_version']]), -grep('^vb_', names(kbas_data))]
 
   # remove 'va_' from column names
   names(kbas_va_data) <- gsub('va_', '', names(kbas_va_data))
@@ -64,7 +64,7 @@ util_format_kbas_data <- function(kbas_data) {
   names(kbas_va_data)[names(kbas_va_data) %in% q_cols_va] <- new_col_va
 
   # process version B data - data[select version B rows, remove 'va_' columns]
-  kbas_vb_data <- kbas_data[kbas_data[['kbas_version']] == 'B' & !is.na(kbas_data[['kbas_version']]), -grep('^va_', colnames(kbas_data))]
+  kbas_vb_data <- kbas_data[kbas_data[['kbas_version']] == 'B' & !is.na(kbas_data[['kbas_version']]), -grep('^va_', names(kbas_data))]
 
   # remove 'vb_' from column names
   names(kbas_vb_data) <- gsub('vb_', '', names(kbas_vb_data))
@@ -79,8 +79,10 @@ util_format_kbas_data <- function(kbas_data) {
   kbas_data <- rbind(kbas_va_data, kbas_vb_data)
 
   #reorder columns
-  kbas_data <-
-    kbas_data %>% dplyr::relocate('session_id', .after = 1) %>% dplyr::relocate(dplyr::contains('kbas_version'), .after = 2) %>% dplyr::relocate(dplyr::contains('kbas_food_score'), .after = 3) %>% dplyr::relocate(dplyr::contains('kbas_toy_score'), .after = 4)
+  kbas_data <- kbas_data[c('participant_id', 'session_id', 'visit_date', 'kbas_version', 'kbas_food_score', 'kbas_toy_score', names(kbas_data)[grepl('^toy_|^food_', names(kbas_data))])]
+
+  # fix naming
+  names(kbas_data)[!grepl('_id|visit_date|kbas_', names(kbas_data))] <- sapply(names(kbas_data)[!grepl('_id|visit_date|kbas_', names(kbas_data))], function(x) paste0('kbas_', x), USE.NAMES = FALSE)
 
   # return data
   return(kbas_data)

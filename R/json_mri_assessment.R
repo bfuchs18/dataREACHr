@@ -295,6 +295,6 @@ json_mri_assessment <- function() {
     print('MRI visit JSON file may be invalid')
   }
 
-  return(mri_visit_json)
+  return(mri_assessment_json)
 
 }

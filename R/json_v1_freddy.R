@@ -17,6 +17,8 @@ json_v1_freddy <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     pre_vas_fullness_time = list( Description = 'Pre-liking (i.e., before VAS liking ratings) fullness rating time',
                                   Unit = "hh:mm:ss"),
     pre_meal_ads_fullness_time = list( Description = 'Pre-meal-advertisement (i.e., efore the advertisement that preceeded the meal) fullness rating time',

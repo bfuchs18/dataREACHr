@@ -1,20 +1,21 @@
-#' json_v3v4_food_paradigm: Generates a json file for visit 3 and visit 4 food paradigm notes and data
+#' json_v3v4_food_paradigm: Generates a json file for visits 3-5 food paradigm notes and data
 #'
-#' This function generates a json file for visit 3 and visit 4 food paradigm notes and data
+#' This function generates a json file for visit 3-5 food paradigm notes and data
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v3v4_food_paradigm <- function() {
+json_v3v4v5_food_paradigm <- function() {
 
-  v3v4_food_paradigm_list <- list(
+  v3v4v5_food_paradigm_list <- list(
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     advertisement_condition = list( Description = 'Advertisement Condition',
                                     Levels = list ('0' =	'Food',
                                                    '1' =	'Toy',
@@ -36,13 +37,13 @@ json_v3v4_food_paradigm <- function() {
   )
 
   # convert formatting to JSON
-  v3v4_food_paradigm_json <- RJSONIO::toJSON(v3v4_food_paradigm_list, pretty = TRUE)
+  v3v4v5_food_paradigm_json <- RJSONIO::toJSON(v3v4v5_food_paradigm_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v3v4_food_paradigm_json, asText = TRUE))){
-    print('v3v4 food paradigm JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(v3v4v5_food_paradigm_json, asText = TRUE))){
+    print('food paradigm info for visits 3-5 JSON file may be invalid')
   }
 
-  return(v3v4_food_paradigm_json)
+  return(v3v4v5_food_paradigm_json)
 
 }

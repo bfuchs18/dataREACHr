@@ -1,6 +1,6 @@
 #' json_loc: Generates a json file for the Loss of Control-Eating Questionnaire
 #'
-#' This function generates a json file for the Loss of Control-Eating Questionnaire with raw participant responses. This function provides accurate json files ONLY if data was collected in Study REACH
+#' This function generates a json file for the Loss of Control-Eating Questionnaire with raw participant responses.
 #'
 #' @return A json file documenting the raw inputs and scored values for the Loss of Control-Eating Questionnaire.
 #'
@@ -17,6 +17,8 @@ json_loc <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit this child-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     loc_1 = list( Description = 'While you were eating ... During the past 3 months have you ever felt that you were not able to stop eating, or not able to control the type of food or amount of food that you ate?  For example, can you remember a time over the last 3 months that you were eating something so yummy that you couldn\'t stop eating, even if you really wanted to?',
                   Levels = list ('0' = 'No',
                                  '1' = 'Yes',

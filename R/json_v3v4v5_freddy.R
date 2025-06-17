@@ -1,15 +1,15 @@
-#' json_v3v4_freddy: Generates a json file for visit 1 Freddy Fullness data
+#' json_v3v4v5_freddy: Generates a json file for visits 3-5 Freddy Fullness data
 #'
-#' This function generates a json file for visit 1 Freddy Fullness data
+#' This function generates a json file for visits 3-5 Freddy Fullness data
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v3v4_freddy <- function() {
+json_v3v4v5_freddy <- function() {
 
-  v3v4_freddy_list <- list(
+  v3v4v5_freddy_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Freddy Fullness Scale',
       Reference = 'Keller KL, Assur SA, Torres M, Lofink HE, Thornton JC, Faith MS, Kissileff HR. Potential of an analog scaling device for measuring fullness in children: development and preliminary testing. Appetite. 2006 Sep;47(2):233-43. doi: 10.1016/j.appet.2006.04.004. Epub 2006 Jul 7. PMID: 16828929.'),
@@ -17,7 +17,8 @@ json_v3v4_freddy <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     advertisement_condition = list( Description = 'Advertisement Condition',
                                     Levels = list ('0' =	'Food',
                                                    '1' =	'Toy',
@@ -49,12 +50,12 @@ json_v3v4_freddy <- function() {
   )
 
   # convert formatting to JSON
-  v3v4_freddy_json <- RJSONIO::toJSON(v3v4_freddy_list, pretty = TRUE)
+  v3v4v5_freddy_json <- RJSONIO::toJSON(v3v4v5_freddy_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v3v4_freddy_json, asText = TRUE))){
-    print('Freddy fullness for visit 1 JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(v3v4v5_freddy_json, asText = TRUE))){
+    print('Freddy fullness for visits 3-5 JSON file may be invalid')
   }
 
-  return(v3v4_freddy_json)
+  return(v3v4v5_freddy_json)
 }

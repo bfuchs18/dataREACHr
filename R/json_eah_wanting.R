@@ -7,16 +7,17 @@
 #'
 #' @export
 
-json_bes <- function() {
+json_eah_wanting <- function() {
 
-  ah_wanting_list <- list(
+  eah_wanting_list <- list(
     'MeasurementToolMetadata' = list(
       Description = 'Eating in the Absence of Hunger (EAH) Wanting Questionnaire. Participants (parents) were provided the following instructions: "For this next part we want to know how much you want different items. The sides say "Not at all" (0) and "A lot" (100). If you do not want the item at all, you should point to the "Not at all" part of the slide. If you REALLY want the item, you should point to the "A lot" part of the slide. If you\'re somewhere in between, point to where the circle should be"'),
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     advertisement_condition = list( Description = 'Advertisement Condition',
                                     Levels = list ('0' =	'Food',
                                                    '1' =	'Toy',

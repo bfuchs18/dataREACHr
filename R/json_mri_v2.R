@@ -1,6 +1,6 @@
 #' json_mri_v2: Generates a json file for MRI visit 2 data
 #'
-#' This function generates a json file for MRI visit 2 data (notes)
+#' This function generates a json file for MRI visit 2 data
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
@@ -14,7 +14,8 @@ json_mri_v2 <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     pre_snack_fullness = list( Description = 'Researcher completed pre-snack fullness prior to MRI scan',
                              Levels = list ('0' = 'No',
                                             '1' = 'Yes')),
@@ -87,7 +88,7 @@ json_mri_v2 <- function() {
     pre_cams_score = list( Description = 'Pre-MRI state anxiety rating',
                          Reference = 'Ersig AL, Kleiber C, McCarthy AM, Hanrahan K. Validation of a clinically useful measure of children\'s state anxiety before medical procedures. J Spec Pediatr Nurs. 2013 Oct;18(4):311-9. doi: 10.1111/jspn.12042. Epub 2013 Jun 25. PMID: 24094126; PMCID: PMC4282760.'),
     post_cams_score = list( Description = 'Post-MRI state anxiety rating',
-                          Reference = 'Ersig AL, Kleiber C, McCarthy AM, Hanrahan K. Validation of a clinically useful measure of children\'s state anxiety before medical procedures. J Spec Pediatr Nurs. 2013 Oct;18(4):311-9. doi: 10.1111/jspn.12042. Epub 2013 Jun 25. PMID: 24094126; PMCID: PMC4282760.'),
+                          Reference = 'Ersig AL, Kleiber C, McCarthy AM, Hanrahan K. Validation of a clinically useful measure of children\'s state anxiety before medical procedures. J Spec Pediatr Nurs. 2013 Oct;18(4):311-9. doi: 10.1111/jspn.12042. Epub 2013 Jun 25. PMID: 24094126; PMCID: PMC4282760.')
   )
 
   # convert formatting to JSON

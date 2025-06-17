@@ -1,7 +1,6 @@
 #' json_debq: Generates a json file for the Dutch Eating Behavior Questionnaire
 #'
 #' This function generates a json file for the scored Dutch Eating Behavior Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_debq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Dutch Eating Behavior Questionnaire
 #'
@@ -19,7 +18,8 @@ json_debq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    debq_form_date = list( Description = 'Date (YYYY-MM-DD) DEBQ form was completed on redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     debq1 = list( Description = 'Do you have the desire to eat when you are irritated?',
                     Levels = list ('0' = 'Never',
                                    '1' = 'Seldom',

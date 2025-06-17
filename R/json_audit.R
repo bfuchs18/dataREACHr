@@ -1,7 +1,6 @@
 #' json_audit: Generates a json file for the Alcohol Use Disorders Identification Test
 #'
 #' This function generates a json file for the scored Alcohol Use Disorders Identification Test and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_audit function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data the Alcohol Use Disorders Identification Test
 #'
@@ -19,7 +18,8 @@ json_audit <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    audit_form_date = list( Description = 'Date (YYYY-MM-DD) AUDIT form was completed on redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     audit1 = list( Description = 'How often do you have a drink containing alcohol?',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Monthly or less',

@@ -1,19 +1,21 @@
-#' json_v1_intake_notde: Generates a json file for intake data that has not been double-entered for V1
+#' json_v1_intake: Generates a json file for intake data for V1
 #'
-#' This function generates a json file for intake data that has not been double-entered for V1
+#' This function generates a json file for intake data for V1
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v1_intake_notde <- function() {
+json_v1_intake <- function() {
 
-  v1_intake_notde_list <- list(
+  v1_intake_list <- list(
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     bread_pre_w_o_plate = list( Description = 'Pre-meal weight of bread (grilled cheese component) without plate',
                                 Unit = "grams"),
     butter_pre_w_o_plate = list( Description = 'Pre-meal weight of butter (grilled cheese component) on bread slice A without plate',
@@ -81,13 +83,13 @@ json_v1_intake_notde <- function() {
   )
 
   # convert formatting to JSON
-  v1_intake_notde_json <- RJSONIO::toJSON(v1_intake_notde_list, pretty = TRUE)
+  v1_intake_json <- RJSONIO::toJSON(v1_intake_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v1_intake_notde_json, asText = TRUE))){
-    print('Intake (not double entered) for visit 1 JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(v1_intake_json, asText = TRUE))){
+    print('Intake for visit 1 JSON file may be invalid')
   }
 
-  return(v1_intake_notde_json)
+  return(v1_intake_json)
 
 }

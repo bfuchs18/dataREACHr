@@ -1,16 +1,22 @@
-#' json_v1_anthro: Generates a json file for visit 1 anthropometrics data
+#' json_anthro: Generates a json file for raw anthropometrics data collected during the visit
 #'
-#' This function generates a json file for isit 1 anthropometrics data
+#' This function generates a json file for raw anthropometrics data collected during the visit
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v1_anthro <- function() {
+json_anthro <- function() {
 
-  v1_anthro_list <- list(
-    hild_height_1_cm = list( Description = 'child height measurement 1',
+  anthro_list <- list(
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
+    child_height_1_cm = list( Description = 'child height measurement 1',
                              Unit = "cm"),
     child_height_2_cm = list( Description = 'child height measurement 2',
                               Unit = "cm"),
@@ -44,12 +50,12 @@ json_v1_anthro <- function() {
   )
 
   # convert formatting to JSON
-  v1_anthro_json <- RJSONIO::toJSON(v1_anthro_list, pretty = TRUE)
+  anthro_json <- RJSONIO::toJSON(anthro_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v1_anthro_json, asText = TRUE))){
-    print('Anthropometrics data for visit 1 JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(anthro_json, asText = TRUE))){
+    print('Anthropometrics data for collected during a visit JSON file may be invalid')
   }
 
-  return(v1_anthro_json)
+  return(anthro_json)
 }

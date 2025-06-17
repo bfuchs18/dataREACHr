@@ -1,7 +1,6 @@
 #' json_pwlb: Generates a json file for the Parent Weight Loss Behavior Questionnaire
 #'
 #' This function generates a json file for the scored Parent Weight Loss Behavior Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_pwlb function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Parent Weight Loss Behavior Questionnaire
 #'
@@ -19,7 +18,8 @@ json_pwlb <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    pwlb_form_date = list( Description = 'Date (YYYY-MM-DD) the PWLB form was completed on Redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     pwlb1 = list( Description = 'Increase Exercise',
                  Levels = list ('0' =	'Never',
                                 '1'	= 'Rarely',
@@ -164,7 +164,7 @@ json_pwlb <- function() {
                                   '2' =	'Sometimes',
                                   '3'	= 'Often',
                                   '4'	= 'Always')),
-    pwlb24a = list( Description = 'Describe Other: (free response)'),
+    pwlb_other_desc = list( Description = 'Describe Other: (free response)'),
     pwlb25 = list( Description = 'Are you currently dieting or exercising to LOSE weight?',
                    Levels = list ('0' =	'Never',
                                   '1'	= 'Rarely',

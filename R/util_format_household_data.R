@@ -1,9 +1,14 @@
-#' util_format_household_data: process household data
+#' util_format_household_data: process household data for REACH visit 1 and 5
 #'
 #' This function process household data
 #'
 #'
-#' @param household_data Household extracted from data from REDCap events util_redcap_parent_v1 and util_redcap_parent_v5
+#' @param household_data Household extracted from data from REDCap events
+#'
+#' @examples
+#'
+#' # process data
+#' household_data_formatted <- util_format_household_data(household_data)
 #'
 #' @seealso [util_redcap_parent_v1()], [util_redcap_parent_v5()]
 #'
@@ -12,9 +17,9 @@
 util_format_household_data <- function(household_data) {
 
   # rename columns
-  names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_reported_height_ft"
-  names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_reported_height_in"
-  names(household_data)[names(household_data) == "demo_self_report_weight"] <- "demo_parent2_reported_weight_lbs"
+  names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_rep_height_ft"
+  names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_rep_height_in"
+  names(household_data)[names(household_data) == "demo_self_report_weight"] <- "demo_parent2_rep_weight_lbs"
 
   # calculate parent age
   household_data[['demo_parent_birthdate']] <- lubridate::as_date(household_data[['demo_parent_birthdate']])
@@ -24,20 +29,20 @@ util_format_household_data <- function(household_data) {
 
 
   # remove birthdate and timestamp variables
-  household_data <- household_data[, -grep("birthdate", names(household_data))]
+  household_data <- household_data[, !grepl("birthdate", names(household_data))]
 
   # fix a '000' participant entry
-  household_data['demo_parent2_reported_height_ft'] <- ifelse(household_data[['demo_parent2_reported_height_ft']] == '000', NA, as.numeric(household_data[['demo_parent2_reported_height_ft']]))
+  household_data['demo_parent2_rep_height_ft'] <- ifelse(household_data[['demo_parent2_rep_height_ft']] == '000', NA, as.numeric(household_data[['demo_parent2_rep_height_ft']]))
 
-  household_data['demo_parent2_reported_height_in'] <- ifelse(household_data[['demo_parent2_reported_height_in']] == '000', NA, as.numeric(household_data[['demo_parent2_reported_height_in']]))
+  household_data['demo_parent2_rep_height_in'] <- ifelse(household_data[['demo_parent2_rep_height_in']] == '000', NA, as.numeric(household_data[['demo_parent2_rep_height_in']]))
 
-  household_data['demo_parent2_reported_weight_lbs'] <- ifelse(household_data[['demo_parent2_reported_weight_lbs']] == '000', NA, as.numeric(household_data[['demo_parent2_reported_weight_lbs']]))
+  household_data['demo_parent2_rep_weight_lbs'] <- ifelse(household_data[['demo_parent2_rep_weight_lbs']] == '000', NA, as.numeric(household_data[['demo_parent2_rep_weight_lbs']]))
 
   # combine parent2 feet and inch components into 1 height variable in meters
-  household_data['demo_parent2_reported_height_m'] <- ((household_data[['demo_parent2_reported_height_ft']]*12) + household_data[['demo_parent2_reported_height_in']])*0.0254
+  household_data['demo_parent2_rep_height_m'] <- ((household_data[['demo_parent2_rep_height_ft']]*12) + household_data[['demo_parent2_rep_height_in']])*0.0254
 
   # calculate parent2 BMI (kg/m2)
-  household_data['demo_parent2_reported_bmi'] <- (household_data[['demo_parent2_reported_weight_lbs']]*0.453592) / (household_data[['parent2_reported_height_m']]**2)
+  household_data['demo_parent2_rep_bmi'] <- (household_data[['demo_parent2_rep_weight_lbs']]*0.453592) / (household_data[['parent2_rep_height_m']]**2)
 
   # food assistance programs
   names(household_data)[names(household_data) == 'demo_programs___0'] <- 'demo_assist_program_no'

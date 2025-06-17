@@ -1,7 +1,7 @@
 #' json_hfias: Generates a json file for the Household Food Insecurity Access Scale
 #'
-#' This function generates a json file for the scored Binge Eating Scale and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_hfias function in dataprepr and is only accurate for data collected in Study REACH
+#' This function generates a json file for the scored Household Food Insecurity Access Scale and raw participant responses.
+
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Household Food Insecurity Access Scale
 #'
@@ -19,7 +19,8 @@ json_hfias <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    hfias_form_date = list( Description = 'Date (YYYY-MM-DD) hfias form was completed on redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     hfias_1 = list( Description = '1. In the past four weeks, did you worry that your household would not have enough food?',
                  Levels = list ('0' = 'No',
                                 '1' = 'Yes')),

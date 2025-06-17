@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_redcap_child_v1.R
 \name{util_redcap_child_v1}
 \alias{util_redcap_child_v1}
-\title{util_redcap_child_v1: Organize child visit 1 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_child_v1: Organize child visit 1 data from REDCap}
 \usage{
 util_redcap_child_v1(data)
 }

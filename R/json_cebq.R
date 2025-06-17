@@ -1,7 +1,6 @@
 #' json_cebq: Generates a json file for the Children\'s Eating Behavior Questionnaire
 #'
 #' This function generates a json file for the scored Children\'s Eating Behavior Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cebq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Children\'s Eating Behavior Questionnaire
 #'
@@ -19,7 +18,8 @@ json_cebq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     cebq1 = list( Description = 'My child loves food',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Rarely',

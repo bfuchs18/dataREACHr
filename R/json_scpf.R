@@ -1,7 +1,6 @@
 #' json_scpf: Generates a json file for the Structure and Control in Parent Feeding questionnaire
 #'
 #' This function generates a json file for the scored Structure and Control in Parent Feeding questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_scpf function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Structure and Control in Parent Feeding questionnaire
 #'
@@ -19,7 +18,8 @@ json_scpf <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    scpf_form_date = list( Description = 'Date (YYYY-MM-DD) the scpf form was completed on Redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                        Unit = 'YYYY-MM-DD'),
     scpf1 = list( Description = 'I avoid buying sweets or desserts I don\'t want my child to eat.',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Rarely',

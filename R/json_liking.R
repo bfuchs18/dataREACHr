@@ -1,15 +1,23 @@
-#' json_v1_liking: Generates a json file for visit 1 VAS liking data
+#' json_liking: Generates a json file for visits 1 and 5 VAS liking data
 #'
-#' This function generates a json file for visit 1 VAS liking data
+#' This function generates a json file for visits 1 and 5 VAS liking data
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v1_liking <- function() {
+json_liking <- function() {
 
-  v1_liking_list <- list(
+  liking_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Visual Analog Liking Scale - 5 faces'),
+    participant_id = list( Description = 'participant id number'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     liking_popcorn = list( Description = 'Food Liking Visual Analogue Scale (VAS): How much do you like this popcorn?',
                            Levels = list ('0' =	'Hate it',
                                           '1'	= 'Dislike it',
@@ -103,12 +111,12 @@ json_v1_liking <- function() {
   )
 
   # convert formatting to JSON
-  v1_liking_json <- RJSONIO::toJSON(v1_liking_list, pretty = TRUE)
+  liking_json <- RJSONIO::toJSON(liking_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v1_liking_json, asText = TRUE))){
-    print('Liking for visit 1 JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(liking_json, asText = TRUE))){
+    print('Liking for visits 1 and 5 JSON file may be invalid')
   }
 
-  return(v1_liking_json)
+  return(liking_json)
 }

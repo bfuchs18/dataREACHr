@@ -1,7 +1,6 @@
 #' json_pmum: Generates a json file for the Problematic Media Use Measure
 #'
 #' This function generates a json file for the scored Problematic Media Use Measure and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_pmum function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A json file documenting the raw inputs and scored values for the Problematic Media Use Measure
 #'
@@ -19,7 +18,8 @@ json_pmum <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    pmum_form_date = list( Description = 'Date (YYYY-MM-DD) the PMUM form was completed on Redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     pmum1 = list( Description = 'My child lies in order to use screen media.',
                    Levels = list ('0' = 'Never',
                                   '1' = 'Rarely',

@@ -1,7 +1,6 @@
 #' json_cfpq: Generates a json file for the Comprehensive Feeding Practices Questionnaire
 #'
 #' This function generates a json file for the scored Comprehensive Feeding Practices Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cfpq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Comprehensive Feeding Practices Questionnaire
 #'
@@ -19,7 +18,8 @@ json_cfpq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    cfpq_form_date = list( Description = 'Date (YYYY-MM-DD) CFPQ form was completed on redcap'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     cfpq1 = list( Description = 'How much do you keep track of the sweets (candy, ice cream, cakes) that your child eats?',
                   Levels = list ('0' = 'Never',
                                  '1' = 'Rarely',

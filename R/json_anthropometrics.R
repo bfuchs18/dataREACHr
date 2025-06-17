@@ -14,6 +14,7 @@ json_anthropometrics <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    visit_date = list( Description = 'Date (YYYY-MM-DD) visit was completed'),
     visit_protocol = list( Description = 'REACH child visit protocol for data collection',
                            Levels = list ('1' = 'Child visit protocol 1',
                                           '5' = 'Child visit protocol 5')),

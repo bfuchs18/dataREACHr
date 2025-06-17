@@ -2,21 +2,46 @@
 % Please edit documentation in R/util_redcap_parent_v2.R
 \name{util_redcap_parent_v2}
 \alias{util_redcap_parent_v2}
-\title{util_redcap_parent_v2: Organize parent visit 2 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_parent_v2: Organize parent visit 2 data from REDCap}
 \usage{
-util_redcap_parent_v2(data, agesex_data, return_data = TRUE)
+util_redcap_parent_v2(data, date_demo_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_2_arm_1e'}
 
-\item{agesex_data}{dataframe with columns: 'participant_id', 'v2_age', 'sex' -- can have additional columns as long as these are in there; rerequired for scoring the BRIEF2}
+\item{date_demo_data}{dataframe with at least the following columns: 'participant_id', 'v2_age', 'sex', and 'v2_date'}
+}
+\value{
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
 
-\item{return_data}{If return_data is set to TRUE, will return a list including:
-\enumerate{
-\item clean raw parent 1 datasets
-\item meta-data/.json for each dataset
-}}
+Returned data includes:
+\itemize{
+\item{visit_data_parent}
+\item{cbq_data}
+\item{brief_data}
+\item{cshq_data}
+\item{bes_data}
+\item{ffbs_data}
+\item{fsq_data}
+\item{fsq_data}
+}
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event parent_visit_2_arm_1
+}
+\examples{
+
+# process REDCap data
+parent_visit2_list <- util_redcap_parent_v2(data, data_data)
+
+\dontrun{
+}
+
+}
+\seealso{
+\code{\link[=proc_redcap]{proc_redcap()}}
 }

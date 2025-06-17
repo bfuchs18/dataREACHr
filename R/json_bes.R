@@ -1,7 +1,6 @@
 #' json_bes: Generates a json file for the Binge Eating Scale
 #'
 #' This function generates a json file for the scored Binge Eating Scale and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_bes function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Binge Eating Scale
 #'
@@ -19,7 +18,8 @@ json_bes <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     bes1 = list( Description = 'Read all of the statements and mark the one that best describes the way you feel about problems your child has controlling his/her eating behavior',
                  Levels = list ('0' = 'My child doesn\'t feel self-conscious about his/her weight or body size when he/she is with others',
                                 '1' = 'My child feels concerned about how he/she looks to others, but it normally does not make him/her feel disappointed with him/herself',

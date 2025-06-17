@@ -1,7 +1,6 @@
 #' json_cbq: Generates a json file for the Children\'s Behavior Questionnaire
 #'
 #' This function generates a json file for the scored Children\'s Behavior Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cbq function in dataprepr and is only accurate for data collected in Study REACH
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Child Behavior Questionnaire
 #'
@@ -19,7 +18,8 @@ json_cbq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                     Levels = list ('ses-1' = 'session 1 / baseline',
                                    'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     cbq1 = list( Description = 'Seems always in a big hurry to get from one place to another.',
                  Levels = list ('0' =	'extremely untrue of your child',
                                 '1'	= 'quite untrue of your child',

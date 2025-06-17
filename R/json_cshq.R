@@ -1,7 +1,6 @@
 #' json_cshq: Generates a json file for the Children\'s Sleep Habits Questionnaire
 #'
 #' This function generates a json file for the scored Children\'s Sleep Habits Questionnaire and raw participant responses.
-#' This function provides accurate json files ONLY if data is processed using score_cshq function in dataprepr and is only accurate for data collected in Study REACH.
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Children\'s Sleep Habits Questionnaire
 #'
@@ -19,7 +18,8 @@ json_cshq <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     cshq_bed_time = list( Description = 'Child\'s bedtime (Please answer with a 24 hour clock):'),
     cshq_wake_time = list( Description = 'Child\'s usual wake time (Please answer with a 24 hour clock):'),
     cshq_night_sleep_amount_hrs_component = list( Description = 'Child\'s usual amount of sleep each night (no naps): _ hours, _ minutes: Hours component'),

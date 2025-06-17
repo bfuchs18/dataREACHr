@@ -6,7 +6,7 @@
 #'
 #' @return Will return a list including:
 #' \itemize{
-#'  \item{clean raw child visit 1 datasets}
+#'  \item{clean raw child visit 2 datasets}
 #'  \item{meta-data formated as json for each dataset}
 #'  }
 #'
@@ -29,7 +29,7 @@
 #' @export
 
 
-util_redcap_child_v2 <- function(data, return_data = TRUE) {
+util_redcap_child_v2 <- function(data) {
 
   #### 1. Set up/initial checks #####
 
@@ -56,12 +56,20 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
   #reduce columns and update names
 
   ## visit data ####
-  visit_data_child <- data[c('participant_id', 'v2_post_check_notes', 'visit_date')]
-  names(visit_data_child)[names(visit_data_child) == "v2_post_check_notes"] <- "v2_notes"
+  visit_data_child <- data[grepl('participant_id|notes|v2_date', names(data))]
+
+  names(visit_data_child)[names(visit_data_child) == 'v2_post_check_notes'] <- 'v2_notes'
+
+  names(data)[names(data) == 'v2_date'] <- 'visit_date'
+  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
 
   ## MRI notes ####
-  mri_info <- data[, grepl('_id|mri|cams|freddy|date', names(data))]
+  mri_info <- data[, grepl('_id|mri|cams|freddy|visit_date', names(data))]
+
+  # remove extra columns, add columns, and re-order
   mri_info <- mri_info[, !grepl('resting|freddy_visit_number', names(mri_info))]
+
+  mri_info <- mri_info[c('participant_id', 'session_id', 'visit_date', names(mri_info)[grepl('mri|cams|freddy', names(mri_info))])]
 
   # fix names
   names(mri_info) <- gsub('run_', 'run', names(mri_info))
@@ -74,12 +82,12 @@ util_redcap_child_v2 <- function(data, return_data = TRUE) {
   # Replace 'freddy' with 'fullness'
   names(mri_info) <- gsub('freddy', 'fullness', names(mri_info))
 
-  mri_info <- mri_info[c('participant_id', 'session_id', 'visit_date', names(mri_info)[grepl('mri|cams|fullness', names(mri_info))])]
-
   mri_info_json <- json_mri_v2()
 
   ## MRI behavioral assessment ####
   mri_assessment_data <- data[, grepl('_id|_familiarity|_recall|_liking|visit_date', names(data))]
+
+  # remove extra columns, add columns, and re-order
   mri_assessment_data <- mri_assessment_data[c('participant_id', 'session_id', 'visit_date', names(mri_assessment_data)[grepl('_familiarity|_recall|_liking', names(mri_assessment_data))])]
 
   # score this data?

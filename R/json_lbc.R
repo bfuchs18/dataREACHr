@@ -1,6 +1,6 @@
 #' json_lbc: Generates a json file for the Lifestyle Behavior Checklist
 #'
-#' This function generates a json file for the scored Lifestyle Behavior Checklist and raw participant responses. This function provides accurate json files ONLY if data is processed using score_lbc function in dataprepr and is only accurate for data collected in Study BRAKE.
+#' This function generates a json file for the scored Lifestyle Behavior Checklist and raw participant responses.
 #'
 #' @return A string with data stored in JSON format containing meta-data for the Lifestyle Behavior Checklist
 #'
@@ -18,7 +18,8 @@ json_lbc <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit this parent-reported survey was completed',
+                       Unit = 'YYYY-MM-DD'),
     lbc1 = list( Description = 'To what extent has this behavior been a problem for you with your child?: My child eats too quickly',
                  Levels = list ('0' = '1 - Not at all',
                                 '1' = '2',

@@ -1,20 +1,21 @@
-#' json_v3v4_intake: Generates a json file for intake data for visit 3 and visit 4
+#' json_v3v4v5_intake: Generates a json file for intake data for visits 3-5
 #'
-#' This function generates a json file for intake data for visit 3 and visit 4
+#' This function generates a json file for intake data for visits 3-5
 #'
 #' @return A string with data stored in JSON format containing meta-data
 #'
 #'
 #' @export
 
-json_v3v4_intake <- function() {
+json_v3v4v5_intake <- function() {
 
-  v3v4_intake_list <- list(
+  v3v4v5_intake_list <- list(
     participant_id = list( Description = 'participant id number'),
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
-    visit_date = list( Description = 'Date (YYYY-MM-DD) of visit this parent report survey was completed'),
+    visit_date = list( Description = 'Date of visit',
+                       Unit = 'YYYY-MM-DD'),
     advertisement_condition = list( Description = 'Advertisement Condition',
                                     Levels = list ('0' =	'Food',
                                                    '1' =	'Toy',
@@ -155,13 +156,13 @@ json_v3v4_intake <- function() {
   )
 
   # convert formatting to JSON
-  v3v4_intake_json <- RJSONIO::toJSON(v3v4_intake_list, pretty = TRUE)
+  v3v4v5_intake_json <- RJSONIO::toJSON(v3v4v5_intake_list, pretty = TRUE)
 
   # double check
-  if (isFALSE(RJSONIO::isValidJSON(v3v4_intake_json, asText = TRUE))){
-    print('Intake visit 3/visit 4 JSON file may be invalid')
+  if (isFALSE(RJSONIO::isValidJSON(v3v4v5_intake_json, asText = TRUE))){
+    print('Intake visit 3-5 JSON file may be invalid')
   }
 
-  return(v3v4_intake_json)
+  return(v3v4v5_intake_json)
 
 }
