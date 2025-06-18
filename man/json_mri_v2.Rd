@@ -10,5 +10,5 @@ json_mri_v2()
 A string with data stored in JSON format containing meta-data
 }
 \description{
-This function generates a json file for MRI visit 2 data (notes)
+This function generates a json file for MRI visit 2 data
 }

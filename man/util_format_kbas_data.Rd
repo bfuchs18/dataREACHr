@@ -7,7 +7,7 @@
 util_format_kbas_data(kbas_data)
 }
 \arguments{
-\item{kbas_data}{Kids Brand Awareness Survey from util_redcap_child_v1 and util_redcap_child_v5}
+\item{kbas_data}{Kids Brand Awareness Survey extracted from data from REDCap events}
 }
 \value{
 formatted kbas_data
@@ -18,7 +18,7 @@ This function formats Kids Brand Awareness Survey data
 \examples{
 
 # process kbas data
-child_visit1_list <- util_redcap_child_v1(data)
+kbas_data_formatted <- util_format_kbas_data(kbas_data)
 
 }
 \seealso{

@@ -2,19 +2,70 @@
 % Please edit documentation in R/util_redcap_parent_v5.R
 \name{util_redcap_parent_v5}
 \alias{util_redcap_parent_v5}
-\title{util_redcap_parent_v5: Organize parent visit 5 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_parent_v5: Organize parent visit 5 data from REDCap}
 \usage{
-util_redcap_parent_v5(data, return_data = TRUE)
+util_redcap_parent_v5(data, date_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_5_arm_1}
 
-\item{return_data}{If return_data is set to TRUE, will return a list including:
-\enumerate{
-\item clean raw parent 1 datasets
-\item meta-data/.json for each dataset
+\item{date_data}{date data for REDCap visit
+
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{demo_data}
+\item{infancy_data}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cfq_data}
+\item{cebq_data}
+\item{efcr_data}
+\item{chaos_data}
+\item{pss_data}
+\item{lbc_data}
 }}
+}
+\value{
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 5 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{visit_data_parent}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cebq_data}
+\item{cbq_data}
+\item{class_data}
+\item{ptsca_data}
+\item{pmum_data}
+\item{audit_data}
+\item{cfpq_data}
+}
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event parent_visit_5_arm_1
+}
+\examples{
+
+# process REDCap data
+parent_visit4_list <- util_redcap_parent_v5(data, date_data)
+
+\dontrun{
+}
+
+}
+\seealso{
+\code{\link[=proc_redcap]{proc_redcap()}}
 }

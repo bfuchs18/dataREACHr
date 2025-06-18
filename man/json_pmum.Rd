@@ -11,5 +11,4 @@ A json file documenting the raw inputs and scored values for the Problematic Med
 }
 \description{
 This function generates a json file for the scored Problematic Media Use Measure and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_pmum function in dataprepr and is only accurate for data collected in Study REACH
 }

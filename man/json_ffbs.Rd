@@ -11,5 +11,4 @@ A string with data stored in JSON format containing meta-data for the Family Foo
 }
 \description{
 This function generates a json file for the scored Family Food Behavior Survey and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_ffbs function in dataprepr and is only accurate for data collected in Study REACH
 }

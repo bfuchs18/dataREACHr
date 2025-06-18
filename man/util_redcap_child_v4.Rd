@@ -2,15 +2,44 @@
 % Please edit documentation in R/util_redcap_child_v4.R
 \name{util_redcap_child_v4}
 \alias{util_redcap_child_v4}
-\title{util_redcap_child_v4: Organize child visit 4 data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_child_v4: Organize child visit 4 data from REDCap}
 \usage{
-util_redcap_child_v4(data, return_data = TRUE)
+util_redcap_child_v4(data)
 }
 \arguments{
 \item{data}{data from REDCap event child_visit_4_arm_1}
+}
+\value{
+Will return a list including:
+\itemize{
+\item{clean raw child visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
 
-\item{return_data}{If return_data is set to TRUE, will return a list of dataframes including: visit_data_child, food_paradigm_info, eah_wanting, freddy_data, intake_data, loc_data, pptq_data, sic_data}
+Returned data includes:
+\itemize{
+\item{visit_data_child}
+\item{food_paradigm_info}
+\item{eah_wanting}
+\item{freddy_data}
+\item{intake_data}
+\item{loc_data}
+\item{pptq_data}
+\item{sic_data}
+}
 }
 \description{
 This function organizes REDCap data from REDCap visit data, event child_visit_4_arm_1
+}
+\examples{
+
+# process REDCap data
+child_visit4_list <- util_redcap_child_v4(data)
+
+\dontrun{
+}
+
+}
+\seealso{
+\code{\link[=proc_redcap]{proc_redcap()}}
 }

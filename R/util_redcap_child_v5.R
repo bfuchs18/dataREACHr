@@ -61,27 +61,35 @@ util_redcap_child_v5 <- function(data) {
   # add session column
   data$session_id <- 'ses-2'
 
+  # add visit
+  data['visit'] <- 5
+
+  # update date
+  names(data)[names(data) == 'v5_date'] <- 'visit_date'
+  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
+
   #reduce columns and update names
 
   ## visit data ####
-  visit_data_child <- data[grepl('participant_id|notes|v5_date', names(data))]
+  visit_data_child <- data[grepl('_id|notes|^visit', names(data))]
+
+  # remove extra columns and re-order
+  visit_data_child <- visit_data_child[, !grepl('dxa_id', names(visit_data_child))]
+
+  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
 
   names(visit_data_child)[names(visit_data_child) == 'v5_post_check_notes'] <- 'v5_notes'
   names(visit_data_child)[names(visit_data_child) == 'v6_pre_check_notes'] <- 'v5_pre_notes'
 
-  names(data)[names(data) == 'v5_date'] <- 'visit_date'
-  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
-
-
   ## intake-related data ####
 
   # food paradigm information (does not include fullness, intake)
-  food_paradigm_info <- data[, grepl('_id|meal|advertisement_condition|eah_notes|eah_intake_notes|visit_date', names(data))]
+  food_paradigm_info <- data[, grepl('_id|meal|advertisement_condition|eah_notes|eah_intake_notes|^visit', names(data))]
 
   # remove extra columns and re-order
   food_paradigm_info <- food_paradigm_info[, !grepl('freddy|consumed|dxa_id', names(food_paradigm_info))]
 
-  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
+  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
 
   # fix variable names
   names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
@@ -90,27 +98,27 @@ util_redcap_child_v5 <- function(data) {
 
 
   # eah wanting
-  eah_wanting <- data[, grepl('_id|wanting|advertisement_condition|visit_date', names(data))]
+  eah_wanting <- data[, grepl('_id|wanting|advertisement_condition|^visit', names(data))]
 
   # remove extra columns and re-order
   eah_wanting <- eah_wanting[, !grepl('dxa_id', names(eah_wanting))]
 
-  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
+  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
 
   eah_wanting_json <- json_eah_wanting()
 
   ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
-  intake_data <- data[, grepl('_id|plate|advertisement_condition|visit_date', names(data))]
+  intake_data <- data[, grepl('_id|plate|advertisement_condition|^visit', names(data))]
 
   # remove extra columns and re-order
   intake_data <- intake_data[, !grepl('dxa_id', names(intake_data))]
 
-  intake_data <- intake_data[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
+  intake_data <- intake_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
 
   intake_json <- json_v3v4v5_intake()
 
   ## freddy data -- this may or may not be replaced with double entry data ####
-  freddy_data <- data[, grepl('_id|freddy|advertisement_condition|visit_date', names(data))]
+  freddy_data <- data[, grepl('_id|freddy|advertisement_condition|^visit', names(data))]
 
   # Replace 'freddy' with 'fullness'
   names(freddy_data) <- gsub('freddy', 'fullness', names(freddy_data))
@@ -118,17 +126,17 @@ util_redcap_child_v5 <- function(data) {
   # remove extra columns and re-order
   freddy_data <- freddy_data[, !grepl('dxa_id', names(freddy_data))]
 
-  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
 
   freddy_json <- json_v3v4v5_freddy()
 
   ## vas food liking (eah and meal foods) ####
-  liking_data <- data[, grepl('_id|vas|advertisement_condition|visit_date', names(data))]
+  liking_data <- data[, grepl('_id|vas|^visit', names(data))]
 
   # remove extra columns and re-order
   liking_data <- liking_data[, !grepl('dxa_id|pre_vas_freddy', names(liking_data))]
 
-  liking_data <- liking_data[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(liking_data)[grepl('vas', names(liking_data))])]
+  liking_data <- liking_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(liking_data)[grepl('vas', names(liking_data))])]
 
   # fix variable names
   names(liking_data) <- gsub('cookie', 'oreo', names(liking_data))
@@ -197,14 +205,12 @@ util_redcap_child_v5 <- function(data) {
   tictoc_data <- tictoc_data[c('participant_id', 'session_id', 'visit_date', names(tictoc_data)[grepl('stq', names(tictoc_data))])]
 
   ## anthro data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
-  anthro_data <- data[, grepl('_id|height|weight|visit_date', names(data))]
+  anthro_data <- data[, grepl('_id|height|weight|^visit', names(data))]
 
   # remove extra columns, add columns, and re-order
   anthro_data <- anthro_data[, !grepl('dxa_id|check|notes|puberty|cooked', names(anthro_data))]
 
-  anthro_data$visit_protocol <- 5
-
-  anthro_data <- anthro_data[c('participant_id', 'session_id', 'visit_date', 'visit_protocol', names(anthro_data)[grepl('height|weight', names(anthro_data))])]
+  anthro_data <- anthro_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(anthro_data)[grepl('height|weight', names(anthro_data))])]
 
   # rename columns
   names(anthro_data) <- gsub('parent_', 'parent1_', names(anthro_data))

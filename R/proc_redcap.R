@@ -84,6 +84,7 @@ proc_redcap <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
 
     #remove empty columns
     sub_dat <- sub_dat[, !colSums(is.na(sub_dat)) == nrow(sub_dat)]
+
     #return
     return(sub_dat)
   }
@@ -121,120 +122,65 @@ proc_redcap <- function(base_wd, overwrite = FALSE, return_data = FALSE) {
   #### Process double-entry data ####
   processed_de_data <- util_redcap_de(redcap_de_data)
 
-  #### Stack questionnaire and update data collected on multiple visits ####
+  #### Combine data across visits ####
+  stq_all <- rbind.data.frame(child_v1_data$stq_data$data, child_v5_data$stq_data$data)
 
-  # Note: double entry data collected on multiple visits is stacked by util_redcap_de()
+  kbas_all <- rbind.data.frame(child_v1_data$kbas_data$data, child_v5_data$kbas_data$data)
 
-  stacked_stq <-
-    dplyr::bind_rows(child_v1_data$stq_data, child_v5_data$stq_data)
+  loc_all <- rbind.data.frame(child_v4_data$loc_data$data, child_v4_data$loc_data$data)
 
-  stacked_kbas <-
-    dplyr::bind_rows(child_v1_data$kbas_data, child_v5_data$kbas_data)
+  household_all <- rbind(data.table::setDT(parent_v1_data$household_data$data), data.table::setDT(parent_v5_data$household_data$data), fill = TRUE)
+  household_all <- as.data.frame(household_all)
 
-  stacked_loc <-
-    dplyr::bind_rows(child_v4_data$loc_data,
-                     child_v5_data$loc_data)
+  cebq_all <- rbind.data.frame(parent_v1_data$cebq_data$data$bids_phenotype, parent_v5_data$cebq_data$data$bids_phenotype)
 
-  stacked_household <-
-    dplyr::bind_rows(parent_v1_data$household_data,
-                     parent_v5_data$household_data)
+  cbq_all <- rbind.data.frame(parent_v2_data$cbq_data$data$bids_phenotype, parent_v5_data$cbq_data$data$bids_phenotype)
 
-  stacked_cebq <-
-    dplyr::bind_rows(
-      parent_v1_data$cebq_data$bids_phenotype,
-      parent_v5_data$cebq_data$bids_phenotype
-    ) %>% dplyr::relocate("session_id", .after = 1)
-
-  stacked_cbq <-
-    dplyr::bind_rows(parent_v2_data$cbq_data$bids_phenotype,
-                     parent_v5_data$cbq_data$bids_phenotype)
-
-  stacked_cshq <-
-    dplyr::bind_rows(
-      parent_v2_data$cshq_data$bids_phenotype,
-      parent_v5_data$cshq_data$bids_phenotype
-    )
+  cshq_all <- rbind.data.frame(parent_v2_data$cshq_data$data$bids_phenotype, parent_v5_data$cshq_data$data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
-  stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data, parent_v5_data$pstca_data)
-  # stacked_pstca <- dplyr::bind_rows(parent_v3_data$pstca_data$bids_phenotype, parent_v5_data$pstca_data$bids_phenotype)
+  pstca_all <- rbind.data.frame(parent_v3_data$pstca_data$data, parent_v5_data$ptsca_data$data)
 
-  stacked_audit <-
-    dplyr::bind_rows(
-      parent_v4_data$audit_data$bids_phenotype,
-      parent_v5_data$audit_data$bids_phenotype)
+  audit_all <- rbind.data.frame(parent_v4_data$audit_data$data$bids_phenotype, parent_v5_data$audit_data$data$bids_phenotype)
 
   # not scored/in bids_phenotype yet
-  stacked_pmum <- dplyr::bind_rows(parent_v4_data$pmum_data, parent_v5_data$pmum_data)
-  # stacked_pmum <- dplyr::bind_rows(parent_v4_data$pmum_data$bids_phenotype, parent_v5_data$pmum_data$bids_phenotype)
+  pmum_all <- rbind.data.frame(parent_v4_data$pmum_data$data, parent_v5_data$pmum_data$data)
 
-  stacked_cfpq <-
-    dplyr::bind_rows(
-      parent_v4_data$cfpq_data$bids_phenotype,
-      parent_v5_data$cfpq_data$bids_phenotype)
+
+  cfpq_all <- rbind.data.frame(parent_v4_data$cfpq_data$data$bids_phenotype, parent_v5_data$cfpq_data$data$bids_phenotype)
 
   # not scored/in bids_phenotype yet - will it be?
-  stacked_rank <- dplyr::bind_rows(parent_v1_data$rank_data, parent_v5_data$rank_data)
-  # stacked_rank <- dplyr::bind_rows(parent_v1_data$rank_data$bids_phenotype, parent_v5_data$rank_data$bids_phenotype)
+  rank_all <- rbind.data.frame(parent_v1_data$rank_data$data, parent_v5_data$rank_data$data)
 
   # not scored/in bids_phenotype yet - will it be?
-  stacked_class <- dplyr::bind_rows(parent_v3_data$class_data, parent_v5_data$class_data)
-  # stacked_class <- dplyr::bind_rows(parent_v3_data$class_data$bids_phenotype, parent_v5_data$class_data$bids_phenotype)
+  class_all <- rbind.data.frame(parent_v3_data$class_data$data, parent_v5_data$class_data$data)
 
   # stack child (V5) and parent (V1, V5) puberty data
-  stacked_puberty <- dplyr::bind_rows(
-    transform(parent_v1_data$puberty_data$bids_phenotype, respondent = "parent"),
-    transform(parent_v5_data$puberty_data$bids_phenotype, respondent = "parent"),
-    transform(child_v5_data$puberty_data$bids_phenotype, respondent = "child")) %>% dplyr::relocate("respondent", .after = 4)
+  puberty_all <- rbind(data.table::setDT(parent_v1_data$puberty_data$data$bids_phenotype), data.table::setDT(parent_v5_data$puberty_data$data$bids_phenotype), data.table::setDT(child_v5_data$puberty_data$data$bids_phenotype), fill = TRUE)
+  puberty_all <- as.data.frame(puberty_all)
 
-  # note: visit column is liking_visit_protocol -- this data will merged with intake data by session_id only
-  stacked_liking_data <- dplyr::bind_rows(
-    transform(child_v1_data$liking_data, liking_visit_protocol = "1"),
-    transform(child_v5_data$liking_data, liking_visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("liking_visit_protocol", .after = 2)
+  # eating paradigm
+  liking_all <- rbind.data.frame(child_v1_data$liking_data$data, child_v5_data$liking_data$data)
 
-  stacked_wanting_data <- dplyr::bind_rows(
-      transform(child_v3_data$eah_wanting, visit_protocol = "3"),
-      transform(child_v4_data$eah_wanting, visit_protocol = "4"),
-      transform(child_v5_data$eah_wanting, visit_protocol = "5")
-    ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  wanting_all <- rbind.data.frame(child_v3_data$eah_wanting$data, child_v4_data$eah_wanting$data, child_v5_data$eah_wanting$data)
 
-  stacked_fullness_data <- dplyr::bind_rows(
-    transform(child_v1_data$freddy_data, visit_protocol = "1"),
-    transform(child_v3_data$freddy_data, visit_protocol = "3"),
-    transform(child_v4_data$freddy_data, visit_protocol = "4"),
-    transform(child_v5_data$freddy_data, visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  fullness_all <- rbind(data.table::setDT(child_v1_data$freddy_data$data), data.table::setDT(child_v4_data$freddy_data$data), data.table::setDT(child_v5_data$freddy_data$data), fill=TRUE)
+  fullness_all <- as.data.frame(fullness_all)
 
-  stacked_food_paradigm_info <- dplyr::bind_rows(
-    transform(child_v1_data$food_paradigm_info, visit_protocol = "1"),
-    transform(child_v3_data$food_paradigm_info, visit_protocol = "3"),
-    transform(child_v4_data$food_paradigm_info, visit_protocol = "4"),
-    transform(child_v5_data$food_paradigm_info, visit_protocol = "5")
-    ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  food_paradigm_info_all <- rbind(data.table::setDT(child_v1_data$food_paradigm_info$data), data.table::setDT(child_v3_data$food_paradigm_info$data), data.table::setDT(child_v4_data$food_paradigm_info$data), data.table::setDT(child_v5_data$food_paradigm_info$data), fill = TRUE)
+  food_paradigm_info_all <- as.data.frame(food_paradigm_info_all)
 
-  stacked_updates <- dplyr::bind_rows(
-    parent_v2_data$visit_data_parent,
-    parent_v3_data$visit_data_parent,
-    parent_v4_data$visit_data_parent,
-    parent_v5_data$visit_data_parent
-  )
+  updates_all <- rbind(data.table::setDT(parent_v2_data$visit2_updates$data), data.table::setDT(parent_v3_data$visit3_updates$data), data.table::setDT(parent_v4_data$visit4_updates$data), data.table::setDT(parent_v5_data$visit5_updates$data), fill = TRUE)
+  updates_all <- as.data.frame(updates_all)
 
-  stacked_visit_anthro_data <- dplyr::bind_rows(
-    transform(child_v1_data$anthro_data, visit_protocol = "1"),
-    transform(child_v5_data$anthro_data, visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  anthro_all <- rbind.data.frame(child_v1_data$anthro_data$data, child_v5_data$anthro_data$data)
 
-  stacked_visit_intake_data <- dplyr::bind_rows(
-    transform(child_v1_data$intake_data, visit_protocol = "1"),
-    transform(child_v3_data$intake_data, visit_protocol = "3"),
-    transform(child_v4_data$intake_data, visit_protocol = "4"),
-    transform(child_v5_data$intake_data, visit_protocol = "5")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  intake_all <- rbind(data.table::setDT(child_v1_data$intake_data$data), data.table::setDT(child_v3_data$intake_data$data), data.table::setDT(child_v4_data$intake_data$data), data.table::setDT(child_v5_data$intake_data$data), fill = TRUE)
+  intake_all <- as.data.frame(intake_all)
 
   ### Process stacked intake data from visit forms (not double entered) ----
   # intake data from visit forms will output until double entry data is ready
-  stacked_visit_intake_data  <- util_calc_intake(stacked_visit_intake_data)
+  intake_all <- util_calc_intake(intake_all)
 
   ### Merge intake-related data ----
   # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)

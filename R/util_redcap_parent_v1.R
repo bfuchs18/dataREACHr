@@ -104,7 +104,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   # remove extra columns, add columns, and re-order
   rank_data <- rank_data[c('participant_id', 'session_id', 'visit_date', names(rank_data)[grepl('rank', names(rank_data))])]
 
-  # process household data
+  # process rank data
   rank_data <- util_format_rank_data(rank_data)
 
   rank_json <- json_rank()

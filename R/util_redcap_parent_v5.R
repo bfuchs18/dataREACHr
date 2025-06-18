@@ -37,6 +37,8 @@
 #'
 #' @seealso [proc_redcap()]
 #'
+#' @export
+
 
 util_redcap_parent_v5 <- function(data, date_data) {
 
@@ -103,6 +105,9 @@ util_redcap_parent_v5 <- function(data, date_data) {
 
   rank_data <- rank_data[c('participant_id', 'session_id', 'visit_date', names(rank_data)[grepl('rank', names(rank_data))])]
 
+  # process rank data
+  rank_data <- util_format_rank_data(rank_data)
+
   # score?
 
   ## Puberty Data ####
@@ -165,13 +170,16 @@ util_redcap_parent_v5 <- function(data, date_data) {
 
   # score? -- need to develop score script
 
-  ## PTSCA Data ####
-  ptsca_data <- data[, grepl('_id|ptsca|visit_date', names(data))]
+  ## PSTCA Data ####
+  pstca_data <- data[, grepl('_id|ptsca|visit_date', names(data))]
 
   # remove extra columns and re-order
-  ptsca_data <- ptsca_data[, !grepl('missingcheck', names(ptsca_data))]
+  pstca_data <- pstca_data[, !grepl('missingcheck', names(pstca_data))]
 
-  ptsca_data <- ptsca_data[c('participant_id', 'session_id', 'visit_date', names(ptsca_data)[grepl('ptsca', names(ptsca_data))])]
+  pstca_data <- pstca_data[c('participant_id', 'session_id', 'visit_date', names(pstca_data)[grepl('ptsca', names(pstca_data))])]
+
+  # fix scale names
+  names(pstca_data) <- gsub('ptsca', 'pstca', names(pstca_data))
 
   # score -- need to develop scorce script
 
@@ -219,7 +227,7 @@ util_redcap_parent_v5 <- function(data, date_data) {
     cbq_data = list(data = cbq_scored, meta = cbq_json),
     cshq_data = list(data = cshq_scored, meta = cshq_json),
     class_data = list(data = class_data, meta = NA),
-    ptsca_data = list(data = ptsca_data, meta = NA),
+    pstca_data = list(data = pstca_data, meta = NA),
     pmum_data = list(data = pmum_data, meta = NA),
     audit_data = list(data = audit_scored, meta = audit_json),
     cfpq_data = list(data = cfpq_scored, meta = cfpq_json)))

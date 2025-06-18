@@ -10,6 +10,5 @@ json_hfias()
 A string with data stored in JSON format containing meta-data for the Household Food Insecurity Access Scale
 }
 \description{
-This function generates a json file for the scored Binge Eating Scale and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_hfias function in dataprepr and is only accurate for data collected in Study REACH
+This function generates a json file for the scored Household Food Insecurity Access Scale and raw participant responses.
 }

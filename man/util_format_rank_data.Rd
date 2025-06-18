@@ -2,16 +2,22 @@
 % Please edit documentation in R/util_format_rank_data.R
 \name{util_format_rank_data}
 \alias{util_format_rank_data}
-\title{util_format_rank_data: process Ranking Food Item Questionnaire data}
+\title{util_format_rank_data: process Ranking Food Item Questionnaire data for REACH visit 1 and 5}
 \usage{
 util_format_rank_data(rank_data)
 }
 \arguments{
-\item{rank_data}{rank extracted from data from REDCap events util_redcap_parent_v1}
+\item{rank_data}{rank extracted from data from REDCap events}
 }
 \description{
 This function process Ranking Food Item Questionnaire data
 }
+\examples{
+
+# process data
+rank_data_formatted <- util_format_rank_data(rank_data)
+
+}
 \seealso{
-\code{\link[=util_redcap_parent_v1]{util_redcap_parent_v1()}}
+\code{\link[=util_redcap_parent_v1]{util_redcap_parent_v1()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}
 }

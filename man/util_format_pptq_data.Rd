@@ -2,13 +2,22 @@
 % Please edit documentation in R/util_format_pptq_data.R
 \name{util_format_pptq_data}
 \alias{util_format_pptq_data}
-\title{util_format_pptq_data: Prepare PPTQ data for scoring (called within util_redcap_child_v4.R)}
+\title{util_format_pptq_data: Prepare PPTQ data for scoring}
 \usage{
 util_format_pptq_data(pptq_data)
 }
 \arguments{
-\item{pptq_data}{PPTQ extracted from data from REDCap event child_visit_4_arm_1'}
+\item{pptq_data}{PPTQ extracted from data from REDCap event}
 }
 \description{
-This function prepares PPTQ data for scoring with dataprepr::score_hfi()
+This function prepares PPTQ data for scoring with dataprepr::score_pptq()
+}
+\examples{
+
+# process data
+pptq_data_formatted <- util_format_pptq_data(pptq_data)
+
+}
+\seealso{
+\code{\link[=util_redcap_child_v1=4]{util_redcap_child_v1=4()}}
 }

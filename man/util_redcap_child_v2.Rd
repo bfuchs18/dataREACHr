@@ -4,7 +4,7 @@
 \alias{util_redcap_child_v2}
 \title{util_redcap_child_v2: Organize child visit 2 data from REDCap}
 \usage{
-util_redcap_child_v2(data, return_data = TRUE)
+util_redcap_child_v2(data)
 }
 \arguments{
 \item{data}{data from REDCap event child_visit_2_arm_1}
@@ -12,7 +12,7 @@ util_redcap_child_v2(data, return_data = TRUE)
 \value{
 Will return a list including:
 \itemize{
-\item{clean raw child visit 1 datasets}
+\item{clean raw child visit 2 datasets}
 \item{meta-data formated as json for each dataset}
 }
 

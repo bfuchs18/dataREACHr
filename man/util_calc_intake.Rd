@@ -4,14 +4,25 @@
 \alias{util_calc_intake}
 \title{util_calc_intake: Computes intake variables (called within util_redcap_de.R)}
 \usage{
-util_calc_intake(stacked_intake)
+util_calc_intake(intake_data, generate_ed_data = FALSE)
 }
 \arguments{
-\item{stacked_intake}{Intake data (i.e., pre and post weights) extracted double entry data}
+\item{intake_data}{Intake data (i.e., pre and post weights) extracted double entry data}
+
+\item{generate_ed_data}{(logical) re-generate food ED database, default = FALSE}
 }
 \value{
-A dataframe of stacked_intake (input) variables and calculated intake variables
+A dataframe of intake_data (input) variables and calculated intake variables
 }
 \description{
 This function computes intake variables
+}
+\examples{
+
+# process data
+intake_calc <- util_calc_intake(intake_data)
+
+}
+\seealso{
+\code{\link[=proc_redcap]{proc_redcap()}}
 }

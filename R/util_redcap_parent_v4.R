@@ -34,6 +34,10 @@
 #'
 #' @seealso [proc_redcap()]
 #'
+#'
+#' @export
+
+
 util_redcap_parent_v4 <- function(data, date_data) {
 
   #### 1. Set up/initial checks #####
@@ -62,10 +66,11 @@ util_redcap_parent_v4 <- function(data, date_data) {
   #reduce columns and update names
 
   ## Update form Data ####
-  visit_data_parent <- data[, !grepl('_id|update|visit_date', names(data))]
+  visit_data_parent <- data[, grepl('_id|update|visit_date', names(data))]
 
   # remove extra columns and re-order
   visit_data_parent <- visit_data_parent[, !grepl('contact|moving', names(visit_data_parent))]
+
   visit_data_parent <- visit_data_parent[c('participant_id', 'session_id', 'visit_date', names(visit_data_parent)[grepl('update', names(visit_data_parent))])]
 
   # rename columns
@@ -128,6 +133,8 @@ util_redcap_parent_v4 <- function(data, date_data) {
   audit_data <- data[, grepl('_id|audit|visit_date', names(data))]
 
   # remove extra columns and re-order
+  audit_data <- audit_data[, !grepl('missingcheck', names(audit_data))]
+
   audit_data <- audit_data[c('participant_id', 'session_id', 'visit_date', names(audit_data)[grepl('audit', names(audit_data))])]
 
   audit_scored <- dataprepr::score_audit(audit_data, id = 'participant_id', base_zero = TRUE)

@@ -1,10 +1,21 @@
-#' util_format_hfi_data: Prepare Fulkerson HFI data for scoring (called within util_redcap_parent_v4.R)
+#' util_format_hfi_data: Prepare Fulkerson HFI data for scoring
 #'
 #' This function prepares Fulkerson HFI data for scoring with dataprepr::score_hfi()
 #'
 #'
-#' @param hfi_data Fulkerson HFI extracted from data from REDCap event parent_visit_4_arm_1'
+#' @param hfi_data Fulkerson HFI extracted from data from REDCap event
 #'
+#' @examples
+#'
+#' # process data
+#' hfi_data_formatted <- util_format_hfi_data(hfi_data)
+#'
+#' @seealso [util_redcap_parent_v4()]
+#'
+#' @export
+#'
+
+
 util_format_hfi_data <- function(hfi_data) {
 
   # update names

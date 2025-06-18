@@ -7,10 +7,8 @@
 json_puberty()
 }
 \value{
-A string with data stored in JSON format containing meta-data for the Pubertal Development Score.
+A string with data stored in JSON format containing meta-data for the Pubertal Development Score and Tanner.
 }
 \description{
-This function generates a json file for the scored Pubertal Development Scale and and raw participant responses.
-This function provides accurate json files ONLY if data is child-report and adult-reported ratings are processed using score_pds function in dataprepr and combined using proc_redcap() in dataREACHr.
-This is only accurate for data collected in Study BREAK
+This function generates a json file for the scored Pubertal Development Scale, Tanner, and raw participant responses.
 }

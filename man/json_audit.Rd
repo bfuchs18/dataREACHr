@@ -11,5 +11,4 @@ A string with data stored in JSON format containing meta-data the Alcohol Use Di
 }
 \description{
 This function generates a json file for the scored Alcohol Use Disorders Identification Test and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_audit function in dataprepr and is only accurate for data collected in Study REACH
 }

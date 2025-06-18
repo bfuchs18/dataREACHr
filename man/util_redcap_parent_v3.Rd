@@ -4,38 +4,15 @@
 \alias{util_redcap_parent_v3}
 \title{util_redcap_parent_v3: Organize parent visit 3 data from REDCap}
 \usage{
-util_redcap_parent_v3(data, date_data)
+util_redcap_parent_v3(data, data_data)
 }
 \arguments{
-\item{data}{data from REDCap event parent_visit_3_arm_1'}
-
-\item{date_data}{date data for REDCap visit
-
-Will return a list including:
-\itemize{
-\item{clean raw and scored parent visit 1 datasets}
-\item{meta-data formated as json for each dataset}
-}
-
-Returned data includes:
-\itemize{
-\item{demo_data}
-\item{infancy_data}
-\item{household_data}
-\item{rank_data}
-\item{puberty_data}
-\item{cfq_data}
-\item{cebq_data}
-\item{efcr_data}
-\item{chaos_data}
-\item{pss_data}
-\item{lbc_data}
-}}
+\item{data}{data from REDCap event parent_visit_3_arm_1}
 }
 \value{
 Will return a list including:
 \itemize{
-\item{clean raw and scored parent visit 1 datasets}
+\item{clean raw and scored parent visit 3 datasets}
 \item{meta-data formated as json for each dataset}
 }
 
@@ -45,9 +22,9 @@ Returned data includes:
 \item{spsrq_scored}
 \item{pwlb_scored}
 \item{tfeq_scored}
-\item{class_data}
+\item{class_score}
 \item{bisbas_scored}
-\item{pstca_data}
+\item{pstca_scored}
 \item{debq_scored}
 \item{scpf_scored}
 }

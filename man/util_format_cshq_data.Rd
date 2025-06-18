@@ -7,10 +7,17 @@
 util_format_cshq_data(cshq_data)
 }
 \arguments{
-\item{cshq_data}{cshq extracted from data from REDCap events util_redcap_parent_v2 and util_redcap_parent_v5
-
-#' @seealso \code{\link[=util_redcap_parent_v2]{util_redcap_parent_v2()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}}
+\item{cshq_data}{cshq extracted from data from REDCap events}
 }
 \description{
 This function prepares Child Sleep Habits Questionnaire data for scoring with dataprepr::score_cshq by re-leveling scored items to have numeric values 1-3: (3 - Usually, 2 - Sometimes, 1 - Rarely or 1 - not sleepy, 2 - very sleepy, 3 - falls asleep)
+}
+\examples{
+
+# process data
+cshq_data_formatted <- util_format_household_data(cshq_data)
+
+}
+\seealso{
+\code{\link[=util_redcap_parent_v2]{util_redcap_parent_v2()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}
 }

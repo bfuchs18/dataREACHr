@@ -7,12 +7,18 @@
 util_format_puberty_data(puberty_data, respondent)
 }
 \arguments{
-\item{puberty_data}{Puberty data (parental_rating_scale_for_pubertal_development, Tanner) extracted from data from REDCap events parent_visit_1_arm_1 and parent_visit_5_arm_1'}
+\item{puberty_data}{Puberty data (Parental Rating Scale for Pubertal Development and Tanner) extracted from data from REDCap events}
 
-\item{respondent}{string to indicate who completed the form. Must be "child" or "parent"}
+\item{respondent}{string to indicate who completed the form. Must be 'child' or 'parent'}
 }
 \description{
 This function prepares parent-reported puberty data for scoring with dataprepr::score_puberty()
+}
+\examples{
+
+# process kbas data
+puberty_data_formatted <- util_format_puberty_data(puberty_data, respondent = 'child')
+
 }
 \seealso{
 \code{\link[=util_redcap_parent_v1]{util_redcap_parent_v1()}}, \code{\link[=util_redcap_parent_v5]{util_redcap_parent_v5()}}

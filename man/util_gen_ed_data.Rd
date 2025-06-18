@@ -6,6 +6,18 @@
 \usage{
 util_gen_ed_data()
 }
+\value{
+A dataframe with energy density data
+}
 \description{
 This function generates a dataframe with energy density data for processing intake data with util_redcap_de()
+}
+\examples{
+
+# process data
+ed_data <- util_gen_ed_data(intake_data)
+
+}
+\seealso{
+\code{\link[=util_calc_intake]{util_calc_intake()}}
 }

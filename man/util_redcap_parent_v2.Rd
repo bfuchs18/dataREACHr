@@ -4,17 +4,38 @@
 \alias{util_redcap_parent_v2}
 \title{util_redcap_parent_v2: Organize parent visit 2 data from REDCap}
 \usage{
-util_redcap_parent_v2(data, date_demo_data)
+util_redcap_parent_v2(data, date_data)
 }
 \arguments{
-\item{data}{data from REDCap event parent_visit_2_arm_1e'}
+\item{data}{data from REDCap event parent_visit_2_arm_1}
 
-\item{date_demo_data}{dataframe with at least the following columns: 'participant_id', 'v2_age', 'sex', and 'v2_date'}
+\item{date_data}{date data for REDCap visit
+
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{demo_data}
+\item{infancy_data}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cfq_data}
+\item{cebq_data}
+\item{efcr_data}
+\item{chaos_data}
+\item{pss_data}
+\item{lbc_data}
+}}
 }
 \value{
 Will return a list including:
 \itemize{
-\item{clean raw and scored parent visit 1 datasets}
+\item{clean raw and scored parent visit 2 datasets}
 \item{meta-data formated as json for each dataset}
 }
 
@@ -26,7 +47,6 @@ Returned data includes:
 \item{cshq_data}
 \item{bes_data}
 \item{ffbs_data}
-\item{fsq_data}
 \item{fsq_data}
 }
 }

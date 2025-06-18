@@ -2,13 +2,13 @@
 % Please edit documentation in R/json_parent_updates.R
 \name{json_parent_updates}
 \alias{json_parent_updates}
-\title{json_parent_updates: Generates a json file for parent_updates}
+\title{json_parent_updates: Generates a json file for parent visit updates}
 \usage{
 json_parent_updates()
 }
 \value{
-A string with data stored in JSON format containing meta-data for parent_updates
+A string with data stored in JSON format containing meta-data for parent visit updates
 }
 \description{
-json_parent_updates: Generates a json file for parent_updates
+This function generates a json file for visit parent visit updates
 }

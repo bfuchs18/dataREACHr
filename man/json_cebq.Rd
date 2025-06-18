@@ -11,5 +11,4 @@ A string with data stored in JSON format containing meta-data for the Children\'
 }
 \description{
 This function generates a json file for the scored Children\'s Eating Behavior Questionnaire and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_cebq function in dataprepr and is only accurate for data collected in Study REACH
 }

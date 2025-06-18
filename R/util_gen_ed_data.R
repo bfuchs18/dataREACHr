@@ -2,8 +2,18 @@
 #'
 #' This function generates a dataframe with energy density data for processing intake data with util_redcap_de()
 #'
+#' @return A dataframe with energy density data
 #'
+#' @examples
 #'
+#' # process data
+#' ed_data <- util_gen_ed_data(intake_data)
+#'
+#' @seealso [util_calc_intake()]
+#'
+#' @export
+
+
 util_gen_ed_data <- function() {
 
   # calculate energy densities (kcal/g) according to nutrition label
@@ -41,7 +51,10 @@ util_gen_ed_data <- function() {
   # generate dataframe
   ed_data <- data.frame(food, ed)
 
-  # return dataframe
-  return(ed_data)
+  #write out to raw-data
+  write.csv(ed_data, "data-raw/reach_foodED_ref.csv", row.names = FALSE)
+
+  #make a database for the package
+  usethis::use_data(ed_data, overwrite = TRUE)
 
 }

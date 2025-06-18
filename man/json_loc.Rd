@@ -10,5 +10,5 @@ json_loc()
 A json file documenting the raw inputs and scored values for the Loss of Control-Eating Questionnaire.
 }
 \description{
-This function generates a json file for the Loss of Control-Eating Questionnaire with raw participant responses. This function provides accurate json files ONLY if data was collected in Study REACH
+This function generates a json file for the Loss of Control-Eating Questionnaire with raw participant responses.
 }

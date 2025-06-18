@@ -5,6 +5,11 @@
 #'
 #' @param rank_data rank extracted from data from REDCap events
 #'
+#' @examples
+#'
+#' # process data
+#' rank_data_formatted <- util_format_rank_data(rank_data)
+#'
 #' @seealso [util_redcap_parent_v1()], [util_redcap_parent_v5()]
 #'
 #' @export

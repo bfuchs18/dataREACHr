@@ -52,59 +52,67 @@ util_redcap_child_v3 <- function(data) {
   # add session column
   data['session_id'] <- 'ses-1'
 
+  # add visit
+  data['visit'] <- 3
+
+  # update date
+  names(data)[names(data) == 'v3_date'] <- 'visit_date'
+  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
+
   #reduce columns and update names
 
   ## visit data ####
-  visit_data_child <- data[grepl('participant_id|notes|v3_date', names(data))]
+  visit_data_child <- data[grepl('_id|notes|^visit', names(data))]
+
+  # remove extra columns and re-order
+  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
 
   names(visit_data_child)[names(visit_data_child) == 'v3_post_check_notes'] <- 'v3_notes'
   names(visit_data_child)[names(visit_data_child) == 'v4_pre_check_notes'] <- 'v4_pre_notes'
 
-  names(data)[names(data) == 'v3_date'] <- 'visit_date'
-  data['visit_date'] <- lubridate::as_date(data[['visit_date']])
-
   ## food paradigm data ####
 
   # food paradigm information (does not include intake and freddy values)
-  food_paradigm_info <- data[, grepl('_id|meal|advertisement_condition|eah|visit_date', names(data))]
+  food_paradigm_info <- data[grepl('_id|meal|advertisement_condition|eah|^visit', names(data))]
 
   # remove extra columns and re-order
-  names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
-  food_paradigm_info <- food_paradigm_info[, !grepl('complete|freddy|wanting|consumed|intake|water', names(food_paradigm_info))]
+  food_paradigm_info <- food_paradigm_info[!grepl('complete|freddy|wanting|consumed|intake|water', names(food_paradigm_info))]
 
-  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
+  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
+
+  names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
   food_paradigm_json <- json_v3v4v5_food_paradigm()
 
   # eah wanting ####
-  eah_wanting <- data[, grepl('_id|advertisement_condition|wanting|visit_date', names(data))]
+  eah_wanting <- data[grepl('_id|advertisement_condition|wanting|^visit', names(data))]
 
   # remove extra columns and re-order
-  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
+  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
 
   eah_wanting_json <- json_eah_wanting()
 
   ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
-  intake_data <- data[, grepl('_id|plate|advertisement_condition|visit_date', names(data))]
+  intake_data <- data[grepl('_id|plate|advertisement_condition|^visit', names(data))]
 
   # remove extra columns and re-order
-  intake_data <- intake_data[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
+  intake_data <- intake_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
 
   intake_json <- json_v3v4v5_intake()
 
   ## freddy data ####
-  freddy_data <- data[, grepl('_id|freddy|advertisement_condition|visit_date', names(data))]
+  freddy_data <- data[grepl('_id|freddy|advertisement_condition|^visit', names(data))]
 
   # Replace 'freddy' with 'fullness'
   names(freddy_data) <- gsub('freddy', 'fullness', names(freddy_data))
 
   # remove extra columns and re-order
-  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
 
   freddy_json <- json_v3v4v5_freddy()
 
   ## sleep log ####
-  sleeplog_data <- data[, grepl('_id|date|bedtime|asleep|attempt|times|waso|awake|out_on|rating|comment|visit_date', names(data))]
+  sleeplog_data <- data[grepl('_id|date|bedtime|asleep|attempt|times|waso|awake|out_on|rating|comment|visit_date', names(data))]
 
   # remove extra columns and re-order
   sleeplog_data <- sleeplog_data[c('participant_id', 'session_id', 'visit_date', names(sleeplog_data)[grepl('date|bedtime|asleep|attempt|times|waso|awake|out_on|rating|comment', names(sleeplog_data))])]

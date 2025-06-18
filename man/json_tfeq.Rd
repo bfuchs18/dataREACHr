@@ -11,5 +11,4 @@ A string with data stored in JSON format containing meta-data for the Three-Fact
 }
 \description{
 This function generates a json file for the scored Three-Factor Eating Questionnaire-R18 and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_tfeq18 function in dataprepr and is only accurate for data collected in Study REACH
 }

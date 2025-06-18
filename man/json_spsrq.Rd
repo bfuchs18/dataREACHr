@@ -11,5 +11,4 @@ A string with data stored in JSON format containing meta-data for the Sensitivit
 }
 \description{
 This function generates a json file for the scored Sensitivity to Punishment and Sensitivity to Reward Questionnaire and raw participant responses.
-This function provides accurate json files ONLY if data is processed using score_spsrq function in dataprepr and is only accurate for data collected in Study REACH.
 }

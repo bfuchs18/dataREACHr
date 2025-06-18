@@ -33,6 +33,8 @@
 #' }
 #'
 #' @seealso [proc_redcap()]
+#'
+#' @export
 
 
 

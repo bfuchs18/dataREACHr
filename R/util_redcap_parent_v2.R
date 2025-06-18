@@ -32,6 +32,9 @@
 #' }
 #'
 #' @seealso [proc_redcap()]
+#'
+#' @export
+
 
 
 util_redcap_parent_v2 <- function(data, date_data) {
