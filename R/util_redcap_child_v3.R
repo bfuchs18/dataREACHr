@@ -53,7 +53,7 @@ util_redcap_child_v3 <- function(data) {
   data['session_id'] <- 'ses-1'
 
   # add visit
-  data['visit'] <- 3
+  data['visit_protocol'] <- 3
 
   # update date
   names(data)[names(data) == 'v3_date'] <- 'visit_date'
@@ -65,10 +65,12 @@ util_redcap_child_v3 <- function(data) {
   visit_data_child <- data[grepl('_id|notes|^visit', names(data))]
 
   # remove extra columns and re-order
-  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
+  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
 
   names(visit_data_child)[names(visit_data_child) == 'v3_post_check_notes'] <- 'v3_notes'
-  names(visit_data_child)[names(visit_data_child) == 'v4_pre_check_notes'] <- 'v4_pre_notes'
+  names(visit_data_child)[names(visit_data_child) == 'v4_pre_check_notes'] <- 'v3_pre_notes'
+
+  names(visit_data_child)[!grepl('_id|v3|^visit', names(visit_data_child))] <- paste0('v3_',  names(visit_data_child)[!grepl('_id|v3|^visit', names(visit_data_child))])
 
   ## food paradigm data ####
 
@@ -78,7 +80,7 @@ util_redcap_child_v3 <- function(data) {
   # remove extra columns and re-order
   food_paradigm_info <- food_paradigm_info[!grepl('complete|freddy|wanting|consumed|intake|water', names(food_paradigm_info))]
 
-  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
+  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(food_paradigm_info)[grepl('meal|eah', names(food_paradigm_info))])]
 
   names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
@@ -88,7 +90,7 @@ util_redcap_child_v3 <- function(data) {
   eah_wanting <- data[grepl('_id|advertisement_condition|wanting|^visit', names(data))]
 
   # remove extra columns and re-order
-  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
+  eah_wanting <- eah_wanting[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(eah_wanting)[grepl('wanting', names(eah_wanting))])]
 
   eah_wanting_json <- json_eah_wanting()
 
@@ -96,7 +98,7 @@ util_redcap_child_v3 <- function(data) {
   intake_data <- data[grepl('_id|plate|advertisement_condition|^visit', names(data))]
 
   # remove extra columns and re-order
-  intake_data <- intake_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
+  intake_data <- intake_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_data)[grepl('plate', names(intake_data))])]
 
   intake_json <- json_v3v4v5_intake()
 
@@ -107,7 +109,11 @@ util_redcap_child_v3 <- function(data) {
   names(freddy_data) <- gsub('freddy', 'fullness', names(freddy_data))
 
   # remove extra columns and re-order
-  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+  freddy_data <- freddy_data[, !grepl('check|visit_number', names(freddy_data))]
+
+  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+
+  names(freddy_data) <- gsub('vas', 'liking', names(freddy_data))
 
   freddy_json <- json_v3v4v5_freddy()
 

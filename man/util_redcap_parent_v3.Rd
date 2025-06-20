@@ -4,10 +4,33 @@
 \alias{util_redcap_parent_v3}
 \title{util_redcap_parent_v3: Organize parent visit 3 data from REDCap}
 \usage{
-util_redcap_parent_v3(data, data_data)
+util_redcap_parent_v3(data, date_data)
 }
 \arguments{
 \item{data}{data from REDCap event parent_visit_3_arm_1}
+
+\item{date_data}{date data for REDCap visit
+
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{demo_data}
+\item{infancy_data}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cfq_data}
+\item{cebq_data}
+\item{efcr_data}
+\item{chaos_data}
+\item{pss_data}
+\item{lbc_data}
+}}
 }
 \value{
 Will return a list including:

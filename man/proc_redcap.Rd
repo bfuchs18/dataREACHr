@@ -4,36 +4,36 @@
 \alias{proc_redcap}
 \title{proc_redcap: Process raw data downloaded from Study REACH REDCap}
 \usage{
-proc_redcap(base_wd, overwrite = FALSE, return_data = FALSE)
+proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
 }
 \arguments{
-\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
+\item{redcap_api}{(logical) execute REDCap API. Default = FALSE.}
 
-\item{overwrite}{(logical) data should be overwritten. Default = FALSE}
+\item{redcap_visit_data}{REDCap visit data from a prior API call}
+
+\item{redcap_de_data}{REDCap double-entry data from a prior API call}
 }
 \value{
 Will return a list including:
-\enumerate{
-\item input_data: list with 2 dataframes with raw data (visit_data, de_data (double_entered data))
-\item visit_data: list of 10 dataframes with intermediate-processed visit data (child_v1_data, child_v2_data, child_v3_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
-\item double_entry_data: list of dataframes with intermediate-processed double entry data
-\item phenotype_data: list of dataframes with processed data that gets exported into bids/phenotype
+\itemize{
+\item{participants: list including data.frame with BIDS participants.tsv information and metadata}
+\item{questionnaires: a list of 37 individual questionnaire lists including a data.frame and metadata}
+\item{demographics}
+\item{anthropometrics}
+\item{intake}
+\item{mri_visit}
+\item{dexa}
+\item{researcher_notes}
+\item{parent_updates}
 }
 }
 \description{
 This function:
-\enumerate{
-\item Reads REDCap data (visit and double-entry) from bids/sourcedata
-\item Calls util_ functions to clean and compile data in dataframes
-\item Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe
-\item Exports the following BIDS-compliant .tsv files into bids/phenotype:
 \itemize{
-\item questionnaire data - raw and scores: efcr, lbc, pss, brief2, bes, ffbs, spsrq, pwlb, tfeq, bisbas, debq, scpf, hfssm, cchip, pptq, stq, kbas, cebq, audit, cfpq, puberty, cshq, chaos, cfq
-\item questionnaire data - raw only: infancy, household, fsq, hfias, sic, fhfi, pstca, pmum, rank, loc, cbq
-\item compiled and researcher-entered data: demographics, intake, anthropometrics, dexa, mri_visit, sleeplog, (wasi?, notes?, updates?)
-}
-\item Exports bids/participants.tsv
-\item Exports a .json file with meta-data for each .tsv
+\item{1) Reads REDCap data (visit and double-entry) using the REDCap API}
+\item{2) Calls util_ functions to clean and compile data in dataframes}
+\item{3) Calls json_ functions to create strings with meta-data stored in JSON format for each dataframe}
+\item{4) Compiles data repeated across visits and sessions}
 }
 }
 \details{

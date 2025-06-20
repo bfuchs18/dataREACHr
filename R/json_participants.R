@@ -43,7 +43,7 @@ json_participants <- function() {
     child_protocol_5_age = list( Description = 'Child age at child visit protocol 5. Computed as difference between child_protocol_5_date and child date of birth (not shared',
                    Unit = 'years',
                    Derivative = TRUE),
-    child_protocol_order = list( Description = 'Child protocol visit order based on child_protocol dates',
+    protocol_visits_order = list( Description = 'Child protocol visit order based on child_protocol dates',
                                  Derivative = TRUE),
     child_protocol_1_date = list( Description = 'Date of child visit protocol 1 (YYYY-MM-DD). This was always the first visit of the study'),
     child_protocol_2_date = list( Description = 'Date of child visit protocol 2 (YYYY-MM-DD)'),

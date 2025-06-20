@@ -15,7 +15,7 @@ This function prepares Child Sleep Habits Questionnaire data for scoring with da
 \examples{
 
 # process data
-cshq_data_formatted <- util_format_household_data(cshq_data)
+cshq_data_formatted <- util_format_cshq_data(cshq_data)
 
 }
 \seealso{

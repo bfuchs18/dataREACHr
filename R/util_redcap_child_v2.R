@@ -54,7 +54,7 @@ util_redcap_child_v2 <- function(data) {
   data['session_id'] <- 'ses-1'
 
   # add visit
-  data['visit'] <- 2
+  data['visit_protocol'] <- 2
 
   # update date
   names(data)[names(data) == 'v2_date'] <- 'visit_date'
@@ -66,9 +66,12 @@ util_redcap_child_v2 <- function(data) {
   visit_data_child <- data[grepl('_id|notes|^visit', names(data))]
 
   # remove extra columns, add columns, and re-order
-  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
+  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
 
   names(visit_data_child)[names(visit_data_child) == 'v2_post_check_notes'] <- 'v2_notes'
+  names(visit_data_child) <- gsub('viewing', 'view', names(visit_data_child))
+
+  names(visit_data_child)[!grepl('_id|v2|^visit', names(visit_data_child))] <- paste0('v2_',  names(visit_data_child)[!grepl('_id|v2|^visit', names(visit_data_child))])
 
   ## MRI notes ####
   mri_info <- data[grepl('_id|mri|cams|freddy|visit_date', names(data))]

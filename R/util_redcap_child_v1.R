@@ -55,7 +55,7 @@ util_redcap_child_v1 <- function(data) {
   data['session_id'] <- 'ses-1'
 
   # add visit number
-  data['visit'] <- 1
+  data['visit_protocol'] <- 1
 
   names(data)[names(data) == 'v1_date'] <- 'visit_date'
   data['visit_date'] <- lubridate::as_date(data[['visit_date']])
@@ -67,9 +67,21 @@ util_redcap_child_v1 <- function(data) {
   #reduce columns and update names
   visit_data_child <- visit_data_child[!grepl('payment|dxa_id', names(visit_data_child))]
 
-  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
+  visit_data_child <- visit_data_child[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(visit_data_child)[grepl('notes', names(visit_data_child))])]
 
+  names(visit_data_child)[names(visit_data_child) == 'v1_pre_check_notes'] <- 'v1_pre_notes'
   names(visit_data_child)[names(visit_data_child) == 'v1_post_check_notes'] <- 'v1_notes'
+  names(visit_data_child)[names(visit_data_child) == 'child_height_weight_notes'] <- 'child_heightweight_notes'
+  names(visit_data_child)[names(visit_data_child) == 'toolbox_age_7_flanker_notes'] <- 'flanker_7yr_notes'
+  names(visit_data_child)[names(visit_data_child) == 'toolbox_age_8_flanker_notes'] <- 'flanker_8yr_notes'
+  names(visit_data_child)[names(visit_data_child) == 'toolbox_age_7_dccs_notes'] <- 'dccs_7yr_notes'
+  names(visit_data_child)[names(visit_data_child) == 'toolbox_age_8_dccs_notes'] <- 'dccs_8yr_notes'
+  names(visit_data_child)[names(visit_data_child) == 'toolbox_list_sorting_notes'] <- 'listsort_notes'
+  names(visit_data_child)[names(visit_data_child) == 'heightweight_notes'] <- 'parent_heightweight_notes'
+
+  names(visit_data_child)[!grepl('_id|v1|^visit', names(visit_data_child))] <- paste0('v1_',  names(visit_data_child)[!grepl('_id|v1|^visit', names(visit_data_child))])
+
+
 
   ## food paradigm information (does not include intake and freddy values) ####
   food_paradigm_info <- data[grepl('_id|meal|advertisement_condition|^visit', names(data))]
@@ -78,7 +90,7 @@ util_redcap_child_v1 <- function(data) {
   food_paradigm_info <- food_paradigm_info[!grepl('payment|dxa_id|freddy|consumed', names(food_paradigm_info))]
   names(food_paradigm_info) <- gsub('intake_notes', 'prep_notes', names(food_paradigm_info))
 
-  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit', 'visit_date', names(food_paradigm_info)[grepl('meal', names(food_paradigm_info))])]
+  food_paradigm_info <- food_paradigm_info[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(food_paradigm_info)[grepl('meal', names(food_paradigm_info))])]
 
   food_paradigm_json <- json_v1_food_paradigm()
 
@@ -88,7 +100,7 @@ util_redcap_child_v1 <- function(data) {
   # remove extra columns and re-order
   intake_data <- intake_data[!grepl('payment|dxa_id', names(intake_data))]
 
-  intake_data <- intake_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(intake_data)[grepl('plate', names(intake_data))])]
+  intake_data <- intake_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_data)[grepl('plate', names(intake_data))])]
 
   v1_intake_json <- json_v1_intake()
 
@@ -100,7 +112,9 @@ util_redcap_child_v1 <- function(data) {
 
   names(freddy_data) <- gsub('freddy', 'fullness', names(freddy_data))
 
-  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+  freddy_data <- freddy_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(freddy_data)[grepl('fullness', names(freddy_data))])]
+
+  names(freddy_data) <- gsub('vas', 'liking', names(freddy_data))
 
   freddy_json <- json_v1_freddy()
 
@@ -113,7 +127,7 @@ util_redcap_child_v1 <- function(data) {
 
   liking_data <- liking_data[!grepl('pre_vas_freddy', names(liking_data))]
 
-  liking_data <- liking_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(liking_data)[grepl('vas', names(liking_data))])]
+  liking_data <- liking_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(liking_data)[grepl('vas', names(liking_data))])]
 
   # Update names
   names(liking_data) <- gsub('vas', 'liking', names(liking_data))
@@ -146,7 +160,7 @@ util_redcap_child_v1 <- function(data) {
   # remove extra columns and re-order
   anthro_data <- anthro_data[!grepl('dxa|v1_|check|notes|cooked|payment', names(anthro_data))]
 
-  anthro_data <- anthro_data[c('participant_id', 'session_id', 'visit', 'visit_date', names(anthro_data)[grepl('height|weight', names(anthro_data))])]
+  anthro_data <- anthro_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(anthro_data)[grepl('height|weight', names(anthro_data))])]
 
   # rename columns
   names(anthro_data) <- gsub('parent_', 'parent1_', names(anthro_data))
@@ -159,7 +173,7 @@ util_redcap_child_v1 <- function(data) {
   anthro_json <- json_anthro()
 
   ## return data ####
-  return(list(visit_data_child = list(data = visit_data_child, meta = NA),
+  return(list(visit_data_child = visit_data_child,
               food_paradigm_info = list(data = food_paradigm_info, meta = food_paradigm_json),
               intake_data = list(data = intake_data, meta = v1_intake_json),
               freddy_data = list(data = freddy_data, meta = freddy_json),

@@ -41,8 +41,11 @@ util_format_household_data <- function(household_data) {
   # combine parent2 feet and inch components into 1 height variable in meters
   household_data['demo_parent2_rep_height_m'] <- ((household_data[['demo_parent2_rep_height_ft']]*12) + household_data[['demo_parent2_rep_height_in']])*0.0254
 
+  # convert parent2 lbs variable in kg
+  household_data['demo_parent2_rep_weight_kg'] <- household_data[['demo_parent2_rep_weight_lbs']]*0.453592
+
   # calculate parent2 BMI (kg/m2)
-  household_data['demo_parent2_rep_bmi'] <- (household_data[['demo_parent2_rep_weight_lbs']]*0.453592) / (household_data[['parent2_rep_height_m']]**2)
+  household_data['demo_parent2_rep_bmi'] <- household_data[['demo_parent2_rep_weight_kg']]/household_data[['demo_parent2_rep_height_m']]^2
 
   # food assistance programs
   names(household_data)[names(household_data) == 'demo_programs___0'] <- 'demo_assist_program_no'

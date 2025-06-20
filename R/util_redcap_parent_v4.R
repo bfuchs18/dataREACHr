@@ -20,7 +20,7 @@
 #'    \item{pmum_scored}
 #'    \item{cchip_scored}
 #'    \item{audit_scored}
-#'    \item{fhfi_scored}
+#'    \item{hfi_scored}
 #'    \item{cfpq_scored}
 #'  }
 #'

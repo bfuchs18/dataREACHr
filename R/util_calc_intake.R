@@ -13,6 +13,8 @@
 #' intake_calc <- util_calc_intake(intake_data)
 #'
 #' @seealso [proc_redcap()]
+#'
+#' @export
 
 util_calc_intake <- function(intake_data, generate_ed_data = FALSE) {
 
@@ -20,7 +22,7 @@ util_calc_intake <- function(intake_data, generate_ed_data = FALSE) {
   intake_data[!grepl('id|visit', names(intake_data))] <- sapply(intake_data[!grepl('id|visit', names(intake_data))], as.numeric)
 
   # make dataframe with energy density data
-  if (isFALSE(generate_ed_data) | !exists('ed_data')) {
+  if (isTRUE(generate_ed_data) | !exists('ed_data')) {
     #make dataframe with energy density data
     ed_data <- util_gen_ed_data()
   }
@@ -76,8 +78,12 @@ util_calc_intake <- function(intake_data, generate_ed_data = FALSE) {
 
   consumed_data <- cbind.data.frame(sapply(foods, function(x) consumed_fn(x), USE.NAMES = FALSE, simplify = FALSE))
 
-  # merge with intake data
+  # merge with intake data - need to do a workaround for grilled cheese kcal name - acting odd
+  intake_names <- names(intake_data)
+  consumed_names <- names(consumed_data)
   intake_data <- cbind.data.frame(c(intake_data, consumed_data))
+
+  names(intake_data) <- c(intake_names, consumed_names)
 
   #### calculate total amounts consumed ####
   # note: by using na.rm = FALSE -- total amounts will only be calculated if there is data for all food items to be summed

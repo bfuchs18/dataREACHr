@@ -8,7 +8,7 @@
 #' @examples
 #'
 #' # process data
-#' cshq_data_formatted <- util_format_household_data(cshq_data)
+#' cshq_data_formatted <- util_format_cshq_data(cshq_data)
 #'
 #' @seealso [util_redcap_parent_v2()], [util_redcap_parent_v5()]
 #'
