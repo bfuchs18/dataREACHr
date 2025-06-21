@@ -58,6 +58,7 @@
 #'  \item{'stq' - Screen Time Questionnaire *need*}
 #'  \item{'tfeq' - Three Factor Eating Questionnaire}
 #' }
+#' @param return (logical) return data to working environment. Default = FALSE.
 #'
 #' @return Does not return anything
 #'
@@ -73,7 +74,7 @@
 #'
 #' @export
 
-write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all') {
+write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -176,24 +177,7 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all') {
 
   #### Return Data ####
   if (isTRUE(return_data)) {
-    return(list(
-      input_data = list(visit_data = redcap_visit_data,
-                        de_data = redcap_de_data),
-      visit_data = list(
-        child_v1_data = child_v1_data,
-        child_v2_data = child_v2_data,
-        child_v3_data = child_v3_data,
-        child_v4_data = child_v4_data,
-        child_v5_data = child_v5_data,
-        parent_v1_data = parent_v1_data,
-        parent_v2_data = parent_v2_data,
-        parent_v3_data = parent_v3_data,
-        parent_v4_data = parent_v4_data,
-        parent_v5_data = parent_v5_data
-      ),
-      double_entry_data = processed_de_data,
-      phenotype_data = data_to_export
-    ))
+    return(proc_redcap_data)
   }
 }
 

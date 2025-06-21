@@ -4,7 +4,12 @@
 \alias{write_redcap}
 \title{write_redcap: Write selected data and json files from processed REDCap data}
 \usage{
-write_redcap(base_wd, overwrite = FALSE, data_list = "all")
+write_redcap(
+  base_wd,
+  overwrite = FALSE,
+  data_list = "all",
+  return_data = FALSE
+)
 }
 \arguments{
 \item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
@@ -59,6 +64,8 @@ write_redcap(base_wd, overwrite = FALSE, data_list = "all")
 \item{'stq' - Screen Time Questionnaire \emph{need}}
 \item{'tfeq' - Three Factor Eating Questionnaire}
 }}
+
+\item{return}{(logical) return data to working environment. Default = FALSE.}
 }
 \value{
 Does not return anything
