@@ -2,14 +2,48 @@
 % Please edit documentation in R/util_redcap_de.R
 \name{util_redcap_de}
 \alias{util_redcap_de}
-\title{util_redcap_de: Organize double-entry data from REDCap (called within proc_redcap.R)}
+\title{util_redcap_de: Organize double-entry data from REDCap}
 \usage{
-util_redcap_de(data, return_data = TRUE)
+util_redcap_de(redcap_api = FALSE, redcap_de_data, date_data)
 }
 \arguments{
-\item{data}{double-entry data}
+\item{redcap_api}{(logical) execute REDCap API. Default = FALSE.}
 
-\item{return_data}{If return_data is set to TRUE, will return a list including: dexa_data, intake_data}
+\item{redcap_de_data}{REDCap double-entry data from a prior API call}
+
+\item{date_data}{date data for REDCap visit
+
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{demo_data}
+\item{infancy_data}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cfq_data}
+\item{cebq_data}
+\item{efcr_data}
+\item{chaos_data}
+\item{pss_data}
+\item{lbc_data}
+}}
+}
+\value{
+Will return a list including data that has been double-entered and checked along with the metadata for:
+\itemize{
+\item{dxa_v1}
+\item{dxa_v5}
+\item{intake_v1}
+\item{intake_v3}
+\item{intake_v4}
+\item{intake_v5}
+}
 }
 \description{
 This function organizes REDCap double entry data data

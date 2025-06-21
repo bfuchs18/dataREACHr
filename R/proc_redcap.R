@@ -10,22 +10,58 @@
 #'
 #' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
 #'
-#' @param redcap_api (logical) execute REDCap API. Default = FALSE.
+#' @inheritParams util_redcap_de
 #' @param redcap_visit_data REDCap visit data from a prior API call
-#' @param redcap_de_data REDCap double-entry data from a prior API call
+#' @inheritParams util_redcap_de
 #'
-#' @return Will return a list including:
-#' \itemize{
-#'    \item{participants: list including data.frame with BIDS participants.tsv information and metadata}
-#'    \item{questionnaires: a list of 37 individual questionnaire lists including a data.frame and metadata}
-#'    \item{demographics}
-#'    \item{anthropometrics}
-#'    \item{intake}
-#'    \item{mri_visit}
-#'    \item{dexa}
-#'    \item{researcher_notes}
-#'    \item{parent_updates}
-#'  }
+#' @return Will return a list including data and metadata for:
+#' #' \itemize{
+#'  \item{'paticipants' - BIDS specified participants.tsv file}
+#'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
+#'  \item{'demographics' - compiled demographic data}
+#'  \item{'dxa' - verified DXA data}
+#'  \item{'household' - compiled demographicinformation about houshold}
+#'  \item{'infancy' - compiled demographic information related to infancy}
+#'  \item{'intake' - compiled intake data with computed intake values}
+#'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'parent_updates' - all visit updates}
+#'  \item{'researcher_notes' - all visit notes}
+#'  \item{'audit' - Alcohol Use Disorders Identification Test}
+#'  \item{'bes' - Binge Eating Scale}
+#'  \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+#'  \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+#'  \item{'cbq' - Child Behavior Questionnaire}
+#'  \item{'cchip' - Community Childhood Hunger Identification Project}
+#'  \item{'cebq' - Children's Eating Behavior Questionnaire}
+#'  \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+#'  \item{'cfq' - Child Feeding Questionnaire}
+#'  \item{'chaos' - Confusion, Hubbub, and Order Scale}
+#'  \item{'class' - *need*}
+#'  \item{'cshq' - Children Sleep Habits Questionnaire}
+#'  \item{'debq' - Dutch Eating Behavior Questionnaire}
+#'  \item{'efcr' - External Food Cue Responsiveness Scale}
+#'  \item{'ffbs' - Family Food Behavior Survey}
+#'  \item{'fsq' - *need*}
+#'  \item{'hfi' - Fulkerson Home Food Inventory}
+#'  \item{'hfias' - Household Food Insecurity Access Scale}
+#'  \item{'hfssm' - U.S. Household Food Security Survey Module}
+#'  \item{'kbas' - Kid's Brand Awareness Scale}
+#'  \item{'lbc' - Lifestyle Behavior Checklist}
+#'  \item{'loc' - Loss of Control-Eating Questionnaire}
+#'  \item{'pmum' - Problematic Media Use Measure *need*}
+#'  \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+#'  \item{'pss' - Perceived Stress Scale}
+#'  \item{'pstca' - *need*}
+#'  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+#'  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+#'  \item{'rank' - Parent ranking of foods sources? *need*}
+#'  \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+#'  \item{'sic' - Stress in Children Questionnaire *need*}
+#'  \item{'sleeplog' - Week long sleep log}
+#'  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+#'  \item{'stq' - Screen Time Questionnaire *need*}
+#'  \item{'tfeq' - Three Factor Eating Questionnaire}
+#' }
 #'
 #' @examples
 #'
@@ -33,6 +69,8 @@
 #' redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
 #'
 #' }
+#'
+#' @seealso [write_redcap()]
 #'
 #' @export
 
@@ -79,8 +117,12 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     redcap_visit_data <- redcap_visit[['data']]
     redcap_visit_dict <- redcap_visit[['dictionary']]
 
+    redcap_de_data <- redcap_de[['data']]
+    redcap_de_dict <- redcap_de[['dictionary']]
+
     # remove '.factor'
     redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
+    redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
   }
 
   #### Extract visit data ####
@@ -132,21 +174,22 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
 
 
   #### Process double-entry data ####
-  #processed_de_data <- util_redcap_de(redcap_de_data)
+  processed_de_data <- util_redcap_de(redcap_api = FALSE, redcap_de_data, date_data)
 
   #### Combine data across visits ####
+  ## DXA data
+  dxa_all <- rbind.data.frame(processed_de_data$dxa_v1$data, processed_de_data$dxa_v5$data)
+
+  ## Merge intake-related data
+  # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
+  merged_intake <- util_merged_intake(child_v1_data, child_v3_data, child_v4_data, child_v5_data, processed_de_data)
+
+  intake_merge_json <- json_intake()
+
   ## questionnaires
   merged_qs_list <- util_merge_questionnaires(child_v1_data, child_v4_data, child_v5_data, parent_v1_data, parent_v2_data, parent_v3_data, parent_v4_data, parent_v5_data)
 
-  #updates json
   updates_json <- json_parent_updates()
-
-  ## Merge intake-related data ---- will need to adujst once have double-entered data
-  # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
-  # intake data from visit forms will output until double entry data is ready
-  merged_intake <- util_merged_intake(child_v1_data, child_v3_data, child_v4_data, child_v5_data)
-
-  intake_merge_json <- json_intake()
 
   ## Merge notes into notes database
   researcher_notes <- util_merged_visitnotes(child_v1_data$visit_data_child, child_v2_data$visit_data_child, child_v3_data$visit_data_child, child_v4_data$visit_data_child, child_v5_data$visit_data_child)
@@ -161,10 +204,14 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
   #### Generate demographics dataframe  ####
   merged_demo <- util_merged_demo(parent_v1_data$demo_data$data, merged_qs_list$household_all, merged_anthro, date_data)
 
+  merged_demo <- merged_demo[!is.na(merged_demo['participant_id']), ]
+
   demographics_json <- json_demographics()
 
   #### Generate participants dataframe ####
   participants_data <- util_merged_participants(parent_v1_data$demo_data$data, merged_demo, date_data)
+
+  participants_data <- participants_data[!is.na(participants_data['participant_id']), ]
 
   participants_json <- json_participants()
 
@@ -175,62 +222,89 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     participants = list(data = participants_data, meta = participants_json),
     anthropometrics = list(data = merged_anthro, meta = anthro_merge_json),
     demographics = list(data = merged_demo, meta = demographics_json),
-    #dxa = processed_de_data$dxa_data,
+    dxa = list(data = dxa_all, meta = processed_de_data$dxa_v1$meta),
     household = list(data = merged_qs_list$household_all,
                      meta = parent_v1_data$household_data$meta),
     infancy = parent_v1_data[['infancy_data']],
     intake = list(data = merged_intake, meta = intake_merge_json),
     mri_visit = child_v2_data$mri_info,
-    researcher_notes = list(data = researcher_notes, meta = notes_json),
     parent_updates = list(data = merged_qs_list$updates_all, meta = updates_json),
+    researcher_notes = list(data = researcher_notes, meta = notes_json),
     audit = list(data = merged_qs_list$audit_all,
                  meta = parent_v4_data$audit_data$meta),
-    bes = parent_v2_data[['bes_data']],
-    bisbas = parent_v3_data[['bisbas_data']],
-    breif = parent_v2_data[['brief_data']],
+    bes = list(data = parent_v2_data[['bes_data']]$data$bids_phenotype,
+               meta = parent_v2_data[['bes_data']]$meta),
+    bisbas = list(data = parent_v3_data[['bisbas_data']]$data$bids_phenotype,
+                  meta = parent_v3_data[['bisbas_data']]$meta),
+    brief2 = list(data = parent_v2_data[['brief_data']]$data$bids_phenotype,
+                  meta = parent_v2_data[['brief_data']]$meta),
     cbq = list(data = merged_qs_list$cbq_all,
                meta = parent_v1_data$stq_data$meta),
-    cchip = parent_v4_data[['cchip_data']],
+    cchip = list(data = parent_v4_data[['cchip_data']]$data$bids_phenotype,
+                 meta = parent_v4_data[['cchip_data']]$meta),
     cebq = list(data = merged_qs_list$cebq_all,
                 meta = parent_v1_data$cebq_data$meta),
     cfpq = list(data = merged_qs_list$cfpq_all,
-                     meta = parent_v4_data$cfpq_data$meta),
-    cfq = parent_v1_data[['cfq_data']],
-    chaos = parent_v1_data[['chaos_data']],
+                meta = parent_v4_data$cfpq_data$meta),
+    cfq = list(data = parent_v1_data[['cfq_data']]$data$bids_phenotype,
+               meta = parent_v1_data[['cfq_data']]$meta),
+    chaos = list(data = parent_v1_data[['chaos_data']]$data$bids_phenotype,
+                 meta = parent_v1_data[['chaos_data']]$meta),
     class = list(data = merged_qs_list$class_all,
-                      meta = parent_v3_data$class_data$meta),
+                 meta = parent_v3_data$class_data$meta),
     cshq = list(data = merged_qs_list$cshq_all,
                 meta = parent_v2_data$cshq_data$meta),
-    debq = parent_v3_data[['debq_data']],
-    efcr = parent_v1_data[['efcr_data']],
-    ffbs = parent_v2_data[['ffbs_data']],
-    fsq = parent_v2_data[['fsq_data']],
-    hfi = parent_v4_data[['hfi_data']],
-    hfias = parent_v4_data[['hfias_data']],
-    hfssm = parent_v4_data[['hfssm_data']],
+    debq = list(data = parent_v3_data[['debq_data']]$data$bids_phenotype,
+                meta = parent_v3_data[['debq_data']]$meta),
+    efcr = list(data = parent_v1_data[['efcr_data']]$data$bids_phenotype,
+                meta = parent_v1_data[['efcr_data']]$meta),
+    ffbs = list(data = parent_v2_data[['ffbs_data']]$data$bids_phenotype,
+                meta = parent_v2_data[['ffbs_data']]$meta),
+    #once scored will need switch to bids_phenotype
+    fsq = list(data = parent_v2_data[['fsq_data']]$data,
+               meta = parent_v2_data[['fsq_data']]$meta),
+    # fsq = list(data = parent_v2_data[['fsq_data']]$data$bids_phenotype,
+    #            meta = parent_v2_data[['fsq_data']]$meta),
+    hfi = list(data = parent_v4_data[['hfi_data']]$data$bids_phenotype,
+               meta = parent_v4_data[['hfi_data']]$meta),
+    hfias = list(data = parent_v4_data[['hfias_data']]$data$bids_phenotype,
+                 meta = parent_v4_data[['hfias_data']]$meta),
+    hfssm = list(data = parent_v4_data[['hfssm_data']]$data$bids_phenotype,
+                 meta = parent_v4_data[['hfssm_data']]$meta),
     kbas = list(data = merged_qs_list$kbas_all,
                 meta = child_v1_data$kbas_data$meta),
-    lbc = parent_v1_data[['lbc_data']],
+    lbc = list(data = parent_v1_data[['lbc_data']]$data$bids_phenotype,
+               meta = parent_v1_data[['lbc_data']]$meta),
     loc = list(data = merged_qs_list$loc_all,
                     meta = child_v4_data$loc_data$meta),
     pmum = list(data = merged_qs_list$pmum_all,
                      meta = parent_v4_data$pmum_data$meta),
-    pptq = child_v4_data[['pptq_data']],
-    pss = parent_v1_data[['pss_data']],
+    pptq = list(data = child_v4_data[['pptq_data']]$data$bids_phenotype,
+                meta = child_v4_data[['pptq_data']]$meta),
+    pss = list(data = parent_v1_data[['pss_data']]$data$bids_phenotype,
+               meta = parent_v1_data[['pss_data']]$meta),
     pstca = list(data = merged_qs_list$pstca_all,
                  meta = parent_v3_data$pstca_data$meta),
     puberty = list(data = merged_qs_list$puberty_all,
                         meta = parent_v1_data$puberty_data$meta),
-    pwlb = parent_v3_data[['pwlb_data']],
+    pwlb = list(data = parent_v3_data[['pwlb_data']]$data$bids_phenotype,
+                meta = parent_v3_data[['pwlb_data']]$meta),
     rank = list(data = merged_qs_list$rank_all,
                      meta = parent_v1_data$rank_data$meta),
-    scpf = parent_v3_data[['scpf_data']],
-    sic = child_v4_data[['sic_data']],
+    scpf = list(data = parent_v3_data[['scpf_data']]$data$bids_phenotype,
+                meta = parent_v3_data[['scpf_data']]$meta),
+    #once scored will need switch to bids_phenotype
+    sic = list(data = child_v4_data[['sic_data']]$data,
+               meta = child_v4_data[['sic_data']]$meta),
+    # sic = list(data = child_v4_data[['sic_data']]$data$bids_phenotype,
+    #            meta = child_v4_data[['sic_data']]$meta),
     sleeplog = child_v3_data[['sleeplog_data']],
-    spsrq = parent_v3_data[['spsrq_data']],
+    spsrq = list(data = parent_v3_data[['spsrq_data']]$data$bids_phenotype,
+                 meta = parent_v3_data[['spsrq_data']]$meta),
     stq = list(data = merged_qs_list$stq_all,
                meta = child_v1_data$stq_data$meta),
-    tfeq = parent_v3_data[['tfeq_data']]
-  ))
+    tfeq = list(data = parent_v3_data[['tfeq_data']]$data$bids_phenotype,
+                meta = parent_v3_data[['tfeq_data']]$meta)
+    ))
 }
 

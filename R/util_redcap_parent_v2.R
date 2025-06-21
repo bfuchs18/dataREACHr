@@ -160,7 +160,7 @@ util_redcap_parent_v2 <- function(data, date_data) {
   fsq_data <- fsq_data[c('participant_id', 'session_id', 'visit_date', names(fsq_data)[grepl('fsq', names(fsq_data))])]
 
   #score -- need to develop score script
-  fsq_json <- json_fsq
+  fsq_json <- json_fsq()
 
   ## return data ####
   return(list(

@@ -10,53 +10,53 @@
 #'
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
-#' @param export list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data. Options include:
+#' @param export list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
-#'  \item{paticipants - BIDS specified participants.tsv file}
-#'  \item{anthropometrics - height, weight, and computed anthropometric data}
-#'  \item{demographics - compiled demographic data}
-#'  \item{dxa - verified DXA data}
-#'  \item{household - compiled demographicinformation about houshold}
-#'  \item{infancy - compiled demographic information related to infancy}
-#'  \item{intake - compiled intake data with computed intake values}
-#'  \item{mri_visit - MRI visit information including Freddy and CAMS}
-#'  \item{researcher_notes - all visit notes}
-#'  \item{parent_updates - all visit updates}
-#'  \item{audit - Alcohol Use Disorders Identification Test}
-#'  \item{bes - Binge Eating Scale}
-#'  \item{bisbas - Behavioral Inhibition System/Behavioral Activation System}
-#'  \item{brief - Behavioral Rating Inventory of Executive Function-2}
-#'  \item{cbq - Child Behavior Questionnaire}
-#'  \item{cchip - Community Childhood Hunger Identification Project}
-#'  \item{cebq - Children's Eating Behavior Questionnaire}
-#'  \item{cfpq - Comprehensive Feeding Practices Questionnaire}
-#'  \item{cfq - Child Feeding Questionnaire}
-#'  \item{chaos - Confusion, Hubbub, and Order Scale}
-#'  \item{class - *need*}
-#'  \item{cshq - Children Sleep Habits Questionnaire}
-#'  \item{debq - Dutch Eating Behavior Questionnaire}
-#'  \item{efcr - External Food Cue Responsiveness Scale}
-#'  \item{ffbs - Family Food Behavior Survey}
-#'  \item{fsq - *need*}
-#'  \item{hfi - Fulkerson Home Food Inventory}
-#'  \item{hfias - Household Food Insecurity Access Scale}
-#'  \item{hfssm - U.S. Household Food Security Survey Module}
-#'  \item{kbas - Kid's Brand Awareness Scale}
-#'  \item{lbc - Lifestyle Behavior Checklist}
-#'  \item{loc - Loss of Control-Eating Questionnaire}
-#'  \item{pmum - Problematic Media Use Measure *need*}
-#'  \item{pptq - Pictorial Personality Traits Questionnaire for Children}
-#'  \item{pss - Perceived Stress Scale}
-#'  \item{pstca - *need*}
-#'  \item{puberty - combination of Tanner and Pubertal Rating Scale}
-#'  \item{pwlb - Parent Weight-Loss Behavior Questionnaire}
-#'  \item{rank - Parent ranking of foods sources? *need*}
-#'  \item{scpf - tructure and Control in Parent Feeding Questionnaire}
-#'  \item{sic - Stress in Children Questionnaire *need*}
-#'  \item{sleeplog - Week long sleep log}
-#'  \item{spsrq - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
-#'  \item{stq - Screen Time Questionnaire *need*}
-#'  \item{tfeq - Three Factor Eating Questionnaire}
+#'  \item{'participants' - BIDS specified participants.tsv file}
+#'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
+#'  \item{'demographics' - compiled demographic data}
+#'  \item{'dxa' - verified DXA data}
+#'  \item{'household' - compiled demographicinformation about houshold}
+#'  \item{'infancy' - compiled demographic information related to infancy}
+#'  \item{'intake' - compiled intake data with computed intake values}
+#'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'parent_updates' - all visit updates}
+#'  \item{'researcher_notes' - all visit notes}
+#'  \item{'audit' - Alcohol Use Disorders Identification Test}
+#'  \item{'bes' - Binge Eating Scale}
+#'  \item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+#'  \item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+#'  \item{'cbq' - Child Behavior Questionnaire}
+#'  \item{'cchip' - Community Childhood Hunger Identification Project}
+#'  \item{'cebq' - Children's Eating Behavior Questionnaire}
+#'  \item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+#'  \item{'cfq' - Child Feeding Questionnaire}
+#'  \item{'chaos' - Confusion, Hubbub, and Order Scale}
+#'  \item{'class' - *need*}
+#'  \item{'cshq' - Children Sleep Habits Questionnaire}
+#'  \item{'debq' - Dutch Eating Behavior Questionnaire}
+#'  \item{'efcr' - External Food Cue Responsiveness Scale}
+#'  \item{'ffbs' - Family Food Behavior Survey}
+#'  \item{'fsq' - *need*}
+#'  \item{'hfi' - Fulkerson Home Food Inventory}
+#'  \item{'hfias' - Household Food Insecurity Access Scale}
+#'  \item{'hfssm' - U.S. Household Food Security Survey Module}
+#'  \item{'kbas' - Kid's Brand Awareness Scale}
+#'  \item{'lbc' - Lifestyle Behavior Checklist}
+#'  \item{'loc' - Loss of Control-Eating Questionnaire}
+#'  \item{'pmum' - Problematic Media Use Measure *need*}
+#'  \item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+#'  \item{'pss' - Perceived Stress Scale}
+#'  \item{'pstca' - *need*}
+#'  \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+#'  \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+#'  \item{'rank' - Parent ranking of foods sources? *need*}
+#'  \item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+#'  \item{'sic' - Stress in Children Questionnaire *need*}
+#'  \item{'sleeplog' - Week long sleep log}
+#'  \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+#'  \item{'stq' - Screen Time Questionnaire *need*}
+#'  \item{'tfeq' - Three Factor Eating Questionnaire}
 #' }
 #'
 #' @return Does not return anything
@@ -112,61 +112,61 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all') {
   redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
 
   # set paths for other directories
+  bids_wd <- file.path(base_wd, 'bids')
   phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
 
   #### Process REDCap data ####
   proc_redcap_data <- proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
 
+  # quick fixes for notes where /n formatting got saved
+  proc_redcap_data$intake$data[grepl('notes', names(proc_redcap_data$intake$data))] <- sapply(names(proc_redcap_data$intake$data)[grepl('notes', names(proc_redcap_data$intake$data))], function(x) gsub('\n', '', proc_redcap_data$intake$data[[x]]))
+
+  proc_redcap_data$mri_visit$data[grepl('notes', names(proc_redcap_data$mri_visit$data))] <- sapply(names(proc_redcap_data$mri_visit$data)[grepl('notes', names(proc_redcap_data$mri_visit$data))], function(x) gsub('\n', '', proc_redcap_data$mri_visit$data[[x]]))
+
+  proc_redcap_data$pstca$data[grepl('response|pstca_29i', names(proc_redcap_data$pstca$data))] <- sapply(names(proc_redcap_data$pstca$data)[grepl('response|pstca_29i', names(proc_redcap_data$pstca$data))], function(x) gsub('\n|- ', ' ', proc_redcap_data$pstca$data[[x]]))
+
+  proc_redcap_data$fsq$data[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))] <- sapply(names(proc_redcap_data$fsq$data)[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))], function(x) gsub('\n|- ', ' ', proc_redcap_data$fsq$data[[x]]))
+
   #### function to export data and metadata ####
+  data_lsit_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
+
   # loop through data_to_export and export data and meta-data
-  for (i in 1:length(data_to_export)) {
+  redcap_export <- function(data_str, overwrite){
 
-    # Get the dataframe
-    df <- data_to_export[[i]]
+    if (data_str %in% data_lsit_options){
 
-    # get the phenotype name
-    phenotype_name <- names(data_to_export)[i]
+      if (data_str == 'participants'){
+        filename_tsv <- file.path(bids_wd, paste0(data_str, '.tsv'))
+        filename_json <- file.path(bids_wd, paste0(data_str, '.json'))
+      } else {
+        filename_tsv <- file.path(phenotype_wd, paste0(data_str, '.tsv'))
+        filename_json <- file.path(phenotype_wd, paste0(data_str, '.json'))
+      }
 
-    # define json function name
-    json_func_name = paste0('json_', phenotype_name)
+      # write tsv
+      if ( isTRUE(overwrite) | !file.exists(filename_tsv) ) {
+        # use 'n/a' for missing values for BIDS compliance
 
-    # Get the json function by name
-    json_func <- get(json_func_name)
+        write.table(proc_redcap_data[[data_str]]$data, filename_tsv, quote = FALSE, sep = '\t', col.names = TRUE, row.names = FALSE, na = 'n/a')
+      }
 
-    # Call the function
-    json <- json_func()
+      # write json
+      if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
+        write(proc_redcap_data[[data_str]]$meta, filename_json)
+      }
 
-    # add extensions to phenotype_name
-    if (phenotype_name == 'participants') {
-      # export participants into bids_wd
-      filename_tsv <- file.path(bids_wd, 'participants.tsv')
-      filename_json <- file.path(bids_wd, 'participants.json')
     } else {
-      # export phenotype data into phenotype_wd
-      filename_tsv <- file.path(phenotype_wd, paste0(phenotype_name, '.tsv'))
-      filename_json <- file.path(phenotype_wd, paste0(phenotype_name, '.json'))
-    }
-
-    # write tsv
-    if ( isTRUE(overwrite) | !file.exists(filename_tsv) ) {
-      write.table(
-        df,
-        filename_tsv,
-        quote = FALSE,
-        sep = '\t',
-        col.names = TRUE,
-        row.names = FALSE,
-        na = 'n/a' # use 'n/a' for missing values for BIDS compliance
-      )
-    }
-
-    # write json
-    if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
-      write(json, filename_json)
+      print(paste0(data_str, ' is not one of the available data set options to print in write_redcap(). Please see help(write_redcap)'))
     }
   }
 
+  if (data_list == 'all'){
+    data_list <- data_lsit_options
+  }
 
+  write_redcap_output <- sapply(data_list, function(x) redcap_export(x, overwrite))
+
+  #move elsewhere##
   # export dataset_description.json
   filename_json <- file.path(phenotype_wd, 'dataset_description.json')
   json <- json_phe_dataset_desc(visit_data_path, data_de_path)

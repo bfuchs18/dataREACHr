@@ -1,4 +1,4 @@
-#' util_calc_intake: Computes intake variables (called within util_redcap_de.R)
+#' util_calc_intake: Computes intake variables
 #'
 #' This function computes intake variables
 #'

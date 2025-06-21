@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_calc_intake.R
 \name{util_calc_intake}
 \alias{util_calc_intake}
-\title{util_calc_intake: Computes intake variables (called within util_redcap_de.R)}
+\title{util_calc_intake: Computes intake variables}
 \usage{
 util_calc_intake(intake_data, generate_ed_data = FALSE)
 }

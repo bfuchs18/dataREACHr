@@ -14,17 +14,53 @@ proc_redcap(redcap_api = FALSE, redcap_visit_data, redcap_de_data)
 \item{redcap_de_data}{REDCap double-entry data from a prior API call}
 }
 \value{
-Will return a list including:
-\itemize{
-\item{participants: list including data.frame with BIDS participants.tsv information and metadata}
-\item{questionnaires: a list of 37 individual questionnaire lists including a data.frame and metadata}
-\item{demographics}
-\item{anthropometrics}
-\item{intake}
-\item{mri_visit}
-\item{dexa}
-\item{researcher_notes}
-\item{parent_updates}
+Will return a list including data and metadata for:
+#' \itemize{
+\item{'paticipants' - BIDS specified participants.tsv file}
+\item{'anthropometrics' - height, weight, and computed anthropometric data}
+\item{'demographics' - compiled demographic data}
+\item{'dxa' - verified DXA data}
+\item{'household' - compiled demographicinformation about houshold}
+\item{'infancy' - compiled demographic information related to infancy}
+\item{'intake' - compiled intake data with computed intake values}
+\item{'mri_visit' - MRI visit information including Freddy and CAMS}
+\item{'parent_updates' - all visit updates}
+\item{'researcher_notes' - all visit notes}
+\item{'audit' - Alcohol Use Disorders Identification Test}
+\item{'bes' - Binge Eating Scale}
+\item{'bisbas' - Behavioral Inhibition System/Behavioral Activation System}
+\item{'brief2' - Behavioral Rating Inventory of Executive Function-2}
+\item{'cbq' - Child Behavior Questionnaire}
+\item{'cchip' - Community Childhood Hunger Identification Project}
+\item{'cebq' - Children's Eating Behavior Questionnaire}
+\item{'cfpq' - Comprehensive Feeding Practices Questionnaire}
+\item{'cfq' - Child Feeding Questionnaire}
+\item{'chaos' - Confusion, Hubbub, and Order Scale}
+\item{'class' - \emph{need}}
+\item{'cshq' - Children Sleep Habits Questionnaire}
+\item{'debq' - Dutch Eating Behavior Questionnaire}
+\item{'efcr' - External Food Cue Responsiveness Scale}
+\item{'ffbs' - Family Food Behavior Survey}
+\item{'fsq' - \emph{need}}
+\item{'hfi' - Fulkerson Home Food Inventory}
+\item{'hfias' - Household Food Insecurity Access Scale}
+\item{'hfssm' - U.S. Household Food Security Survey Module}
+\item{'kbas' - Kid's Brand Awareness Scale}
+\item{'lbc' - Lifestyle Behavior Checklist}
+\item{'loc' - Loss of Control-Eating Questionnaire}
+\item{'pmum' - Problematic Media Use Measure \emph{need}}
+\item{'pptq' - Pictorial Personality Traits Questionnaire for Children}
+\item{'pss' - Perceived Stress Scale}
+\item{'pstca' - \emph{need}}
+\item{'puberty' - combination of Tanner and Pubertal Rating Scale}
+\item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
+\item{'rank' - Parent ranking of foods sources? \emph{need}}
+\item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+\item{'sic' - Stress in Children Questionnaire \emph{need}}
+\item{'sleeplog' - Week long sleep log}
+\item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}
+\item{'stq' - Screen Time Questionnaire \emph{need}}
+\item{'tfeq' - Three Factor Eating Questionnaire}
 }
 }
 \description{
@@ -46,4 +82,7 @@ redcap_data <- proc_redcap(base_wd, overwrite = FALSE, overwrite_jsons = FALSE)
 
 }
 
+}
+\seealso{
+\code{\link[=write_redcap]{write_redcap()}}
 }

@@ -1,183 +1,432 @@
-#' util_redcap_de: Organize double-entry data from REDCap (called within proc_redcap.R)
+#' util_redcap_de: Organize double-entry data from REDCap
 #'
 #' This function organizes REDCap double entry data data
 #'
-#' @importFrom rlang .data
-#' @param data double-entry data
-#' @param return_data If return_data is set to TRUE, will return a list including: dexa_data, intake_data
+#' @param redcap_api (logical) execute REDCap API. Default = FALSE.
+#' @param redcap_de_data REDCap double-entry data from a prior API call
+#' @inheritParams util_redcap_parent_v1
+#'
+#' @return Will return a list including data that has been double-entered and checked along with the metadata for:
+#' \itemize{
+#'  \item{dxa_v1}
+#'  \item{dxa_v5}
+#'  \item{intake_v1}
+#'  \item{intake_v3}
+#'  \item{intake_v4}
+#'  \item{intake_v5}
+#' }
+#'
 #'
 #' @export
 
-util_redcap_de <- function(data, return_data = TRUE) {
+util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
   #### Set up/initial checks #####
 
-  # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(data)
+  # check that data is passed if redcap_api = FALSE
+  if (isFALSE(redcap_api)){
 
-  if (isTRUE(data_arg)) {
-    if (!is.data.frame(data)) {
-      stop("data must be a data.frame")
+    # check that redcap_de_data exist and is a data.frame
+    de_data_arg <- methods::hasArg(redcap_de_data)
+
+    if (isTRUE(de_data_arg)) {
+      if (!is.data.frame(redcap_de_data)) {
+        stop('redcap_de_data must be a data.frame with recap_api = FALSE')
+      }
+    } else if (isFALSE(de_data_arg)) {
+      stop('redcap_de_data must be a data.frame with recap_api = FALSE')
     }
-  } else if (isFALSE(data_arg)) {
-    stop("REDCap double entry data must be entered as a data.frame")
+
+  } else {
+    # get data from REDCap directly (only will work if have access and keys setup)
+    Sys.setenv(reach_de_redcap_key = keyring::key_get('reach-de_redcap_key'))
+    redcap_de <- REDCapDM::redcap_data(uri = 'https://redcap.ctsi.psu.edu/api/',
+                                       token = Sys.getenv('reach_de_redcap_key'))
+
+    redcap_de_data <- redcap_de[['data']]
+    redcap_de_dict <- redcap_de[['dictionary']]
+
+    # remove '.factor'
+    redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
   }
 
   # update name of participant ID column
-  names(data)[names(data) == "record_id"] <- "participant_id"
+  names(redcap_de_data)[names(redcap_de_data) == 'record_id'] <- 'participant_id'
 
-  ## Extract merged and unmerged data ####
+  ## Extract data ####
+  checked_data <- redcap_de_data[!grepl('--', redcap_de_data$participant_id), ]
 
-  # get logical vector of rows that contain unmerged data (contain "--" in participant_id)
-  unmerged_rows <- grepl("--", data$participant_id)
+  # make a grepl string including all merged ids separate by '|'
+  merged_ids_grepl <- paste0(checked_data[['participant_id']], collapse = '|')
 
-  # subset unmerged rows only
-  unmerged_data <- data[unmerged_rows, ]
+  # get vector indicator of unmerged ids
+  unmerged_ids <- sapply(redcap_de_data[['participant_id']], function(x) !grepl(merged_ids_grepl, x))
 
-  # subset merged data only (remove rows with "--")
-  merged_data <- data[!unmerged_rows, ]
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
+    unmerged_data <- redcap_de_data[unmerged_ids, ]
+  }
 
-  # Make ID column bids compliant: add "sub_"
-  merged_data$participant_id <- paste0("sub-", merged_data$participant_id)
+  # Make ID column bids compliant: add 'sub_'
+  checked_data$participant_id <- paste0('sub-', checked_data$participant_id)
 
-  ## define function to compare unmerged data (i.e., do the double-entry verification) ----
-  compare_de <- function(unmerged_data) {
+  ## DXA data - visit 1 ####
+  # visit 1 data
+  dxa_v1 <- checked_data[grepl('participant_id|^dxa.*v1$|^left.*v1$|right.*v1$|^v1.*v1$', names(checked_data))]
 
-    # get list of IDs
-    de_ids <- unmerged_data$participant_id
-    ids <- unique(gsub("--1|--2","",de_ids))
+  # remove extra columns and re-order
+  dxa_v1 <- dxa_v1[!grepl('check|dxa_id|visit_number|dob|sex|ethnicity|age', names(dxa_v1))]
 
-    verified_data_list <- list()
-    discrepancy_log <- list()
+  # add session column
+  dxa_v1['session_id'] <- 'ses-1'
 
-    for (i in 1:length(ids)) {
+  # add visit number
+  dxa_v1['visit_protocol'] <- 1
 
-      id = ids[i]
+  # fix names
+  names(dxa_v1) <- gsub('^v1_|_v1$|dxa_', '', names(dxa_v1))
+  names(dxa_v1)[names(dxa_v1) == 'scan_date'] <- 'visit_date'
 
-      # subset participant rows
-      sub_de_data <- unmerged_data[grepl(id, unmerged_data$participant_id),]
+  dxa_v1['visit_date'] <- lubridate::as_date(dxa_v1[['visit_date']])
 
-      # extract entries without participant_id
-      entry_1 <- sub_de_data[1,!names(sub_de_data) %in% c("participant_id")]
-      entry_2 <- sub_de_data[2,!names(sub_de_data) %in% c("participant_id")]
+  # re-order
+  dxa_v1 <- dxa_v1[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'height', 'weight', names(dxa_v1)[!grepl('_id|visit|^height|^weight', names(dxa_v1))])]
 
-      # if rows are equal
-      if ( isTRUE(all.equal(entry_1, entry_2, check.attributes = FALSE)) ) {
+  # make numeric
+  dxa_v1[!grepl('_id|date', names(dxa_v1))] <- sapply(dxa_v1[!grepl('_id|date', names(dxa_v1))], function(x) as.numeric(x))
 
-        # add entry 1 row to list
-        verified_data_list[[i]] <- sub_de_data[1,]
+  dxa_v1 <- util_format_dxa(dxa_v1)
 
-      } else {
-        print(paste("sub", id, "double entry discrepancy. Check discrepancy_log"))
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
 
-        # add discrepancy to discrepancy_log
-        discrepancy_log[[length(discrepancy_log) + 1]] <- paste("ID:", id, "Discrepancy:", all.equal(entry_1, entry_2, check.attributes = FALSE))
-      }
+    dxa_v1_unmerged <- unmerged_data[grepl('participant_id|^dxa.*v1$|^left.*v1$|right.*v1$|^v1.*v1$', names(unmerged_data))]
 
+    # remove extra columns and re-order
+    dxa_v1_unmerged <- dxa_v1_unmerged[!grepl('check|dxa_id|visit_number|dob|sex|ethnicity|age', names(dxa_v1_unmerged))]
+
+    # add session column
+    dxa_v1_unmerged['session_id'] <- 'ses-1'
+
+    # add visit number
+    dxa_v1_unmerged['visit_protocol'] <- 1
+
+    # fix names
+    names(dxa_v1_unmerged) <- gsub('^v1_|_v1$|dxa_', '', names(dxa_v1_unmerged))
+    names(dxa_v1_unmerged)[names(dxa_v1_unmerged) == 'scan_date'] <- 'visit_date'
+    dxa_v1_unmerged['visit_date'] <- lubridate::as_date(dxa_v1_unmerged[['visit_date']])
+
+    # re-order
+    dxa_v1_unmerged <- dxa_v1_unmerged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'height', 'weight', names(dxa_v1_unmerged)[!grepl('_id|visit|^height|^weight', names(dxa_v1_unmerged))])]
+
+    # make numeric
+    dxa_v1_unmerged[!grepl('_id|date', names(dxa_v1_unmerged))] <- sapply(dxa_v1_unmerged[!grepl('_id|date', names(dxa_v1_unmerged))], function(x) as.numeric(x))
+
+    dxa_v1_unmerged <- util_format_dxa(dxa_v1_unmerged)
+
+    # check unmerged values
+    data_de_list <- util_de_check(dxa_v1_unmerged)
+
+    if (is.data.frame(data_de_list$merged_de_data)) {
+      dxa_v1 <- rbind.data.frame(dxa_v1, data_de_list$merged_de_data)
+      dxa_v1 <- dxa_v1[order(dxa_v1[['participant_id']]), ]
     }
-
-    # create verified bids dataframe
-    verified_data <- dplyr::bind_rows(verified_data_list)
-    verified_data$participant_id <- gsub("--1", "", verified_data$participant_id)
-    verified_data$participant_id <- paste0("sub-", verified_data$participant_id)
-
-    return(list(verified_data = verified_data, discrepancy_log = discrepancy_log))
   }
 
-  ## DEXA data ####
-
-  # visit 1 data
-  dexa_v1_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v1|dxa_sex_v1|dxa_height_v1|dxa_weight_v1|dxa_age_v1|^left.*v1$|right.*v1$|^v1.*v1$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v1", (2) Starts with "left", ends with "v1", (3) Starts with "left", ends with "v1", (4) starts with "v1", ends with "v1"
-  colnames(dexa_v1_unmerged) <- gsub("^v1_|_v1$", "", colnames(dexa_v1_unmerged)) # Remove "v1_" and "_v1" from column names
-  dexa_v1_unmerged <- dexa_v1_unmerged %>% dplyr::mutate(across(-c(participant_id, dxa_scan_date,), as.numeric)) # convert cols to numeric
-
+  ## DXA data - visit 5####
   # visit 5 data
-  dexa_v5_unmerged <- unmerged_data[, grep("participant_id|dxa_scan_date_v5|dxa_sex_v5|dxa_height_v5|dxa_weight_v5|dxa_age_v5|^left.*v5$|right.*v5$|^v1.*v5$", names(unmerged_data))] # column identifiers: (1) Starts with "dxa", ends with "v5", (2) Starts with "left", ends with "v5", (3) Starts with "left", ends with "v5", (4) starts with "v1", ends with "v5
-  colnames(dexa_v5_unmerged) <- gsub("^v1_|_v5$", "", colnames(dexa_v5_unmerged)) # Remove "v1_" and "_v5" from column names
-  dexa_v5_unmerged <- dexa_v5_unmerged %>% dplyr::mutate(across(-c(participant_id, dxa_scan_date,), as.numeric)) # convert cols to numeric
+  dxa_v5 <- checked_data[grepl('participant_id|^dxa.*v5$|^left.*v5$|right.*v5$|^v1.*v5$', names(checked_data))]
 
-  # run comparison function
-  compared_v1_dexa <- compare_de(dexa_v1_unmerged)
-  compared_v5_dexa <- compare_de(dexa_v5_unmerged)
+  # remove extra columns and re-order
+  dxa_v5 <- dxa_v5[!grepl('check|dxa_id|visit_number|dob|sex|ethnicity|age', names(dxa_v5))]
 
-  # extract verified dataframes
-  dexa_v1_data <- compared_v1_dexa$verified_data
-  dexa_v5_data <- compared_v5_dexa$verified_data
+  # add session column
+  dxa_v5['session_id'] <- 'ses-2'
 
-  # stack visit 1 and visit 5 data, add "visit_protocol" and "session_id" columns and reorder
-  stacked_dexa <- dplyr::bind_rows(
-    transform(dexa_v1_data, visit_protocol = "1", session_id = "ses-1"),
-    transform(dexa_v5_data, visit_protocol = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+  # add visit number
+  dxa_v5['visit_protocol'] <- 5
 
+  # fix names
+  names(dxa_v5) <- gsub('^v1_|_v5$|dxa_', '', names(dxa_v5))
+  names(dxa_v5)[names(dxa_v5) == 'scan_date'] <- 'visit_date'
 
-  # update column names -- mostly to match names from food and brain to facilitate compiling
+  dxa_v5['visit_date'] <- lubridate::as_date(dxa_v5[['visit_date']])
 
-  # add "dexa" prefix to all cols except "participant_id", "session_id", "visit_protocol" and cols that already start with "dxa"
-  names(stacked_dexa) <- ifelse(names(stacked_dexa) %in% c("participant_id", "session_id", "visit_protocol", grep("^dxa", names(stacked_dexa), value = TRUE)),
-                                names(stacked_dexa),
-                                paste0("dxa_", names(stacked_dexa)))
-  names(stacked_dexa) <- gsub("left", "l", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("right", "r", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("_am", "_ptile", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("_am", "_ptile", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("fat_trunk_over_leg", "percfat_trunk_legs_ratio", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("lean_over_height", "lean_height_ratio", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("fat_mass_over_height", "fatmass_height_ratio", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("trunk_over_limb_fat", "fatmass_trunk_limb_ratio", names(stacked_dexa)) # name wont match Food and Brain which uses leg instead of limb for these vars, but limb is more accurate based on description
-  names(stacked_dexa) <- gsub("z_score", "zscore", names(stacked_dexa))
-  names(stacked_dexa) <- gsub("lean_and_bmc", "lean_bmc_comb", names(stacked_dexa))
+  # re-order
+  dxa_v5 <- dxa_v5[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'height', 'weight', names(dxa_v5)[!grepl('_id|visit|^height|^weight', names(dxa_v5))])]
 
+  # make numeric
+  dxa_v5[!grepl('_id|date', names(dxa_v5))] <- sapply(dxa_v5[!grepl('_id|date', names(dxa_v5))], function(x) as.numeric(x))
 
-  ## intake data ####
+  dxa_v5 <- util_format_dxa(dxa_v5)
 
-  intake_data <- merged_data[, grep("participant_id|bread|butter|cheese|tender|carrot|chips|fruit|water|ranch|ketchup|meal|brownie|corn_chip|kiss|ice_cream|oreo|popcorn|pretzel|skittle|starburst|eah", names(merged_data))]
-  intake_data <- intake_data[, -grep("complete|notes|intake_eah_visit_number|consumed|ad_cond", names(intake_data))]
-  colnames(intake_data) <- gsub("freddy", "fullness", colnames(intake_data)) # Replace "freddy" with "fullness" in colnames
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
 
-  # visit 1 data
-  v1_intake_data <- intake_data[, grep("participant_id|_v1$", names(intake_data))]
-  names(v1_intake_data) <- gsub('_v1', '', names(v1_intake_data))
+    dxa_v5_unmerged <- unmerged_data[grepl('participant_id|^dxa.*v5$|^left.*v5$|right.*v5$|^v1.*v5$', names(unmerged_data))]
 
-  # visit 3 data
-  v3_intake_data <- intake_data[, grep("participant_id|_v3$", names(intake_data))]
-  names(v3_intake_data) <- gsub('_v3', '', names(v3_intake_data))
+    # remove extra columns and re-order
+    dxa_v5_unmerged <- dxa_v5_unmerged[!grepl('check|dxa_id|visit_number|dob|sex|ethnicity|age', names(dxa_v5_unmerged))]
 
-  # visit 4 data
-  v4_intake_data <- intake_data[, grep("participant_id|_v4$", names(intake_data))]
-  names(v4_intake_data) <- gsub('_v4', '', names(v4_intake_data))
+    # add session column
+    dxa_v5_unmerged['session_id'] <- 'ses-1'
 
-  # visit 5 data
-  v5_intake_data <- intake_data[, grep("participant_id|_v5$", names(intake_data))]
-  names(v5_intake_data) <- gsub('_v5', '', names(v5_intake_data))
+    # add visit number
+    dxa_v5_unmerged['visit_protocol'] <- 1
 
-  # make all values numeric except column 1 (participant_id)
-  v1_intake_data <- dplyr::mutate_at(v1_intake_data, -1, function(x) as.numeric(as.character(x)))
-  v3_intake_data <- dplyr::mutate_at(v3_intake_data, -1, function(x) as.numeric(as.character(x)))
-  v4_intake_data <- dplyr::mutate_at(v4_intake_data, -1, function(x) as.numeric(as.character(x)))
-  v5_intake_data <- dplyr::mutate_at(v5_intake_data, -1, function(x) as.numeric(as.character(x)))
+    # fix names
+    names(dxa_v5_unmerged) <- gsub('^v1_|_v5$|dxa_', '', names(dxa_v5_unmerged))
+    names(dxa_v5_unmerged)[names(dxa_v5_unmerged) == 'scan_date'] <- 'visit_date'
+    dxa_v5_unmerged['visit_date'] <- lubridate::as_date(dxa_v5_unmerged[['visit_date']])
 
-  # stack intake data
-  stacked_intake <- dplyr::bind_rows(
-    transform(v1_intake_data, visit_protocol = "1", session_id = "ses-1"),
-    transform(v3_intake_data, visit_protocol = "3", session_id = "ses-1"),
-    transform(v4_intake_data, visit_protocol = "4", session_id = "ses-1"),
-    transform(v5_intake_data, visit_protocol = "5", session_id = "ses-2")
-  ) %>% dplyr::relocate("session_id", .after = 1) %>% dplyr::relocate("visit_protocol", .after = 2)
+    # re-order
+    dxa_v5_unmerged <- dxa_v5_unmerged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'height', 'weight', names(dxa_v5_unmerged)[!grepl('_id|visit|^height|^weight', names(dxa_v5_unmerged))])]
 
-  # compute intake variables
-  stacked_intake <- util_calc_intake(stacked_intake)
+    # make numeric
+    dxa_v5_unmerged[!grepl('_id|date', names(dxa_v5_unmerged))] <- sapply(dxa_v5_unmerged[!grepl('_id|date', names(dxa_v5_unmerged))], function(x) as.numeric(x))
 
-  if (isTRUE(return_data)) {
-    return(
-      list(
-        dexa_data = stacked_dexa,
-        intake_data = stacked_intake,
-        discrepancies = list(v1_dexa = compared_v1_dexa$discrepancy_log,
-                             v5_dexa = compared_v5_dexa$discrepancy_log)
-      )
-    )
+    dxa_v5_unmerged <- util_format_dxa(dxa_v5_unmerged)
+
+    # check unmerged values
+    data_de_list <- util_de_check(dxa_v5_unmerged)
+
+    if (is.data.frame(data_de_list$merged_de_data)) {
+      dxa_v5 <- rbind.data.frame(dxa_v5, data_de_list$merged_de_data)
+      dxa_v5 <- dxa_v5[order(dxa_v5[['participant_id']]), ]
+    }
   }
+
+  dxa_json <- json_dxa()
+
+  ## intake data - visit 1 ####
+  intake_v1 <- checked_data[grepl('_id|plate_v1', names(checked_data))]
+
+  # remove extra columns and re-order
+  intake_v1 <- intake_v1[!grepl('dxa_id', names(intake_v1))]
+
+  intake_v1['session_id'] <- 'ses-1'
+  intake_v1['visit_protocol'] <- 1
+
+  # merge with date data for v1
+  intake_v1 <- merge(intake_v1, date_data[c('participant_id', 'v1_date')], by = 'participant_id', all.x = TRUE)
+  names(intake_v1)[names(intake_v1) == 'v1_date'] <- 'visit_date'
+  intake_v1['visit_date'] <- lubridate::as_date(intake_v1[['visit_date']])
+
+  # fix names
+  names(intake_v1) <- gsub('_v1', '', names(intake_v1))
+
+  # re-order
+  intake_v1 <- intake_v1[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v1)[!grepl('_id|visit', names(intake_v1))])]
+
+
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
+
+    intake_v1_unmerged <- unmerged_data[grepl('_id|plate_v1', names(unmerged_data))]
+
+    # remove extra columns and re-order
+    intake_v1_unmerged <- intake_v1_unmerged[!grepl('dxa_id', names(intake_v1_unmerged))]
+
+    intake_v1_unmerged['session_id'] <- 'ses-1'
+    intake_v1_unmerged['visit_protocol'] <- 1
+
+    # fix names
+    names(intake_v1_unmerged) <- gsub('_v1', '', names(intake_v1_unmerged))
+
+    # check unmerged values
+    intake_v1_de_list <- util_de_check(intake_v1_unmerged)
+
+    if (is.data.frame(intake_v1_de_list$merged_de_data)) {
+      # get date info for newly merged data
+      intake_v1_de_merged <- merge(intake_v1_de_list$merged_de_data, date_data[c('participant_id', 'v1_date')], by = 'participant_id', all.x = TRUE)
+      names(intake_v1_de_merged)[names(intake_v1_de_merged) == 'v1_date'] <- 'visit_date'
+      intake_v1_de_merged['visit_date'] <- lubridate::as_date(intake_v1_de_merged[['visit_date']])
+
+      # re-order
+      intake_v1_de_merged <- intake_v1_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v1_de_merged)[!grepl('_id|visit', names(intake_v1_de_merged))])]
+
+      # combine with exisitng merged data
+      intake_v1 <- rbind.data.frame(intake_v1, intake_v1_de_merged)
+      intake_v1 <- intake_v1[order(intake_v1[['participant_id']]), ]
+    }
+  }
+
+  intake_v1_json <- json_v1_intake()
+
+  ## intake data - visit 3 ####
+  intake_v3 <- checked_data[grepl('_id|plate_v3|^ad.*v3$', names(checked_data))]
+
+  # remove extra columns and re-order
+  intake_v3 <- intake_v3[!grepl('dxa_id', names(intake_v3))]
+
+  intake_v3['session_id'] <- 'ses-1'
+  intake_v3['visit_protocol'] <- 3
+
+  # merge with date data for v3
+  intake_v3 <- merge(intake_v3, date_data[c('participant_id', 'v3_date')], by = 'participant_id', all.x = TRUE)
+  names(intake_v3)[names(intake_v3) == 'v3_date'] <- 'visit_date'
+  intake_v3['visit_date'] <- lubridate::as_date(intake_v3[['visit_date']])
+
+  #fix names
+  names(intake_v3)[names(intake_v3) == 'ad_cond_eah_v3'] <- 'advertisement_condition'
+  names(intake_v3) <- gsub('_v3', '', names(intake_v3))
+
+  # re-order
+  intake_v3 <- intake_v3[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v3)[!grepl('_id|visit|advertisement_condition', names(intake_v3))])]
+
+
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
+
+    intake_v3_unmerged <- unmerged_data[grepl('_id|plate_v3|^ad.*v3$', names(unmerged_data))]
+
+    # remove extra columns and re-order
+    intake_v3_unmerged <- intake_v3_unmerged[!grepl('dxa_id', names(intake_v3_unmerged))]
+
+    intake_v3_unmerged['session_id'] <- 'ses-1'
+    intake_v3_unmerged['visit_protocol'] <- 3
+
+    #fix names
+    names(intake_v3_unmerged)[names(intake_v3_unmerged) == 'ad_cond_eah_v3'] <- 'advertisement_condition'
+    names(intake_v3_unmerged) <- gsub('_v3', '', names(intake_v3_unmerged))
+
+    # check unmerged values
+    intake_v3_de_list <- util_de_check(intake_v3_unmerged)
+
+    if (is.data.frame(intake_v3_de_list$merged_de_data)) {
+      # get date info for newly merged data
+      intake_v3_de_merged <- merge(intake_v3_de_list$merged_de_data, date_data[c('participant_id', 'v3_date')], by = 'participant_id', all.x = TRUE)
+      names(intake_v3_de_merged)[names(intake_v3_de_merged) == 'v3_date'] <- 'visit_date'
+      intake_v3_de_merged['visit_date'] <- lubridate::as_date(intake_v3_de_merged[['visit_date']])
+
+      # re-order
+      intake_v3_de_merged <- intake_v3_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v3_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v3_de_merged))])]
+
+      # combine with exisitng merged data
+      intake_v3 <- rbind.data.frame(intake_v3, intake_v3_de_merged)
+      intake_v3 <- intake_v3[order(intake_v3[['participant_id']]), ]
+    }
+  }
+
+  ## intake data - visit 4 ####
+  intake_v4 <- checked_data[grepl('_id|plate_v4|^ad.*v4$', names(checked_data))]
+
+  # remove extra columns and re-order
+  intake_v4 <- intake_v4[!grepl('dxa_id', names(intake_v4))]
+
+  intake_v4['session_id'] <- 'ses-1'
+  intake_v4['visit_protocol'] <- 4
+
+  #fix names
+  names(intake_v4)[names(intake_v4) == 'ad_cond_eah_v4'] <- 'advertisement_condition'
+  names(intake_v4) <- gsub('_v4', '', names(intake_v4))
+
+  # merge with date data for v4
+  intake_v4 <- merge(intake_v4, date_data[c('participant_id', 'v4_date')], by = 'participant_id', all.x = TRUE)
+  names(intake_v4)[names(intake_v4) == 'v4_date'] <- 'visit_date'
+  intake_v4['visit_date'] <- lubridate::as_date(intake_v4[['visit_date']])
+
+  # re-order
+  intake_v4 <- intake_v4[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v4)[!grepl('_id|visit|advertisement_condition', names(intake_v4))])]
+
+
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
+
+    intake_v4_unmerged <- unmerged_data[grepl('_id|plate_v4|^ad.*v4$', names(unmerged_data))]
+
+    # remove extra columns and re-order
+    intake_v4_unmerged <- intake_v4_unmerged[!grepl('dxa_id', names(intake_v4_unmerged))]
+
+    intake_v4_unmerged['session_id'] <- 'ses-1'
+    intake_v4_unmerged['visit_protocol'] <- 4
+
+    #fix names
+    names(intake_v4_unmerged)[names(intake_v4_unmerged) == 'ad_cond_eah_v4'] <- 'advertisement_condition'
+    names(intake_v4_unmerged) <- gsub('_v4', '', names(intake_v4_unmerged))
+
+    # check unmerged values
+    intake_v4_de_list <- util_de_check(intake_v4_unmerged)
+
+    if (is.data.frame(intake_v4_de_list$merged_de_data)) {
+      # get date info for newly merged data
+      intake_v4_de_merged <- merge(intake_v4_de_list$merged_de_data, date_data[c('participant_id', 'v4_date')], by = 'participant_id', all.x = TRUE)
+      names(intake_v4_de_merged)[names(intake_v4_de_merged) == 'v4_date'] <- 'visit_date'
+      intake_v4_de_merged['visit_date'] <- lubridate::as_date(intake_v4_de_merged[['visit_date']])
+
+      # re-order
+      intake_v4_de_merged <- intake_v4_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v4_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v4_de_merged))])]
+
+      # combine with exisitng merged data
+      intake_v4 <- rbind.data.frame(intake_v4, intake_v4_de_merged)
+      intake_v4 <- intake_v4[order(intake_v4[['participant_id']]), ]
+    }
+  }
+
+  ## intake data - visit 5 ####
+  intake_v5 <- checked_data[grepl('_id|plate_v5', names(checked_data))]
+
+  # remove extra columns and re-order
+  intake_v5 <- intake_v5[!grepl('dxa_id', names(intake_v5))]
+
+  intake_v5['session_id'] <- 'ses-2'
+  intake_v5['visit_protocol'] <- 5
+
+  #fix names
+  names(intake_v5) <- gsub('_v5', '', names(intake_v5))
+  intake_v5['advertisement_condition'] <- NA
+
+  # merge with date data for v5
+  intake_v5 <- merge(intake_v5, date_data[c('participant_id', 'v5_date')], by = 'participant_id', all.x = TRUE)
+  names(intake_v5)[names(intake_v5) == 'v5_date'] <- 'visit_date'
+  intake_v5['visit_date'] <- lubridate::as_date(intake_v5[['visit_date']])
+
+  # re-order
+  intake_v5 <- intake_v5[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v5)[!grepl('_id|visit|advertisement_condition', names(intake_v5))])]
+
+
+  # if there are unmerged participants
+  if (sum(unmerged_ids) > 0) {
+
+    intake_v5_unmerged <- unmerged_data[grepl('_id|plate_v5', names(unmerged_data))]
+
+    # remove extra columns and re-order
+    intake_v5_unmerged <- intake_v5_unmerged[!grepl('dxa_id', names(intake_v5_unmerged))]
+
+    intake_v5_unmerged['session_id'] <- 'ses-2'
+    intake_v5_unmerged['visit_protocol'] <- 5
+
+    #fix names
+    names(intake_v5_unmerged) <- gsub('_v5', '', names(intake_v5_unmerged))
+    intake_v5_unmerged['advertisement_condition'] <- NA
+
+    # check unmerged values
+    intake_v5_de_list <- util_de_check(intake_v5_unmerged)
+
+    if (is.data.frame(intake_v5_de_list$merged_de_data)) {
+      # get date info for newly merged data
+      intake_v5_de_merged <- merge(intake_v5_de_list$merged_de_data, date_data[c('participant_id', 'v5_date')], by = 'participant_id', all.x = TRUE)
+      names(intake_v5_de_merged)[names(intake_v5_de_merged) == 'v5_date'] <- 'visit_date'
+      intake_v5_de_merged['visit_date'] <- lubridate::as_date(intake_v5_de_merged[['visit_date']])
+
+      # re-order
+      intake_v5_de_merged <- intake_v5_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v5_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v5_de_merged))])]
+
+      # combine with exisitng merged data
+      intake_v5 <- rbind.data.frame(intake_v5, intake_v5_de_merged)
+      intake_v5 <- intake_v5[order(intake_v5[['participant_id']]), ]
+    }
+  }
+
+  intake_v3v4v5_json = json_v3v4v5_intake()
+
+  return(list(dxa_v1 = list(data = dxa_v1, meta = dxa_json),
+              dxa_v5 = list(data = dxa_v5, meta = dxa_json),
+              intake_v1 = list(data = intake_v1, meta = intake_v1_json),
+              intake_v3 = list(data = intake_v3, meta = intake_v3v4v5_json),
+              intake_v4 = list(data = intake_v4, meta = intake_v3v4v5_json),
+              intake_v5 = list(data = intake_v5, meta = intake_v3v4v5_json)
+  ))
 
 }
 
