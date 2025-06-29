@@ -123,12 +123,14 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     # remove '.factor'
     redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
     redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
+
+
   }
 
-  #### Extract visit data ####
-
   # Make ID column bids compliant: Convert record_id to strings padded with zeros and add 'sub_'
-  redcap_visit_data['record_id'] <- sprintf('sub-%03d', redcap_visit_data[['record_id']])
+  #redcap_visit_data['record_id'] <- sprintf('sub-%03d', redcap_visit_data[['record_id']])
+
+  #### Extract visit data ####
 
   # # subset events and remove unnecessary columns
   redcap_long_wide <- function(event_name, data){

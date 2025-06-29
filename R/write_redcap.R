@@ -112,6 +112,9 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', return_d
   redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
   redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
 
+  # Make ID column bids compliant: Convert record_id to strings padded with zeros and add 'sub_'
+  redcap_visit_data['record_id'] <- sprintf('sub-%03d', redcap_visit_data[['record_id']])
+
   # set paths for other directories
   bids_wd <- file.path(base_wd, 'bids')
   phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
