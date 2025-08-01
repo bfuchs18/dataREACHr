@@ -17,9 +17,9 @@
 util_format_household_data <- function(household_data) {
 
   # rename columns
-  names(household_data)[names(household_data) == "demo_self_report_feet"] <- "demo_parent2_rep_height_ft"
-  names(household_data)[names(household_data) == "demo_self_report_inches"] <- "demo_parent2_rep_height_in"
-  names(household_data)[names(household_data) == "demo_self_report_weight"] <- "demo_parent2_rep_weight_lbs"
+  names(household_data)[names(household_data) == 'demo_self_report_feet'] <- 'demo_parent2_rep_height_ft'
+  names(household_data)[names(household_data) == 'demo_self_report_inches'] <- 'demo_parent2_rep_height_in'
+  names(household_data)[names(household_data) == 'demo_self_report_weight'] <- 'demo_parent2_rep_weight_lbs'
 
   # calculate parent age
   household_data[['demo_parent_birthdate']] <- lubridate::as_date(household_data[['demo_parent_birthdate']])
@@ -29,7 +29,7 @@ util_format_household_data <- function(household_data) {
 
 
   # remove birthdate and timestamp variables
-  household_data <- household_data[, !grepl("birthdate", names(household_data))]
+  household_data <- household_data[, !grepl('birthdate', names(household_data))]
 
   # fix a '000' participant entry
   household_data['demo_parent2_rep_height_ft'] <- ifelse(household_data[['demo_parent2_rep_height_ft']] == '000', NA, as.numeric(household_data[['demo_parent2_rep_height_ft']]))
@@ -70,6 +70,8 @@ util_format_household_data <- function(household_data) {
   names(household_data)[names(household_data) == 'demo_grow_own_food___8'] <- 'demo_grow_redmeat'
   names(household_data)[names(household_data) == 'demo_grow_own_food___9'] <- 'demo_grow_poultry'
   names(household_data)[names(household_data) == 'demo_grow_own_food___10'] <- 'demo_grow_none'
+
+  names(household_data)[names(household_data) == 'demo_allowance_other'] <- 'demo_allowance_amt'
 
   # return data
   return(household_data)

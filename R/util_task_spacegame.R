@@ -6,9 +6,9 @@
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_task_foodview
-#' @inheritParams util_task_foodview
+#' @inheritParams util_copy_to_source
 #'
-#' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
+#' @return statement of task completed
 #'
 #' @examples
 #' \dontrun{

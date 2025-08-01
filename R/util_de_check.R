@@ -36,20 +36,20 @@ util_de_check <- function(unmerged_data) {
       check_list <- sapply(names(de_data)[!grepl('_id', names(de_data))], function(x) ifelse(de_data[de_data['participant_id'] == paste0(id_str, '--1'), x] == de_data[de_data['participant_id'] == paste0(id_str, '--2'), x], TRUE, FALSE))
 
       if (sum(isFALSE(check_list)) == 0){
-        check_good = TRUE
+        check_good = rep(TRUE, nrow(de_data))
       } else {
-        check_good = FALSE
+        check_good = rep(FALSE, nrow(de_data))
       }
     } else {
       # not 1 or two
-      check_good = FALSE
+      check_good = rep(FALSE, nrow(de_data))
     }
 
     return(check_good)
   }
 
   # get logical indicator of ids with matching data
-  id_check_good <- sapply(id_list, function(x) de_check_fn(x, unmerged_data))
+  id_check_good <- unlist(sapply(id_list, function(x) de_check_fn(x, unmerged_data), simplify = FALSE))
 
   if (sum(grepl('TRUE', id_check_good)) > 0){
 

@@ -31,24 +31,22 @@ util_merged_intake <- function(child_v1_data, child_v3_data, child_v4_data, chil
   food_paradigm_info_all <- rbind(data.table::setDT(child_v1_data$food_paradigm_info$data), data.table::setDT(child_v3_data$food_paradigm_info$data), data.table::setDT(child_v4_data$food_paradigm_info$data), data.table::setDT(child_v5_data$food_paradigm_info$data), fill = TRUE)
   food_paradigm_info_all <- as.data.frame(food_paradigm_info_all)
 
-  # non-double entered
-  # intake_all <- rbind(data.table::setDT(child_v1_data$intake_data$data), data.table::setDT(child_v3_data$intake_data$data), data.table::setDT(child_v4_data$intake_data$data), data.table::setDT(child_v5_data$intake_data$data), fill = TRUE)
-  # intake_all <- as.data.frame(intake_all)
-  #
-  # intake_all <- util_calc_intake(intake_all)
-
+  # intake data
   intake_all <- rbind(data.table::setDT(proc_de_data$intake_v1$data), data.table::setDT(proc_de_data$intake_v3$data), data.table::setDT(proc_de_data$intake_v4$data), data.table::setDT(proc_de_data$intake_v5$data), fill = TRUE)
   intake_all <- as.data.frame(intake_all)
 
+  # reorder
+  intake_all <- intake_all[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'ad_cond_meal', 'ad_cond_eah', names(intake_all)[!grepl('_id|visit_|ad_cond', names(intake_all))])]
+
   intake_all <- util_calc_intake(intake_all)
 
-  merged_intake <- merge(food_paradigm_info_all, liking_all[!grepl('visit_protocol|visit_date', names(liking_all))], by=c('participant_id', 'session_id'), all = TRUE)
+  merged_intake <- merge(food_paradigm_info_all[!grepl('advertisement_condition', names(food_paradigm_info_all))], liking_all[!grepl('visit_protocol|visit_date', names(liking_all))], by=c('participant_id', 'session_id'), all = TRUE)
   merged_intake <- merge(merged_intake, wanting_all[!grepl('session_id|visit_date|advertisement_condition', names(wanting_all))], by=c('participant_id', 'visit_protocol'), all = TRUE)
   merged_intake <- merge(merged_intake, fullness_all[!grepl('session_id|visit_date|advertisement_condition', names(fullness_all))], by=c('participant_id', 'visit_protocol'), all = TRUE)
-  merged_intake <- merge(merged_intake, intake_all[!grepl('session_id|visit_date|advertisement_condition', names(intake_all))], by=c('participant_id', 'visit_protocol'), all = TRUE)
+  merged_intake <- merge(merged_intake, intake_all[!grepl('visit_date|advertisement_condition', names(intake_all))], by=c('participant_id', 'session_id', 'visit_protocol'), all = TRUE)
 
   # re-order
-  merged_intake <- merged_intake[c('participant_id', 'session_id', names(merged_intake)[!grepl('_id', names(merged_intake))])]
+  merged_intake <- merged_intake[c('participant_id', 'session_id', 'ad_cond_meal', 'ad_cond_eah', names(merged_intake)[!grepl('_id|ad_cond', names(merged_intake))])]
 
   # return data
   return(merged_intake)

@@ -1,29 +1,31 @@
 #' util_copy_to_source: A function to copy a file into sourcedata
 #'
+#' @inheritParams proc_tasks
 #' @param task_dir (string) path to directory with all task files to be copied into sourcedata
 #' @param task_str (string) task string used in filenaming (e.g., 'foodview')
-#' @param sub_id (integer) subject id
+#' @param sub_str (string) bids-formatted session string. e.g., 'sub-001'
+#' @param sub_id (numeric) participant number
 #' @param ses_str (string) bids-formatted session string. e.g., 'ses-1'
 #' @param sourcefile_prefix (string) string to prefix filename with in sourcedata (optional)
-#' @param overwrite (logical) logical indicating whether file should be overwritten in sourcedata
+#' @param file_pattern (string) sting to identify files (optional)
+#' @param overwrite (logical) logical indicating whether file should be overwritten
 #'
 #' @examples
-#' util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_id = 'sub-001', ses_str = 'ses-1', overwrite = TRUE)
+#' util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_str = 'sub-001', ses_str = 'ses-1', overwrite = TRUE)
+#'
+#' @export
 #'
 
 
-util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_prefix, overwrite) {
+util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, sub_id, sourcefile_prefix, file_pattern, overwrite) {
 
   # check for sourcefile_prefix arg
   prefix_arg <- methods::hasArg(sourcefile_prefix)
 
-  # sub_str
-  sub_str <- sprintf('sub-%03d', sub_id)
-
-  print(sub_str)
-
   # get files
-  raw_files <- list.files(path = task_dir, pattern = task_str)
+  if (!grepl('nih|actigraph|rrv|pit', task_str)) {
+    raw_files <- list.files(path = base_wd, pattern = task_str)
+  }
 
   # food view ####
   if (task_str == 'foodview'){
@@ -56,7 +58,7 @@ util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_
     # set sourcedata directory for task files
     sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
 
-    raw_files <- raw_files[grepl(sprintf('%03d', sub_id), raw_files)]
+    raw_files <- raw_files[grepl(sub_str, raw_files)]
 
     raw_files_short <- substr(raw_files, 1, unlist(gregexpr('_', raw_files))-1)
 
@@ -121,11 +123,11 @@ util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_
 
     raw_files <- list.files(path = task_dir, pattern = 'PIT')
 
-    raw_files <- raw_files[grepl(paste0(sprintf('%03d', sub_id), '_Food'), raw_files)]
+    raw_files <- raw_files[grepl(paste0(sub_str, '_Food'), raw_files)]
 
     # output warning if .csv not found
     if ( sum(grepl('.csv', raw_files)) == 0) {
-      print(paste('WARNING: subject', sub_id, ses_str, 'has PIT output files but no csv' ))
+      print(paste('WARNING: subject', sub_str, ' ', ses_str, 'has PIT output files but no csv' ))
     }
 
     raw_files_short <- substr(raw_files, tail(unlist(gregexpr('\\.', raw_files[1])), 1), nchar(raw_files))
@@ -134,6 +136,25 @@ util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_
 
     rename_files <- gsub('.csv', '.tsv', rename_files)
     rename_files <- gsub('.txt', '.tsv', rename_files)
+  }
+
+  # Actigraph ####
+  if (task_str == 'actigraph'){
+
+    # set sourcedata directory for task files
+    sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'motion')
+
+    raw_files <- list.files(path = task_dir, pattern = file_pattern)
+
+    raw_files <- raw_files[grepl(paste0('REACH_', sprintf('%03d', sub_id)), raw_files)]
+
+    rename_files <- gsub('REACH_', 'sub-', raw_files)
+
+    if (file_pattern == '.agd'){
+      rename_files <- gsub(paste0(sub_str, '_'), paste0(sub_str, '_', ses_str, '_motion-'), rename_files)
+    } else {
+      rename_files <- gsub(sub_str, paste0(sub_str, '_', ses_str, '_motion'), rename_files)
+    }
   }
 
 
@@ -168,7 +189,7 @@ util_copy_to_source <- function(task_dir, task_str, sub_id, ses_str, sourcefile_
 
     if (task_str %in% c('foodview', 'stop', 'nih', 'rrv')){
       mapply(save_fun, file_path=file.path(task_dir, raw_files), source_path = source_paths)
-    } else if (task_str %in% c('mbmfNovelStakes')){
+    } else if (task_str %in% c('mbmfNovelStakes', 'actigraph')){
       # copy file into sub_task_source_dir
       file.copy(from = file.path(task_dir, raw_files), to = source_paths, overwrite = overwrite)
     } else if (task_str %in% c('pit')){

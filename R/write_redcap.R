@@ -10,7 +10,7 @@
 #'
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
-#' @param export list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
+#' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
 #'  \item{'participants' - BIDS specified participants.tsv file}
 #'  \item{'anthropometrics' - height, weight, and computed anthropometric data}
@@ -58,7 +58,7 @@
 #'  \item{'stq' - Screen Time Questionnaire *need*}
 #'  \item{'tfeq' - Three Factor Eating Questionnaire}
 #' }
-#' @param return (logical) return data to working environment. Default = FALSE.
+#' @inheritParams write_tasks
 #'
 #' @return Does not return anything
 #'
@@ -70,7 +70,6 @@
 #'
 #' }
 #'
-#' @importFrom utils tail write.table read.csv head
 #'
 #' @export
 
@@ -132,12 +131,19 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', return_d
   proc_redcap_data$fsq$data[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))] <- sapply(names(proc_redcap_data$fsq$data)[grepl('resources|fsq_12', names(proc_redcap_data$fsq$data))], function(x) gsub('\n|- ', ' ', proc_redcap_data$fsq$data[[x]]))
 
   #### function to export data and metadata ####
-  data_lsit_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
+
+  data_list_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
+
+  if (length(data_list) == 1) {
+    if (data_list == 'all'){
+      data_list <- data_list_options
+    }
+  }
 
   # loop through data_to_export and export data and meta-data
   redcap_export <- function(data_str, overwrite){
 
-    if (data_str %in% data_lsit_options){
+    if (data_str %in% data_list_options){
 
       if (data_str == 'participants'){
         filename_tsv <- file.path(bids_wd, paste0(data_str, '.tsv'))
@@ -164,19 +170,7 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', return_d
     }
   }
 
-  if (data_list == 'all'){
-    data_list <- data_lsit_options
-  }
-
   write_redcap_output <- sapply(data_list, function(x) redcap_export(x, overwrite))
-
-  #move elsewhere##
-  # export dataset_description.json
-  filename_json <- file.path(phenotype_wd, 'dataset_description.json')
-  json <- json_phe_dataset_desc(visit_data_path, data_de_path)
-  if ( isTRUE(overwrite) | !file.exists(filename_json) ) {
-    write(json, filename_json)
-  }
 
   #### Return Data ####
   if (isTRUE(return_data)) {

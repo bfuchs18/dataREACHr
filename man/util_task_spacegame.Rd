@@ -7,14 +7,16 @@
 util_task_spacegame(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
 }
 \arguments{
+\item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
+
 \item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
 \item{bids_wd}{string with full path to bids directory that contains the sourcedata/ and rawdata/ directories}
 
-\item{overwrite}{(logical) logical indicating whether file should be overwritten in sourcedata}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
 \value{
-If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
+statement of task completed
 }
 \description{
 This function formats, cleans, and organizes spacegame data (.mat) from bids/sourcedata into rawdata for a given subject

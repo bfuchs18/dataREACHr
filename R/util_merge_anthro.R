@@ -6,7 +6,7 @@
 #' @param visit1_anthro visit 1 anthropometrics data.frame
 #' @param visit5_anthro visit 2 anthropometrics data.frame
 #' @param merged_household merged household data.frame
-#' @param date_data data.frame with all visit date information
+#' @inheritParams util_redcap_parent_v1
 #'
 #' @examples
 #'
@@ -35,13 +35,13 @@ util_merged_anthro <- function(visit1_anthro, visit5_anthro, merged_household, d
   merged_anthro <- merged_anthro[!grepl('v1_age|v5_age', names(merged_anthro))]
 
   # compute bmi variables
-  merged_anthro['child_bmi'] <- round(merged_anthro['child_weight_average'] /((merged_anthro['child_height_average'] / 100) ^ 2), digits = 2)
+  merged_anthro['child_bmi'] <- round(merged_anthro['weight_mean_kg'] /((merged_anthro['height_mean_cm'] / 100) ^ 2), digits = 2)
 
   merged_anthro['child_bmi_z'] <- round(childsds::sds(value = merged_anthro[['child_bmi']], age = merged_anthro[['age']], sex = merged_anthro[['sex']], item = 'bmi', ref = childsds::cdc.ref, type = 'SDS', male = 'male', female = 'female'), digits = 2)
 
   merged_anthro['child_bmi_p'] <- round((childsds::sds(value = merged_anthro[['child_bmi']], age = merged_anthro[['age']], sex = merged_anthro[['sex']], item = 'bmi', ref = childsds::cdc.ref, type = 'perc', male = 'male', female = 'female')) * 100, digits = 2)
 
-  merged_anthro['parent1_bmi'] <- round(merged_anthro['parent1_weight_average_kg'] / ((merged_anthro['parent1_height_average_cm'] / 100) ^ 2), digits = 2)
+  merged_anthro['parent1_bmi'] <- round(merged_anthro['parent1_weight_mean_kg'] / ((merged_anthro['parent1_height_mean_cm'] / 100) ^ 2), digits = 2)
 
   # Define parental BMI values and method
   ## parent1_sex ('female' or 'male') indicates the parent with measured anthro; demo_child_relationship (0 = bio-mom, 1 = bio-dad) indicates parent that reported height/weight for bio parent *not* at visit in household demo form

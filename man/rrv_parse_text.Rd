@@ -4,12 +4,12 @@
 \alias{rrv_parse_text}
 \title{rrv_parse_text: Generate tabular data from rrv text files}
 \usage{
-rrv_parse_text(rrv_file, participant_id)
+rrv_parse_text(rrv_file, sub_str)
 }
 \arguments{
 \item{rrv_file}{(character string) full path to rrv file}
 
-\item{participant_id}{(character string) bids-compliant subject ID}
+\item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 }
 \description{
 This function generates and returns 1 dataframe with data from input RRV file
@@ -20,7 +20,7 @@ This function generates and returns 1 dataframe with data from input RRV file
 
 # process task data for the Food View Task
 file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/rrv_060.txt"
-rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-060")
+rrv_csv <- rrv_parse_text(rrv_file = file_name, sub_str = "sub-060")
 
 }
 

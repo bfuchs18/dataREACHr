@@ -14,9 +14,9 @@ write_redcap(
 \arguments{
 \item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
-\item{overwrite}{(logical) data should be overwritten. Default = FALSE}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten}
 
-\item{export}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
+\item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 \itemize{
 \item{'participants' - BIDS specified participants.tsv file}
 \item{'anthropometrics' - height, weight, and computed anthropometric data}
@@ -65,7 +65,7 @@ write_redcap(
 \item{'tfeq' - Three Factor Eating Questionnaire}
 }}
 
-\item{return}{(logical) return data to working environment. Default = FALSE.}
+\item{return_data}{(logical) return data to working environment. Default = FALSE}
 }
 \value{
 Does not return anything
@@ -86,5 +86,6 @@ To use this function, the correct path must be used. The path must be the full p
 write_redcap(base_wd, overwrite = FALSE, data_list = 'all')
 
 }
+
 
 }

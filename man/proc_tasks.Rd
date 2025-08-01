@@ -4,24 +4,21 @@
 \alias{proc_tasks}
 \title{proc_tasks: Process task data from untouchedRaw to create bids compliant files}
 \usage{
-proc_tasks(
-  base_wd,
-  overwrite = FALSE,
-  all_tasks = FALSE,
-  task_vector,
-  overwrite_jsons = FALSE
-)
+proc_tasks(base_wd, overwrite = FALSE, task_list)
 }
 \arguments{
 \item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
-\item{overwrite}{(logical) data should be overwritten. Default = FALSE}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten}
 
-\item{all_tasks}{(logical) all tasks should be moved to sourcedata. Default = FALSE. If all_tasks = FALSE, user must specify tasks to process in task_vector}
-
-\item{task_vector}{(vector) tasks to process. Must be included if all_tasks = FALSE. Options include: c('sst', 'foodview', 'spacegame', 'nih_toolbox', 'rrv', 'pit') (optional)}
-
-\item{overwrite_jsons}{(logical) overwrite existing jsons in rawdata. Default = FALSE}
+\item{task_list}{tasks to process. Options include 'all' to process all task data or a list of the following:\itemize{
+\item{'foodview' - fMRI Food Viewing task}
+\item{'nihtoolbox' - NIH Toolbox data}
+\item{'pit' - Pavlovian Instrumental Transfer task data}
+\item{'rrv' - Relative Reinforcing Value of Food task}
+\item{'spacegame' - Space Game data (need to finish processing in Matlab)}
+\item{'sst' - fMRI Stop-Signal Task data}
+}}
 }
 \description{
 This function: \itemize{
@@ -33,11 +30,8 @@ This function: \itemize{
 \examples{
 
 \dontrun{
-# organize task data for all tasks in untouchedRaw into sourcedata and rawdata
-proc_task(base_wd = base_wd, all_tasks = TRUE)
-
 # organize task data for space game and NIH toolbox in untouchedRaw into sourcedata and raw data
-proc_task(base_wd = base_wd, task_vector = c('spacegame', 'nih_toolbox'))
+proc_task(base_wd = base_wd, task_list = c('spacegame', 'nih_toolbox'))
 
 }
 

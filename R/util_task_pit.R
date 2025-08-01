@@ -2,26 +2,26 @@
 #'
 #' This function formats and organizes RRV data from bids/sourcedata into bids/rawdata for a given subject
 #'
-#' @param sub subject label used in sub-label. Leading zeros not required
-#' @param ses session label used in ses-label.
-#' @param bids_wd string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
-#' @param return_data logical indicating if data should be returned. Default = TRUE
+#'@inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
+#' @inheritParams util_task_foodview
+#' @inheritParams util_copy_to_source
 #'
-#' @return If return_data is set to TRUE, will return a dataframe with cleaned data
+#'
+#' @return statement of task completed
 #'
 #' @examples
 #'
 #' \dontrun{
 #' # process task data for the Food View Task
-#' pit_data <- util_task_pit(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#' pit_data <- util_task_pit(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
 #'
 #' }
 #' @importFrom utils read.table
 #' @importFrom rlang .data
 #' @export
 
-util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TRUE) {
+util_task_pit <- function(sub_str, ses_str, bids_wd, overwrite = FALSE) {
 
   #### Check args #####
 
@@ -37,15 +37,6 @@ util_task_pit <- function(sub, ses, bids_wd, overwrite = FALSE, return_data = TR
   } else if (isFALSE(bids_wd)) {
     stop("bids_wd must be entered as a string")
   }
-
-  #### Define sub/ses vars ####
-
-  # Get subject number with leading zeros
-  sub <- sprintf("%03d", as.numeric(sub))
-
-  # Set sub and ses strings
-  sub_str <- sprintf("sub-%03d", as.numeric(sub))
-  ses_str <- paste0("ses-", ses)
 
   #### Import Data #####
 

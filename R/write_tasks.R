@@ -1,24 +1,42 @@
-#' proc_task_derivs: Exports derivative databases with task beh summary metrics and associated meta-data
+#' write_tasks: Write selected data and json files from processed REDCap data
 #'
-#' This function calls deriv_{task} functions and exports TSVs with summary behavioral metrics and associated meta-data
+#' This function:
+#' \itemize{
+#'    \item{1) Calls proc_tasks function to organize and clean task data into BIDS-compliant .tsv}
+#'    \item{2) Calls proc_tasks_deriv function to generate summary datasets}
+#'    \item{2) Exports all or select BIDS-compliant .tsv and .json files into bids/derivatives and/or bids/phenotype}
+#'}
 #'
-#' @param task_data list of processed task data returned by proc_task()
-#' @param export_dir string with absolute path to export directory (typically behavioral summary directory)
+#' To use this function, the correct path must be used. The path must be the full path to the data file, including the file name.
+#'
+#' @inheritParams proc_tasks
+#' @inheritParams util_copy_to_source
+#' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
+#' \itemize{
+#'  \item{'foodview' - fMRI Food Viewing task}
+#'  \item{'nihtoolbox' - NIH Toolbox data}
+#'  \item{'pit' - Pavlovian Instrumental Transfer task data}
+#'  \item{'rrv' - Relative Reinforcing Value of Food task}
+#'  \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
+#'  \item{'sst' - fMRI Stop-Signal Task data}
+#' }
+#' @param return_data (logical) return data to working environment. Default = FALSE
+#'
+#'
 #' @examples
 #'
 #' \dontrun{
 #'
 #' # process task data
-#' base_dir = "/Users/bari/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/b-childfoodlab_Shared/Active_Studies/MarketingResilienceRO1_8242020/ParticipantData/"
 #' task_data <- proc_task(base_wd = base_dir, return_data = TRUE)
 #'
 #' # export derivative databases
-#' proc_task_derivs(task_data, "path/to/export/")
+#' write_tasks(task_data, "path/to/export/")
 #' }
 #'
 #' @export
 
-proc_task_derivs <- function(task_data, export_dir) {
+write_tasks <- function(base_wd, overwrite = FALSE, data_list = 'all', return_data = FALSE) {
 
   #### Set up/initial checks #####
 

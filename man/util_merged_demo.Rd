@@ -13,7 +13,28 @@ util_merged_demo(visit1_demo, household_all, merged_anthro, date_data)
 
 \item{merged_anthro}{merged anthro data.fram}
 
-\item{date_data}{data.frame with all visit date information}
+\item{date_data}{date data for REDCap visit
+
+Will return a list including:
+\itemize{
+\item{clean raw and scored parent visit 1 datasets}
+\item{meta-data formated as json for each dataset}
+}
+
+Returned data includes:
+\itemize{
+\item{demo_data}
+\item{infancy_data}
+\item{household_data}
+\item{rank_data}
+\item{puberty_data}
+\item{cfq_data}
+\item{cebq_data}
+\item{efcr_data}
+\item{chaos_data}
+\item{pss_data}
+\item{lbc_data}
+}}
 }
 \description{
 This function merges demographic data across visits and formats/calculates necessary values

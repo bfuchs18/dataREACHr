@@ -4,21 +4,19 @@
 \alias{util_task_rrv}
 \title{util_task_rrv: Clean and organize RRV data into BIDS rawdata}
 \usage{
-util_task_rrv(sub, ses = 1, bids_wd, overwrite = FALSE, return_data = TRUE)
+util_task_rrv(sub_str, ses_str, bids_wd, overwrite = FALSE, return_data = TRUE)
 }
 \arguments{
-\item{sub}{subject label used in sub-label. Leading zeros not required}
+\item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 
-\item{ses}{session label used in ses-label. Default = 1}
+\item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
-\item{bids_wd}{string with full path to bids directory -- this is the directory that contains sourcedata/ and rawdata/}
+\item{bids_wd}{string with full path to bids directory that contains the sourcedata/ and rawdata/ directories}
 
-\item{overwrite}{logical indicating if data should be overwritten in /rawdata. Default = FALSE}
-
-\item{return_data}{logical indicating if data should be returned. Default = TRUE}
+\item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
 \value{
-If return_data is set to TRUE, will return a dataframe with cleaned data
+statement of task completed
 }
 \description{
 This function formats and organizes RRV data from bids/sourcedata into bids/rawdata for a given subject
@@ -28,7 +26,7 @@ If subject has RRV text file, rrv_parse_text() will be called. If subject does n
 
 \dontrun{
 # process task data for the Food View Task
-rrv_data <- util_task_rrv(sub = 001, ses = 1, bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+rrv_data <- util_task_rrv(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
 
 }
 }

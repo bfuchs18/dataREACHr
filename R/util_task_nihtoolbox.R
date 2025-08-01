@@ -6,9 +6,9 @@
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_task_foodview
-#' @inheritParams util_task_foodview
+#' @inheritParams util_copy_to_source
 #'
-#' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
+#' @return statement of task completed
 #'
 #' @examples
 #'
@@ -22,8 +22,6 @@
 #' @export
 
 util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
-
-  print(sub_str)
 
   #### Set up/initial checks #####
 

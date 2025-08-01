@@ -207,8 +207,9 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   # remove extra columns and re-order
   intake_v1 <- intake_v1[!grepl('dxa_id', names(intake_v1))]
 
-  intake_v1['session_id'] <- 'ses-2'
+  intake_v1['session_id'] <- 'ses-1'
   intake_v1['visit_protocol'] <- 1
+  intake_v1['ad_cond_meal'] <- 0
 
   # merge with date data for v1
   intake_v1 <- merge(intake_v1, date_data[c('participant_id', 'v1_date')], by = 'participant_id', all.x = TRUE)
@@ -232,6 +233,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
     intake_v1_unmerged['session_id'] <- 'ses-1'
     intake_v1_unmerged['visit_protocol'] <- 1
+    intake_v1_unmerged['ad_cond_meal'] <- 0
 
     # fix names
     names(intake_v1_unmerged) <- gsub('_v1', '', names(intake_v1_unmerged))
@@ -274,11 +276,10 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   intake_v3['visit_date'] <- lubridate::as_date(intake_v3[['visit_date']])
 
   #fix names
-  names(intake_v3)[names(intake_v3) == 'ad_cond_eah_v3'] <- 'advertisement_condition'
   names(intake_v3) <- gsub('_v3', '', names(intake_v3))
 
   # re-order
-  intake_v3 <- intake_v3[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v3)[!grepl('_id|visit|advertisement_condition', names(intake_v3))])]
+  intake_v3 <- intake_v3[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v3)[!grepl('_id|visit', names(intake_v3))])]
 
 
   # if there are unmerged participants
@@ -293,7 +294,6 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
     intake_v3_unmerged['visit_protocol'] <- 3
 
     #fix names
-    names(intake_v3_unmerged)[names(intake_v3_unmerged) == 'ad_cond_eah_v3'] <- 'advertisement_condition'
     names(intake_v3_unmerged) <- gsub('_v3', '', names(intake_v3_unmerged))
 
     # check unmerged values
@@ -306,7 +306,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
       intake_v3_de_merged['visit_date'] <- lubridate::as_date(intake_v3_de_merged[['visit_date']])
 
       # re-order
-      intake_v3_de_merged <- intake_v3_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v3_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v3_de_merged))])]
+      intake_v3_de_merged <- intake_v3_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v3_de_merged)[!grepl('_id|visit', names(intake_v3_de_merged))])]
 
       # remove rows with all NA
       intake_v3_de_merged <- intake_v3_de_merged[!(rowSums(is.na(intake_v3_de_merged)) >= ncol(intake_v3_de_merged) - 4), ]
@@ -327,7 +327,6 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   intake_v4['visit_protocol'] <- 4
 
   #fix names
-  names(intake_v4)[names(intake_v4) == 'ad_cond_eah_v4'] <- 'advertisement_condition'
   names(intake_v4) <- gsub('_v4', '', names(intake_v4))
 
   # merge with date data for v4
@@ -336,7 +335,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   intake_v4['visit_date'] <- lubridate::as_date(intake_v4[['visit_date']])
 
   # re-order
-  intake_v4 <- intake_v4[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v4)[!grepl('_id|visit|advertisement_condition', names(intake_v4))])]
+  intake_v4 <- intake_v4[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v4)[!grepl('_id|visit', names(intake_v4))])]
 
   # if there are unmerged participants
   if (sum(unmerged_ids) > 0) {
@@ -350,7 +349,6 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
     intake_v4_unmerged['visit_protocol'] <- 4
 
     #fix names
-    names(intake_v4_unmerged)[names(intake_v4_unmerged) == 'ad_cond_eah_v4'] <- 'advertisement_condition'
     names(intake_v4_unmerged) <- gsub('_v4', '', names(intake_v4_unmerged))
 
     # check unmerged values
@@ -363,7 +361,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
       intake_v4_de_merged['visit_date'] <- lubridate::as_date(intake_v4_de_merged[['visit_date']])
 
       # re-order
-      intake_v4_de_merged <- intake_v4_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v4_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v4_de_merged))])]
+      intake_v4_de_merged <- intake_v4_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v4_de_merged)[!grepl('_id|visit', names(intake_v4_de_merged))])]
 
       # remove rows with all NA
       intake_v4_de_merged <- intake_v4_de_merged[!(rowSums(is.na(intake_v4_de_merged)) >= ncol(intake_v4_de_merged) - 4), ]
@@ -382,10 +380,11 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
   intake_v5['session_id'] <- 'ses-2'
   intake_v5['visit_protocol'] <- 5
+  intake_v5['ad_cond_meal'] <- 0
+  intake_v5['ad_cond_eah'] <- 0
 
   #fix names
   names(intake_v5) <- gsub('_v5', '', names(intake_v5))
-  intake_v5['advertisement_condition'] <- NA
 
   # merge with date data for v5
   intake_v5 <- merge(intake_v5, date_data[c('participant_id', 'v5_date')], by = 'participant_id', all.x = TRUE)
@@ -393,7 +392,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
   intake_v5['visit_date'] <- lubridate::as_date(intake_v5[['visit_date']])
 
   # re-order
-  intake_v5 <- intake_v5[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v5)[!grepl('_id|visit|advertisement_condition', names(intake_v5))])]
+  intake_v5 <- intake_v5[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v5)[!grepl('_id|visit', names(intake_v5))])]
 
 
   # if there are unmerged participants
@@ -406,10 +405,11 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
     intake_v5_unmerged['session_id'] <- 'ses-2'
     intake_v5_unmerged['visit_protocol'] <- 5
+    intake_v5_unmerged['ad_cond_meal'] <- 0
+    intake_v5_unmerged['ad_cond_eah'] <- 0
 
     #fix names
     names(intake_v5_unmerged) <- gsub('_v5', '', names(intake_v5_unmerged))
-    intake_v5_unmerged['advertisement_condition'] <- NA
 
     # check unmerged values
     intake_v5_de_list <- util_de_check(intake_v5_unmerged)
@@ -421,7 +421,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
       intake_v5_de_merged['visit_date'] <- lubridate::as_date(intake_v5_de_merged[['visit_date']])
 
       # re-order
-      intake_v5_de_merged <- intake_v5_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', 'advertisement_condition', names(intake_v5_de_merged)[!grepl('_id|visit|advertisement_condition', names(intake_v5_de_merged))])]
+      intake_v5_de_merged <- intake_v5_de_merged[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(intake_v5_de_merged)[!grepl('_id|visit', names(intake_v5_de_merged))])]
 
       # remove rows with all NA
       intake_v5_de_merged <- intake_v5_de_merged[!(rowSums(is.na(intake_v5_de_merged)) >= ncol(intake_v5_de_merged) - 4), ]

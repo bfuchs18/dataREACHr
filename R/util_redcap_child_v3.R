@@ -94,7 +94,7 @@ util_redcap_child_v3 <- function(data) {
 
   eah_wanting_json <- json_eah_wanting()
 
-  ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data ####
+  ## intake_data -- need for first ~16 as not double entered/no paper sheet ####
   intake_data <- data[grepl('_id|plate|advertisement_condition|^visit', names(data))]
 
   # remove extra columns and re-order

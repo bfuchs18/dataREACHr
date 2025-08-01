@@ -5,7 +5,7 @@
 #'
 #' @param visit1_demo visit 1 demo data.frame
 #' @param merged_demo merged demo data.frame
-#' @param date_data data.frame with all visit date information
+#' @inheritParams util_redcap_parent_v1
 #'
 #' @examples
 #'

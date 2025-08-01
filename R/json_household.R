@@ -306,7 +306,7 @@ json_household <- function() {
     demo_allowance = list( Description = 'Does your child get money as an allowance?',
                            Levels = list ('0' = 'No',
                                           '1' = 'Yes')),
-    demo_allowance_other = list( Description = 'About how much money per week do you give your child for their allowance?',
+    demo_allowance_amt = list( Description = 'About how much money per week do you give your child for their allowance?',
                                  Levels = list ('0' = 'Less than $1 a week',
                                                 '1' = '$1 - $5 a week',
                                                 '2' = 'More than $5 a week')),

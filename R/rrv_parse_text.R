@@ -4,7 +4,7 @@
 #'
 #'
 #' @param rrv_file (character string) full path to rrv file
-#' @param participant_id (character string) bids-compliant subject ID
+#' @inheritParams util_copy_to_source
 #'
 #' @examples
 #'
@@ -12,20 +12,20 @@
 #'
 #' # process task data for the Food View Task
 #' file_name = "/Users/baf44/projects/Keller_Marketing/ParticipantData/untouchedRaw/rrv_task/REACH_060/rrv_060.txt"
-#' rrv_csv <- rrv_parse_text(rrv_file = file_name, participant_id = "sub-060")
+#' rrv_csv <- rrv_parse_text(rrv_file = file_name, sub_str = "sub-060")
 #'
 #' }
 #'
 #'
 #' @export
 
-rrv_parse_text <- function(rrv_file, participant_id) {
+rrv_parse_text <- function(rrv_file, sub_str) {
 
   #### Argument check ####
 
-  participant_arg <- methods::hasArg(participant_id)
+  participant_arg <- methods::hasArg(sub_str)
   if (isTRUE(participant_arg)) {
-    if (!is.character(participant_id)) {
+    if (!is.character(sub_str)) {
       stop("participant_arg must be entered as a string")
     }
   } else if (isFALSE(participant_arg)) {
@@ -52,7 +52,7 @@ rrv_parse_text <- function(rrv_file, participant_id) {
   #### create empty dataframe to save data to ####
 
   ## created vector with column names
-  rrv_data_columns= c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers", "session_blocks", "session_nonresp_blocks",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")
+  rrv_data_columns= c("sub_str", "ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers", "session_blocks", "session_nonresp_blocks",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")
 
   ## pass this vector length to ncol parameter
   rrv_data = data.frame(matrix(nrow = 0, ncol = length(rrv_data_columns)))
@@ -219,7 +219,7 @@ rrv_parse_text <- function(rrv_file, participant_id) {
         # create row for game.csv
         rrv_data_row <-
           data.frame(
-            participant_id = participant_id, #user input to function
+            sub_str = sub_str, #user input to function
             ID = sub, #task-level
             screen = as.integer(Screen), #reinforcer-level
             reinforcer = reinforcer_cat, #reinforcer-level

@@ -142,7 +142,7 @@ util_redcap_parent_v5 <- function(data, date_data) {
 
   cbq_data <- cbq_data[c('participant_id', 'session_id', 'visit_date', names(cbq_data)[grepl('cbq', names(cbq_data))])]
 
-  cbq_scored <- dataprepr::score_cbq(cbq_data, base_zero = TRUE, id = 'participant_id', does_not_apply_value = 7)
+  cbq_scored <- dataprepr::score_cbq(cbq_data, base_zero = TRUE, id = 'participant_id', pna_value = 7)
 
   cbq_json <- json_cbq()
 

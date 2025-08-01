@@ -6,9 +6,9 @@
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #' @param bids_wd string with full path to bids directory that contains the sourcedata/ and rawdata/ directories
-#' @param overwrite logical indicating if data should be overwritten in /rawdata. Default = FALSE
+#' @inheritParams util_copy_to_source
 #'
-#' @return If return_data is set to TRUE, will return a list with 1 cleaned dataframe per run
+#' @return statement of task completed
 #'
 #' @examples
 #'

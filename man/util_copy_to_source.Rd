@@ -5,31 +5,40 @@
 \title{util_copy_to_source: A function to copy a file into sourcedata}
 \usage{
 util_copy_to_source(
+  base_wd,
   task_dir,
   task_str,
-  sub_id,
+  sub_str,
   ses_str,
+  sub_id,
   sourcefile_prefix,
+  file_pattern,
   overwrite
 )
 }
 \arguments{
+\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
+
 \item{task_dir}{(string) path to directory with all task files to be copied into sourcedata}
 
 \item{task_str}{(string) task string used in filenaming (e.g., 'foodview')}
 
-\item{sub_id}{(integer) subject id}
+\item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 
 \item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
+\item{sub_id}{(numeric) participant number}
+
 \item{sourcefile_prefix}{(string) string to prefix filename with in sourcedata (optional)}
 
-\item{overwrite}{(logical) logical indicating whether file should be overwritten in sourcedata}
+\item{file_pattern}{(string) sting to identify files (optional)}
+
+\item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
 \description{
 util_copy_to_source: A function to copy a file into sourcedata
 }
 \examples{
-util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_id = 'sub-001', ses_str = 'ses-1', overwrite = TRUE)
+util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_str = 'sub-001', ses_str = 'ses-1', overwrite = TRUE)
 
 }

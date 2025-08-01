@@ -94,7 +94,7 @@ util_redcap_child_v1 <- function(data) {
 
   food_paradigm_json <- json_v1_food_paradigm()
 
-  ## intake_data -- this data can be used for prelim analyses, but eventually will be replaced with double entry data
+  ## intake_data -- need for first ~16 as not double entered/no paper sheet ####
   intake_data <- data[grepl('_id|plate|^visit', names(data))]
 
   # remove extra columns and re-order
@@ -165,10 +165,23 @@ util_redcap_child_v1 <- function(data) {
   # rename columns
   names(anthro_data) <- gsub('parent_', 'parent1_', names(anthro_data))
   names(anthro_data) <- gsub('parent1_height_sex', 'parent1_sex', names(anthro_data))
+
   names(anthro_data) <- gsub('child_average_weight', 'child_weight_average', names(anthro_data))
+  names(anthro_data) <- gsub('average', 'mean', names(anthro_data))
+
+
+  names(anthro_data) <- gsub('height_1_cm', 'height1_cm', names(anthro_data))
+  names(anthro_data) <- gsub('height_2_cm', 'height2_cm', names(anthro_data))
+
+  names(anthro_data) <- gsub('weight_1_kg', 'weight1_kg', names(anthro_data))
+  names(anthro_data) <- gsub('weight_2_kg', 'weight2_kg', names(anthro_data))
+
+  names(anthro_data) <- gsub('child_height_mean', 'height_mean_cm', names(anthro_data))
+  names(anthro_data) <- gsub('child_weight_mean', 'weight_mean_kg', names(anthro_data))
+
 
   # re-label parent1 sex
-  anthro_data$parent1_sex <- ifelse(anthro_data$parent1_sex == 0, 'female', ifelse(anthro_data$parent1_sex == 1, 'male', NA))
+  anthro_data['parent1_sex'] <- ifelse(anthro_data[['parent1_sex']] == 0, 'female', ifelse(anthro_data[['parent1_sex']] == 1, 'male', NA))
 
   anthro_json <- json_anthro()
 

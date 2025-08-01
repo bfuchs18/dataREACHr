@@ -124,11 +124,10 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     redcap_visit_data <- redcap_visit_data[, !grepl('.factor', names(redcap_visit_data))]
     redcap_de_data <- redcap_de_data[, !grepl('.factor', names(redcap_de_data))]
 
+    # Make ID column bids compliant: Convert record_id to strings padded with zeros and add 'sub_'
+    redcap_visit_data['record_id'] <- sprintf('sub-%03d', redcap_visit_data[['record_id']])
 
   }
-
-  # Make ID column bids compliant: Convert record_id to strings padded with zeros and add 'sub_'
-  #redcap_visit_data['record_id'] <- sprintf('sub-%03d', redcap_visit_data[['record_id']])
 
   #### Extract visit data ####
 
@@ -278,9 +277,9 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     lbc = list(data = parent_v1_data[['lbc_data']]$data$bids_phenotype,
                meta = parent_v1_data[['lbc_data']]$meta),
     loc = list(data = merged_qs_list$loc_all,
-                    meta = child_v4_data$loc_data$meta),
+               meta = child_v4_data$loc_data$meta),
     pmum = list(data = merged_qs_list$pmum_all,
-                     meta = parent_v4_data$pmum_data$meta),
+                meta = parent_v4_data$pmum_data$meta),
     pptq = list(data = child_v4_data[['pptq_data']]$data$bids_phenotype,
                 meta = child_v4_data[['pptq_data']]$meta),
     pss = list(data = parent_v1_data[['pss_data']]$data$bids_phenotype,
@@ -288,11 +287,11 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     pstca = list(data = merged_qs_list$pstca_all,
                  meta = parent_v3_data$pstca_data$meta),
     puberty = list(data = merged_qs_list$puberty_all,
-                        meta = parent_v1_data$puberty_data$meta),
+                   meta = parent_v1_data$puberty_data$meta),
     pwlb = list(data = parent_v3_data[['pwlb_data']]$data$bids_phenotype,
                 meta = parent_v3_data[['pwlb_data']]$meta),
     rank = list(data = merged_qs_list$rank_all,
-                     meta = parent_v1_data$rank_data$meta),
+                meta = parent_v1_data$rank_data$meta),
     scpf = list(data = parent_v3_data[['scpf_data']]$data$bids_phenotype,
                 meta = parent_v3_data[['scpf_data']]$meta),
     #once scored will need switch to bids_phenotype
@@ -307,6 +306,5 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
                meta = child_v1_data$stq_data$meta),
     tfeq = list(data = parent_v3_data[['tfeq_data']]$data$bids_phenotype,
                 meta = parent_v3_data[['tfeq_data']]$meta)
-    ))
+  ))
 }
-
