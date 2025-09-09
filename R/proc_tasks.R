@@ -1,9 +1,8 @@
 #' proc_tasks: Process task data from untouchedRaw to create bids compliant files
 #'
 #' This function: \itemize{
-#' \item{1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)}
-#' \item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions}
-#' \item{3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()}
+#' \item{1) copies task data from untouchedRaw into bids/sourcedata using util_task_untouched_to_source}
+#' \item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata using task-specific util_task_{task-name} functions}
 #' }
 #'
 #' @param base_wd (string) full path to directory that contains both the untouchedRaw and bids directories
@@ -251,6 +250,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
       pit_list[['id']] <- as.numeric(sapply(pit_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))[1]-1), simplify = TRUE))
 
       pit_list[['sub_str']] <- sapply(pit_list[['id']], function(x) sprintf('sub-%03d', x), simplify = TRUE)
+
       #organize data into BIDS sourcedata
       pit_list[['sourcedata_done']] <- sapply(pit_list[['id']], function(x) util_copy_to_source(task_dir = pit_dir, task_str = 'pit', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = ses_str, overwrite = overwrite), simplify = TRUE)
 

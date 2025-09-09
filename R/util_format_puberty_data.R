@@ -1,4 +1,4 @@
-#' util_format_puberty_data: Prepare parent-reported puberty data for scoring (called within util_redcap_parent_v1.R and util_redcap_parent_v5.R)
+#' util_format_puberty_data: Prepare parent-reported puberty data for scoring
 #'
 #' This function prepares parent-reported puberty data for scoring with dataprepr::score_puberty()
 #'

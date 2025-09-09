@@ -72,10 +72,10 @@ util_redcap_parent_v1 <- function(data, date_data) {
   # (3) household_data: data collected as part of the 'Parent Household Demographics' qualtrics form
 
   # select all demo variables
-  demo_data_all <- data[, grepl('_id||demo|visit_date', names(data))]
+  demo_data_all <- datagrepl('_id||demo|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
-  demo_data_all <- demo_data_all[, !grepl('missingcheck', names(demo_data_all))]
+  demo_data_all <- demo_data_all!grepl('missingcheck', names(demo_data_all))]
 
   demo_data_all <- demo_data_all[c('participant_id', 'session_id', 'visit_date', names(demo_data_all)[grepl('demo', names(demo_data_all))])]
 
@@ -99,7 +99,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   household_json <- json_household()
 
   ## RANK Data (ranking food item questionnaire) ####
-  rank_data <- data[, grepl('_id|rank|visit_date', names(data))]
+  rank_data <- datagrepl('_id|rank|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   rank_data <- rank_data[c('participant_id', 'session_id', 'visit_date', names(rank_data)[grepl('rank', names(rank_data))])]
@@ -111,7 +111,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   # score?
 
   ## Puberty Data ####
-  puberty_data <- data[, grep('_id|visit_date|prs|tanner|visit_date', names(data))]
+  puberty_data <- data[, grep('_id|visit_date|prs|tanner', names(data))]
 
   # remove extra columns, add columns, and re-order
   puberty_data['respondent'] <- 'parent'
@@ -127,7 +127,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   puberty_json <- json_puberty()
 
   ## CFQ Data ####
-  cfq_data <- data[, grepl('_id|cfq|visit_date', names(data))]
+  cfq_data <- datagrepl('_id|cfq|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   cfq_data <- cfq_data[, -grep('missingcheck|timestamp', names(cfq_data))]
@@ -138,7 +138,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   cfq_json <- json_cfq()
 
   ## CEBQ Data ####
-  cebq_data <- data[, grepl('_id|cebq|visit_date', names(data))]
+  cebq_data <- datagrepl('_id|cebq|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   cebq_data <- cebq_data[c('participant_id', 'session_id', 'visit_date', names(cebq_data)[grepl('cebq', names(cebq_data))])]
@@ -148,7 +148,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   cebq_json <- json_cebq()
 
   ## EFCR Data ####
-  efcr_data <- data[, grepl('_id||efcr|visit_date', names(data))]
+  efcr_data <- datagrepl('_id||efcr|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   efcr_data <- efcr_data[c('participant_id', 'session_id', 'visit_date', names(efcr_data)[grepl('efcr', names(efcr_data))])]
@@ -158,7 +158,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   efcr_json <- json_efcr()
 
   ## CHAOS Data  ####
-  chaos_data <- data[, grepl('_id|chaos|visit_date', names(data))]
+  chaos_data <- datagrepl('_id|chaos|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   chaos_data <- chaos_data[c('participant_id', 'session_id', 'visit_date', names(chaos_data)[grepl('chaos', names(chaos_data))])]
@@ -169,7 +169,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
 
 
   ## PSS Data  (percieved stress scale) ####
-  pss_data <- data[, grepl('_id|pss|visit_date', names(data))]
+  pss_data <- datagrepl('_id|pss|visit_date', names(data))]
 
   # remove extra columns, add columns, and re-order
   pss_data <- pss_data[c('participant_id', 'session_id', 'visit_date', names(pss_data)[grepl('pss', names(pss_data))])]
@@ -179,7 +179,7 @@ util_redcap_parent_v1 <- function(data, date_data) {
   pss_json <- json_pss()
 
   ## LBC Data  ####
-  lbc_data <- data[, grepl('_id|lbc|visit_date', names(data))]
+  lbc_data <- datagrepl('_id|lbc|visit_date', names(data))]
 
   # rename columns
   names(lbc_data) <- gsub('lbc_', 'lbc', names(lbc_data))
