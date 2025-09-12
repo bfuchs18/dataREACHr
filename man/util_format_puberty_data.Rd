@@ -2,7 +2,7 @@
 % Please edit documentation in R/util_format_puberty_data.R
 \name{util_format_puberty_data}
 \alias{util_format_puberty_data}
-\title{util_format_puberty_data: Prepare parent-reported puberty data for scoring (called within util_redcap_parent_v1.R and util_redcap_parent_v5.R)}
+\title{util_format_puberty_data: Prepare parent-reported puberty data for scoring}
 \usage{
 util_format_puberty_data(puberty_data, respondent)
 }

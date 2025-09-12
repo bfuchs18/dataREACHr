@@ -103,6 +103,8 @@ dataREACH <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type =
 
   #### Set up/initial checks #####
 
+  phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
+
   # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
 
@@ -118,11 +120,11 @@ dataREACH <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type =
 
   ## dataset description - requried by BIDS ####
   # export dataset_description.json
-  json_dataset_desc <- json_phe_dataset_desc(visit_data_path, data_de_path)
+  json_dataset_desc <- json_dataset_desc()
   filename_dataset_json <- file.path(phenotype_wd, 'dataset_description.json')
 
   if ( isTRUE(overwrite) | !file.exists(filename_dataset_json) ) {
-    write(json_dataset_desc, filename_json)
+    write(json_dataset_desc, filename_dataset_json)
   }
 
   #### function to export data and metadata ####

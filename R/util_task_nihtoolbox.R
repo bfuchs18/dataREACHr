@@ -5,7 +5,7 @@
 #'
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
-#' @inheritParams util_task_foodview
+#' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #'
 #' @return statement of task completed
@@ -14,88 +14,54 @@
 #'
 #' \dontrun{
 #' # process assessment (response) data for the NIH toolbox
-#' util_task_nihtoolbox(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
+#' util_task_nihtoolbox(sub_str = 'sub-001', ses_str = 'ses-1', base_wd = base_wd)
 #'
 #' }
 #'
 #' @importFrom utils read.csv
 #' @export
 
-util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
+util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', base_wd, overwrite = FALSE) {
 
   #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(bids_wd)
+  data_arg <- methods::hasArg(base_wd)
 
   if (isTRUE(data_arg)) {
-    if (!is.character(bids_wd)) {
-      stop('bids_wd must be entered as a string')
-    } else if (!file.exists(bids_wd)) {
-      stop('bids_wd entered, but file does not exist. Check bids_wd string.')
+    if (!is.character(base_wd)) {
+      stop('base_wd must be entered as a string')
+    } else if (!file.exists(base_wd)) {
+      stop('base_wd entered, but file does not exist. Check base_wd string.')
     }
   } else if (isFALSE(data_arg)) {
-    stop('bids_wd must be entered as a string')
+    stop('base_wd must be entered as a string')
   }
 
   # get directory paths
-  source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
-  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
+  source_beh_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
+  raw_beh_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, ses_str, 'beh')
 
-  if (length(list.files(path = source_beh_wd, pattern = 'events')) > 0){
+  data_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_data.tsv'))
+  score_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_scores.tsv'))
 
-    toolbox_files_data <- list.files(path = source_beh_wd, pattern = 'events')
-    toolbox_files_scores <- list.files(path = source_beh_wd, pattern = 'scores')
-
-    data_list <- sapply(toolbox_files_data, function(x) read.table(file.path(source_beh_wd, x), header = TRUE, sep = '\t'), simplify = FALSE)
-    data <- rbind.data.frame(data_list[[1]], data_list[[2]])
-
-    scores_list <- sapply(toolbox_files_scores, function(x) read.table(file.path(source_beh_wd, x), header = TRUE, sep = '\t'), simplify = FALSE)
-    scores <- rbind.data.frame(scores_list[[1]], scores_list[[2]])
-
-  } else {
-    data_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_data.tsv'))
-    score_source_file <- file.path(source_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_scores.tsv'))
-
-    if (file.exists(data_source_file)) {
-      data <- read.table(data_source_file, sep = '\t', header = TRUE)
-    } else {
-      print(paste(sub_str, 'has no sst assessment data file'))
-    }
-
-    if (file.exists(score_source_file)) {
-      scores <- read.table(score_source_file, sep = '\t', header = TRUE)
-    } else {
-      print(paste(sub_str, 'has no sst assessment scores file. Aborting task processing for this sub.'))
-      return()
-    }
-  }
+  #print(sub_str)
 
   # function to process data
-  proc_nih <- function(data){
+  proc_nih <- function(data, sub_str, ses_str){
     # make separate columns for task (e.g., 'Flanker Inhibitory Control') and test ages (e.g., 'Ages 8-11 v2.1') from Inst (e.g., 'NIH Toolbox Flanker Inhibitory Control and Attention Test Ages 8-11 v2.1') ??
     # Separate the 'Inst' column into 'Test' and 'Ages' columns
-    data <- tidyr::separate(data, Inst, into = c('Test', 'Test_Ages'), sep = 'Test', remove = FALSE)
 
-    # Replace values in the 'Test' column
-    data <- data %>%
-      dplyr::mutate(Test = dplyr::case_when(
-        stringr::str_detect(Test, 'Flanker Inhibitory Control') ~ 'flanker',
-        stringr::str_detect(Test, 'Dimensional Change Card Sort') ~ 'dccs',
-        stringr::str_detect(Test, 'List Sorting Working Memory') ~ 'listsort',
-        TRUE ~ 'other'  # Default case
-      ))
+    data['test'] <- ifelse(grepl('List', data[['Inst']]), 'listsort', ifelse(grepl('Flanker', data[['Inst']]), 'flanker', ifelse(grepl('Card', data[['Inst']]), 'dccs', NA)))
 
-    # remove columns where Test = other
-    data <- data[!(data[['Test']] %in% 'other'),]
+    data['test_ages'] <- ifelse(grepl('7+', data[['Inst']]), 'Age 7+ v2.1', ifelse(grepl('8-11', data[['Inst']]), '8-11 v2.1', NA))
 
     # add subject column
-    data[['sub']] <- sub_str
-    data <- data %>% dplyr::relocate('sub') # move sub to first column
+    sub_num <- as.numeric(substr(sub_str, unlist(gregexpr('-', sub_str))+1, nchar(sub_str)))
+    data['sub'] <- sub_num
 
     # add session column
-    data[['ses']] <- ses_str
-    data <- data %>% dplyr::relocate('ses', .after = 1) # after col 1
+    data['ses'] <- ses_str
 
     # bids compliance
     names(data) <- tolower(names(data))
@@ -106,37 +72,81 @@ util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite 
     #update names
     names(data)[names(data) == 'deviceid'] <- 'device_id'
 
+    #reorder
+    data <- data[c('sub', 'ses', 'test', 'test_ages', names(data)[!grepl('sub|ses|test', names(data))])]
+
     return(data)
   }
 
-  #proc data
-  data <- proc_nih(data)
-  scores <- proc_nih(scores)
+  if (length(list.files(path = source_beh_wd, pattern = 'nih_toolbox_data')) > 0){
+    events_file <- list.files(path = source_beh_wd, pattern = 'nih_toolbox_data')
 
-  #update names
-  names(data)[names(data) == 'sub'] <- 'participant_id'
-  names(data)[names(data) == 'ses'] <- 'session_id'
-  names(data)[names(data) == 'instordr'] <- 'inst_ordr'
-  names(data)[names(data) == 'instsctn'] <- 'inst_sctn'
-  names(data)[names(data) == 'itmordr'] <- 'itm_ordr'
-  names(data)[names(data) == 'itemid'] <- 'item_id'
-  names(data)[names(data) == 'datatype'] <- 'data_type'
-  names(data)[names(data) == 'responsetime'] <- 'response_time'
-  names(data)[names(data) == 'datecreated'] <- 'date_created'
-  names(data)[names(data) == 'inststarted'] <- 'inst_started'
-  names(data)[names(data) == 'instended'] <- 'inst_ended'
+    data <- read.table(file.path(source_beh_wd, events_file), sep = '\t', header = TRUE)
 
+    data <- proc_nih(data, sub_str, ses_str)
 
-  names(scores)[names(scores) == 'sub'] <- 'participant_id'
-  names(scores)[names(scores) == 'ses'] <- 'session_id'
-  names(scores) <- gsub('standard_score', 'ss', names(scores))
-  names(scores)[names(scores) == 'datefinished'] <- 'date_finished'
-  names(scores)[names(scores) == 'national_percentile__age_adjusted_'] <- 'national_percentile_age_adjusted'
-  names(scores)[names(scores) == 'instrumentbreakoff'] <- 'instrument_breakoff'
-  names(scores)[names(scores) == 'instrumentstatus2'] <- 'instrument_status2'
-  names(scores)[names(scores) == 'instrumentrcreason'] <- 'instrument_rc_reason'
-  names(scores)[names(scores) == 'instrumentrcreasonother'] <- 'instrument_rc_reason_other'
+    #date formatting
+    data['visit_date'] <- lubridate::as_date(data[['datecreated']])
 
+    if (sum(is.na(data[['visit_date']])) > 0){
+      data[is.na(data['visit_date']), 'visit_date'] <- lubridate::as_date(as.POSIXct(data[is.na(data['visit_date']), 'datecreated'], format = '%d/%M/%y %H:%M', tz = "UTC"))
+    }
+
+    #update names
+    names(data)[names(data) == 'instordr'] <- 'inst_ordr'
+    names(data)[names(data) == 'instsctn'] <- 'inst_sctn'
+    names(data)[names(data) == 'itmordr'] <- 'itm_ordr'
+    names(data)[names(data) == 'itemid'] <- 'item_id'
+    names(data)[names(data) == 'datatype'] <- 'data_type'
+    names(data)[names(data) == 'responsetime'] <- 'response_time'
+    names(data)[names(data) == 'datecreated'] <- 'date_created'
+    names(data)[names(data) == 'inststarted'] <- 'inst_started'
+    names(data)[names(data) == 'instended'] <- 'inst_ended'
+
+    data <- data[c('sub', 'ses', 'visit_date', 'test', 'test_ages', names(data)[!grepl('sub|ses|^visit|test|inst|device_id|locale|datatype|datecreated', names(data))])]
+
+    events_data = TRUE
+
+  } else {
+    print(paste(sub_str, 'has no NIH Toolbox data file'))
+  }
+
+  if (length(list.files(path = source_beh_wd, pattern = 'nih_toolbox_scores')) > 0){
+    scores_file <- list.files(path = source_beh_wd, pattern = 'nih_toolbox_scores')
+
+    scores <- read.table(file.path(source_beh_wd, scores_file), sep = '\t', header = TRUE)
+
+    scores <- proc_nih(scores, sub_str, ses_str)
+
+    #date formatting
+    scores['visit_date'] <- lubridate::as_date(scores[['datefinished']])
+
+    if (sum(is.na(scores[['visit_date']])) > 0){
+      scores[is.na(scores['visit_date']), 'visit_date'] <- lubridate::as_date(as.POSIXct(scores[is.na(scores['visit_date']), 'datefinished'], format = '%d/%M/%y %H:%M', tz = "UTC"))
+    }
+
+    #update names
+    names(scores)[names(scores) == 'sub'] <- 'participant_id'
+    scores['participant_id'] <- sub_str
+
+    names(scores)[names(scores) == 'ses'] <- 'session_id'
+
+    names(scores) <- gsub('standard_score', 'ss', names(scores))
+    names(scores)[names(scores) == 'national_percentile__age_adjusted_'] <- 'national_percentile_age_adjusted'
+    names(scores)[names(scores) == 'instrumentbreakoff'] <- 'instrument_breakoff'
+    names(scores)[names(scores) == 'instrumentstatus2'] <- 'instrument_status2'
+    names(scores)[names(scores) == 'instrumentrcreason'] <- 'instrument_rc_reason'
+    names(scores)[names(scores) == 'instrumentrcreasonother'] <- 'instrument_rc_reason_other'
+
+    scores <- scores[c('participant_id', 'session_id', 'visit_date', 'test', 'test_ages', names(scores)[!grepl('_id|^visit|test|inst|date_finished|column|language', names(scores))])]
+
+    scores_data = TRUE
+
+  } else {
+
+    print(paste(sub_str, 'has no NIH Toolbox scores file.'))
+    return()
+  }
 
   #### Save in rawdata #####
 
@@ -145,13 +155,26 @@ util_task_nihtoolbox <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite 
     dir.create(raw_beh_wd, recursive = TRUE)
   }
 
-  # define output file with path
-  outfiles <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_', c('events', 'scores'), '.tsv'))
+  if (isTRUE(events_data) | isTRUE(scores_data)){
 
-  if (!file.exists(outfiles[1]) | isTRUE(overwrite)){
+    # define output file with path
+    if (isTRUE(events_data)){
 
-    write.table(data, outfiles[1], sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
-    write.table(scores, outfiles[2], sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+      outfile_events <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_events.tsv'))
+
+      if (!file.exists(outfile_events) | isTRUE(overwrite)){
+        write.table(data, outfile_events, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+      }
+    }
+
+    if (isTRUE(scores_data)){
+
+      outfile_scores <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-nih_toolbox_scores.tsv'))
+
+      if (!file.exists(outfile_scores) | isTRUE(overwrite)){
+        write.table(scores, outfile_scores, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a" )
+      }
+    }
 
     if (isTRUE(overwrite)){
       return('overwrote with new version')

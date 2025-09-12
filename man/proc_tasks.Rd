@@ -22,9 +22,8 @@ proc_tasks(base_wd, overwrite = FALSE, task_list)
 }
 \description{
 This function: \itemize{
-\item{1) copies task data from untouchedRaw into bids/sourcedata for all tasks (food view, pit, sst, nih toolbox, spacegame), using util_task_untouched_to_source(all_tasks = TRUE)}
-\item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata for the following tasks: rrv, sst, foodview nih-toolbox, pit, spacegame, using task-specific util_task_{task-name} functions}
-\item{3) exports JSON meta-data files for tasks organized into rawdata (rrv, sst, foodview), using write_task_jsons()}
+\item{1) copies task data from untouchedRaw into bids/sourcedata using util_task_untouched_to_source}
+\item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata using task-specific util_task_{task-name} functions}
 }
 }
 \examples{

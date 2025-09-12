@@ -143,7 +143,7 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, data_l
       }
 
       # save file path
-      save_file_path <- file.path(micro_sub_dir, paste0(id, '_', ses_str, '_commercial-', commercial_cond, '_', paradigm, '-micro_events.tsv'))
+      save_file_path <- file.path(micro_sub_dir, paste0(id, '_', ses_str, '_', paradigm, '-micro_commercial-', commercial_cond, '_events.tsv'))
 
       # check if file exists or should overwrite
 
@@ -175,7 +175,7 @@ write_microstructure <- function(base_wd, intake_data, overwrite = FALSE, data_l
         paradigm <- ifelse(grepl('meal', dat_name), 'meal', 'eah')
 
         # export dataset_description.json
-        filename_json <- file.path(bids_wd, paste0('commercial-', commercial_cond, '_', paradigm, '-micro_events.json'))
+        filename_json <- file.path(bids_wd, paste0(paradigm, '-micro_commercial-', commercial_cond, '_events.json'))
 
         json_events <- proc_micro_data[[dat_name]]$meta
 

@@ -5,7 +5,8 @@
 #' \item{2) processes task sourcedata and exports cleaned dataframes into bids/rawdata using task-specific util_task_{task-name} functions}
 #' }
 #'
-#' @param base_wd (string) full path to directory that contains both the untouchedRaw and bids directories
+#'
+#' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #' @param task_list tasks to process. Options include 'all' to process all task data or a list of the following:\itemize{
 #'  \item{'foodview' - fMRI Food Viewing task}
@@ -68,7 +69,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
     foodview_dir <- file.path(base_wd, 'untouchedRaw', 'foodview_task')
 
     # get list of available subjects
-    foodview_list <- list.files(foodview_dir, pattern = '.txt')
+    foodview_list <- list.files(foodview_dir, pattern = '.txt', recursive = TRUE)
     foodview_list <- as.data.frame(foodview_list[!(grepl('onsets', foodview_list))])
     names(foodview_list) <- 'filename'
 
@@ -78,13 +79,94 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
     foodview_list[['sub_str']] <- sapply(foodview_list[['id']], function(x) sprintf('sub-%03d', x), simplify = TRUE)
 
     #organize data into BIDS sourcedata
-    foodview_list[['sourcedata_done']] <- sapply(foodview_list[['id']], function(x) util_copy_to_source(task_dir = foodview_dir, task_str = 'foodview', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
+    foodview_list[['sourcedata_done']] <- sapply(foodview_list[['id']], function(x) util_copy_to_source(base_wd = base_wd, task_dir = foodview_dir, task_str = 'foodview', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
 
     #process raw data
-    foodview_list[['rawproc_done']] <- sapply(foodview_list[['sub_str']], function(x) util_task_foodview(sub_str = x, ses_str = 'ses-1', bids_wd = file.path(base_wd, 'bids'), overwrite = overwrite), simplify = TRUE)
+    foodview_list[['rawproc_done']] <- sapply(foodview_list[['sub_str']], function(x) util_task_foodview(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
 
   }
 
+  #### NIH toolbox ####
+  if (task_list == 'all' | 'nih_toolbox' %in% task_list) {
+    print('-- copying NIH toolbox')
+
+    nih_list_v1 <- as.data.frame(list.files(path = Sys.glob(file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'visit1', 'reach*')), pattern = '.csv'))
+    names(nih_list_v1) <- 'filename'
+
+    nih_list_v5 <- as.data.frame(list.files(path = Sys.glob(file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'visit5', 'reach*')), pattern = '.csv'))
+    names(nih_list_v5) <- 'filename'
+
+    # add session
+    nih_list_v1['ses'] <- 'ses-1'
+    nih_list_v5['ses'] <- 'ses-2'
+
+    nih_list_v1['ses_folder'] <- 'visit1'
+    nih_list_v5['ses_folder'] <- 'visit5'
+
+    # combine
+    nih_list <- rbind.data.frame(nih_list_v1, nih_list_v5)
+
+    # remove any registration data
+    nih_list <- nih_list[!grepl('reg', nih_list[['filename']]), ]
+
+    #get list of subject IDs
+    nih_list['id_str'] <- sapply(nih_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+
+    nih_list['sub_str'] <- paste0('sub-', nih_list[['id_str']])
+
+    nih_list['id'] <- as.numeric(nih_list[['id_str']])
+
+    nih_list['id_folder'] <- paste0('reach_',  nih_list[['id_str']])
+
+    #organize data into BIDS sourcedata
+    nih_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = nih_list[['id']], sub_str = nih_list[['sub_str']], task_dir = file.path(base_wd, 'untouchedRaw', 'nih-toolbox', nih_list[['ses_folder']], nih_list[['id_folder']]), ses_str = nih_list[['ses']], MoreArgs = list(base_wd = base_wd, task_str = 'nih', overwrite = overwrite))
+
+    # process raw data
+    nih_list[['rawproc_done']] <- mapply(util_task_nihtoolbox, sub_str = nih_list[['sub_str']], ses_str = nih_list[['ses']], MoreArgs = list(base_wd = base_wd, overwrite = overwrite))
+
+    #generate json file for rawdata
+    nihtoolbox_json <- json_nihtoolbox_events()
+
+    nihtoolbox_filename_json <- file.path(base_wd, 'bids', 'task-nih_toolbox_events.json')
+
+    if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_json) ) {
+      write(nihtoolbox_json, nihtoolbox_filename_json)
+    }
+  }
+
+  #### PIT ####
+
+  if (task_list == 'all' | 'pit' %in% task_list) {
+    print('-- copying PIT task')
+
+    pit_list_ses1 <- as.data.frame(list.files(path = Sys.glob(file.path(base_wd, 'untouchedRaw', 'pit_task', 'visit3-4')), pattern = '*Food-PIT*'))
+    names(pit_list_ses1) <- 'filename'
+    pit_list_ses1['ses'] <- 'ses-1'
+    pit_list_ses1['ses_folder'] <- 'visit3-4'
+
+    pit_list_ses2 <- as.data.frame(list.files(path = Sys.glob(file.path(base_wd, 'untouchedRaw', 'pit_task', 'visit5')), pattern = '*Food-PIT*'))
+    names(pit_list_ses2) <- 'filename'
+    pit_list_ses2['ses'] <- 'ses-2'
+    pit_list_ses2['ses_folder'] <- 'visit5'
+
+    # combine
+    pit_list <- rbind.data.frame(pit_list_ses1, pit_list_ses2)
+
+    #get list of subject IDs
+    pit_list[['id']] <- as.numeric(sapply(pit_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))[1]-1), simplify = TRUE))
+
+    pit_list[['sub_str']] <- sapply(pit_list[['id']], function(x) sprintf('sub-%03d', x), simplify = TRUE)
+
+    # reduce to 1 line per participant
+    pit_list <- pit_list[grepl('psydat', pit_list[['filename']]), ]
+
+    #organize data into BIDS sourcedata
+    pit_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = pit_list[['id']], sub_str = pit_list[['sub_str']], task_dir = file.path(base_wd, 'untouchedRaw', 'pit_task', pit_list[['ses_folder']]), ses_str = pit_list[['ses']], MoreArgs = list(base_wd = base_wd, task_str = 'pit', overwrite = overwrite))
+
+    #process raw data
+    pit_list[['sourcedata_done']] <- mapply(util_task_pit, sub_str = pit_list[['sub_str']], ses_str = pit_list[['ses']], MoreArgs = list(base_wd = base_wd, overwrite = overwrite))
+
+  }
 
   #### Stop Signal Task ####
   if (task_list == 'all' | 'sst' %in% task_list) {
@@ -143,65 +225,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
 
   }
 
-  #### NIH toolbox ####
-  if (task_list == 'all' | 'nih_toolbox' %in% task_list) {
-    print('-- copying NIH toolbox')
 
-    nih_list <- list()
-    # for each session
-    if (length(ses_str) == 2){
-      file_paths <- c(file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1'), file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V5'))
-      nih_list <- as.data.frame(unlist(sapply(file_paths, function(x) list.dirs(x, recursive = FALSE, full.names = FALSE), simplify = TRUE, USE.NAMES = FALSE)))
-      names(nih_list) <- 'id_folder'
-
-      nih_list[['ses']] <- c(rep('ses-1', length(list.dirs(file_paths[1], recursive = FALSE, full.names = FALSE))), rep('ses-2', length(list.dirs(file_paths[2], recursive = FALSE, full.names = FALSE))))
-
-    } else {
-      # define directory with data
-      if (ses_str == 'ses-1') {
-        nih_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V1')
-      } else {
-        nih_dir <- file.path(base_wd, 'untouchedRaw', 'nih-toolbox', 'V5')
-      }
-
-      # get list of subject directories
-      nih_list <- as.data.frame(list.dirs(nih_dir, recursive = FALSE, full.names = FALSE))
-      names(nih_list) <- 'id_folder'
-
-      nih_list[['ses']] <- ses_str
-    }
-
-    nih_list[['ses_folder']] <- ifelse(nih_list[['ses']] == 'ses-1', 'V1', 'V5')
-
-    #get list of subject IDs
-    nih_list[['id']] <- as.numeric(sapply(nih_list[['id_folder']], function(x) substr(x, unlist(gregexpr('_', x))+1, nchar(x)), simplify = TRUE))
-
-    nih_list[['sub_str']] <- sapply(nih_list[['id']], function(x) sprintf('sub-%03d', as.numeric(x)), simplify = TRUE)
-
-    #organize data into BIDS sourcedata
-    nih_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = nih_list[['id']], sub_str = nih_list[['sub_str']], task_dir = file.path(base_wd, 'untouchedRaw', 'nih-toolbox', nih_list[['ses_folder']], nih_list[['id_folder']]), ses_str = nih_list[['ses']], MoreArgs = list(task_str = 'nih', overwrite = overwrite))
-
-    #process raw data
-    nih_list[['rawproc_done']] <- mapply(util_task_nihtoolbox, sub_str = nih_list[['sub_str']], ses_str = nih_list[['ses']], MoreArgs = list(bids_wd = file.path(base_wd, 'bids'), overwrite = overwrite))
-
-    # generate derivatives file
-    phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
-    raw_beh_wd <- file.path(base_wd, 'bids', 'rawdata')
-
-    #create derivative file
-    if (!dir.exists(phenotype_wd)) {
-      dir.create(phenotype_wd, recursive = TRUE)
-    }
-
-    nih_events_dat <- do.call('rbind', mapply(read.table, file = file.path(raw_beh_wd, nih_list[['sub_str']], nih_list[['ses']], 'beh', paste0(nih_list[['sub_str']], '_', nih_list[['ses']], '_task-nih_toolbox_events.tsv')), MoreArgs = list(sep = '\t', header = TRUE), SIMPLIFY = FALSE))
-
-    write.table(nih_events_dat, file.path(phenotype_wd, 'nih_toolbox_events.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = 'n/a' )
-
-    nih_scores_dat <- do.call('rbind', mapply(read.table, file = file.path(raw_beh_wd, nih_list[['sub_str']], nih_list[['ses']], 'beh', paste0(nih_list[['sub_str']], '_', nih_list[['ses']], '_task-nih_toolbox_scores.tsv')), MoreArgs = list(sep = '\t', header = TRUE), SIMPLIFY = FALSE))
-
-    write.table(nih_scores_dat, file.path(phenotype_wd, 'nih_toolbox_scores.tsv'), sep = '\t', quote = FALSE, row.names = FALSE, na = 'n/a' )
-
-  }
 
   #### RRV ####
   if (task_list == 'all' | 'rrv' %in% task_list) {
@@ -227,36 +251,5 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
   }
 
 
-  #### PIT ####
 
-  if (task_list == 'all' | 'pit' %in% task_list) {
-    print('-- copying PIT task')
-
-    # for each session
-    for (ses_str in c('ses-1', 'ses-2')) {
-
-      # define directory with pit data
-      if (ses_str == 'ses-1') {
-        pit_dir <- file.path(base_wd, 'untouchedRaw', 'pit_task', 'V4_PIT')
-      } else {
-        pit_dir <- file.path(base_wd, 'untouchedRaw', 'pit_task', 'V5_PIT')
-      }
-
-      # get list of available subjects
-      pit_list <- as.data.frame(list.files(pit_dir, pattern = '.psydat'))
-      names(pit_list) <- 'filename'
-
-      #get list of subject IDs
-      pit_list[['id']] <- as.numeric(sapply(pit_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))[1]-1), simplify = TRUE))
-
-      pit_list[['sub_str']] <- sapply(pit_list[['id']], function(x) sprintf('sub-%03d', x), simplify = TRUE)
-
-      #organize data into BIDS sourcedata
-      pit_list[['sourcedata_done']] <- sapply(pit_list[['id']], function(x) util_copy_to_source(task_dir = pit_dir, task_str = 'pit', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = ses_str, overwrite = overwrite), simplify = TRUE)
-
-      #process raw data
-      #foodrating_list[['rawproc_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_foodrating(sub_str = x, ses = 'baseline', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
-
-    }
-  }
 }

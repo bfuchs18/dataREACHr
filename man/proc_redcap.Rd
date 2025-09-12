@@ -55,7 +55,7 @@ Will return a list including data and metadata for:
 \item{'puberty' - combination of Tanner and Pubertal Rating Scale}
 \item{'pwlb' - Parent Weight-Loss Behavior Questionnaire}
 \item{'rank' - Parent ranking of foods sources? \emph{need}}
-\item{'scpf' - tructure and Control in Parent Feeding Questionnaire}
+\item{'scpf' - Structure and Control in Parent Feeding Questionnaire}
 \item{'sic' - Stress in Children Questionnaire \emph{need}}
 \item{'sleeplog' - Week long sleep log}
 \item{'spsrq' - Sensitivity to Punishment and Sensitivity to Reward Questionnaire}

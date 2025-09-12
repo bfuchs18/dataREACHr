@@ -1,6 +1,6 @@
 #' util_copy_to_source: A function to copy a file into sourcedata
 #'
-#' @inheritParams proc_tasks
+#' @param base_wd (string) full path to directory that contains both the untouchedRaw and bids directories
 #' @param task_dir (string) path to directory with all task files to be copied into sourcedata
 #' @param task_str (string) task string used in filenaming (e.g., 'foodview')
 #' @param sub_str (string) bids-formatted session string. e.g., 'sub-001'
@@ -23,8 +23,10 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
   prefix_arg <- methods::hasArg(sourcefile_prefix)
 
   # get files
-  if (!grepl('nih|actigraph|rrv|pit', task_str)) {
-    raw_files <- list.files(path = base_wd, pattern = task_str)
+  if (grepl('foodview|stop', task_str)) {
+    raw_files <- list.files(path = task_dir, pattern = paste0(sub_id, '.txt'), recursive = TRUE)
+  } else if (!grepl('nih|actigraph|rrv|pit', task_str)) {
+    raw_files <- list.files(path = task_dir, pattern = task_str)
   }
 
   # food view ####
@@ -33,7 +35,9 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'func')
 
     raw_files <- raw_files[grepl(paste0('-', sub_id, '.txt'), raw_files)]
-    raw_files_short <- substr(raw_files, 1, unlist(gregexpr('-', raw_files))-1)
+
+    raw_files_short <- basename(raw_files)
+    raw_files_short <- substr(raw_files_short, 1, unlist(gregexpr('-', raw_files_short))-1)
 
     rename_files <- paste0(sub_str, '_', ses_str, '_task-', raw_files_short, '.tsv')
   }
@@ -76,20 +80,35 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
 
     raw_files <- list.files(path = task_dir, pattern = '.csv')
 
-    if (sum(grepl('sub', raw_files)) > 0){
-      raw_files_short <- sapply(raw_files, function(x) substr(x, unlist(gregexpr('_', x))+1, nchar(x)), simplify = TRUE, USE.NAMES = FALSE)
-    } else {
-      raw_files_short <- sapply(raw_files, function(x) substr(x, unlist(gregexpr(' ', x))[2]+1, nchar(x)), simplify = TRUE, USE.NAMES = FALSE)
+    raw_files_short <- sapply(raw_files, function(x) substr(x, unlist(gregexpr('_', x))[1]+1, nchar(x)), simplify = TRUE, USE.NAMES = FALSE)
 
-      raw_files_short <- gsub('Assessment ', '', raw_files_short)
-      raw_files_short <- gsub('Registration ', 'registration_', raw_files_short)
-      raw_files_short <- tolower(raw_files_short)
-
-    }
+    raw_files_short <- gsub('assessment_', '', raw_files_short)
 
     rename_files <- paste0(sub_str, '_', ses_str, '_task-nih_toolbox_', raw_files_short)
 
     rename_files <- gsub('.csv', '.tsv', rename_files)
+  }
+
+  # PIT ####
+  if (task_str == 'pit'){
+
+    # set sourcedata directory for task files
+    sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
+
+    sub_id_str <- sprintf('%03d', sub_id)
+    raw_files <- list.files(path = task_dir, pattern = paste0(sub_id_str, '_Food-PIT*'))
+
+    # output warning if .csv not found
+    if (sum(grepl('.csv', raw_files)) == 0) {
+      print(paste('WARNING: subject', sub_str, ' ', ses_str, 'has PIT output files but no csv' ))
+    }
+
+    raw_files_short <- substr(raw_files, tail(unlist(gregexpr('\\.', raw_files[1])), 1), nchar(raw_files))
+
+    rename_files <- paste0(sub_str, '_', ses_str, '_task-pit', raw_files_short)
+
+    rename_files <- gsub('.csv', '.tsv', rename_files)
+    rename_files <- gsub('.txt', '.tsv', rename_files)
   }
 
   # RRV ####
@@ -113,29 +132,6 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     # } else {
     #   print(paste('WARNING: ',task_dir, ' has files that will not be copied into sourcedata because they do not adhere to expected naming conventions for RRV'))
     # }
-  }
-
-  # PIT ####
-  if (task_str == 'pit'){
-
-    # set sourcedata directory for task files
-    sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
-
-    raw_files <- list.files(path = task_dir, pattern = 'PIT')
-
-    raw_files <- raw_files[grepl(paste0(sub_str, '_Food'), raw_files)]
-
-    # output warning if .csv not found
-    if ( sum(grepl('.csv', raw_files)) == 0) {
-      print(paste('WARNING: subject', sub_str, ' ', ses_str, 'has PIT output files but no csv' ))
-    }
-
-    raw_files_short <- substr(raw_files, tail(unlist(gregexpr('\\.', raw_files[1])), 1), nchar(raw_files))
-
-    rename_files <- paste0(sub_str, '_', ses_str, '_task-pit', raw_files_short)
-
-    rename_files <- gsub('.csv', '.tsv', rename_files)
-    rename_files <- gsub('.txt', '.tsv', rename_files)
   }
 
   # Actigraph ####
