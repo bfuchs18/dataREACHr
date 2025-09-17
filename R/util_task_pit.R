@@ -2,7 +2,7 @@
 #'
 #' This function formats and organizes RRV data from bids/sourcedata into bids/rawdata for a given subject
 #'
-#'@inheritParams util_copy_to_source
+#' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_task_foodview
 #' @inheritParams util_copy_to_source
@@ -42,11 +42,11 @@ util_task_pit <- function(sub_str, ses_str, base_wd, overwrite = FALSE) {
   #print(sub_str)
 
   # get directory paths
-  source_beh_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh', paste0(sub_str, '_', ses_str, '_task-pit.tsv'))
+  source_beh_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh', paste0(sub_str, '_', ses_str, '_task-pit.tsv'))
 
   # load data, abort processing no file or >1 file matches pattern
-  if (file.exists(source_beh_wd)) {
-    pit_data <- read.table(source_beh_wd, header = TRUE, sep = '\t', na.strings='n/a')
+  if (file.exists(source_beh_file)) {
+    pit_data <- read.table(source_beh_file, header = TRUE, sep = '\t', na.strings='n/a')
   } else {
     print(paste(sub_str, "has no PIT tsv."))
     return()
@@ -131,13 +131,15 @@ util_task_pit <- function(sub_str, ses_str, base_wd, overwrite = FALSE) {
   beh_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-pit_events.tsv'))
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
     utils::write.table(pit_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a")
+
+    if (isTRUE(overwrite)){
+      return('overwrote with new version')
+    } else {
+      return('complete')
+    }
+  } else {
+    return('exists')
   }
 
-
-  #### Return data #####
-
-  if (isTRUE(return_data)) {
-    return(pit_data)
-  }
 }
 

@@ -11,7 +11,7 @@
 #' @param proc_source whether to processes the raw data using proc_tasks.R. Default = FALSE
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
-#' @inheritParams util_group_foodrating
+#' @inheritParams util_group_foodview
 #'
 #' @examples
 #'
@@ -158,27 +158,50 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     pit_database <- util_group_pit(data_list = pit_list, base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
   }
 
-  # Shape Game ####
+  # RRV ####
 
-  if ('shapegame' %in% task_list) {
+  if ('rrv' %in% task_list) {
 
     if (isTRUE(proc_source)) {
       #organize data into BIDS sourcedata and rawdata
-      proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'shapegame')
+      proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'rrv')
     }
 
-    print('-- creating Shape Game summary data')
+    print('-- creating RRV summary data')
 
     # get list of available subjects
-    shapegame_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'beh')), pattern = '*shapegame_events.tsv', recursive = TRUE))
-    names(shapegame_list) <- 'filename'
+    rrv_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-1', 'beh')), pattern = '*rrv_events.tsv', recursive = TRUE))
+    names(rrv_list) <- 'filename'
 
     #get list of subject IDs
-    shapegame_list[['sub_str']] <- sapply(shapegame_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+    rrv_list[['sub_str']] <- sapply(rrv_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
 
     #get summary data -> produces derivative dataframe
-    shapegame_database <- util_group_shapegame(data_list = shapegame_list, ses = 'baseline', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+    rrv_database <- util_group_rrv(data_list = rrv_list, base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
   }
+
+  # Stop-Signal Task  ####
+
+  if ('sst' %in% task_list) {
+
+    if (isTRUE(proc_source)) {
+      #organize data into BIDS sourcedata and rawdata
+      proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'sst')
+    }
+
+    print('-- creating Taste-Test summary data')
+
+    # get list of available subjects
+    sst_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-1', 'beh')), pattern = '*prescan_events.tsv', recursive = TRUE))
+    names(sst_list) <- 'filename'
+
+    #get list of subject IDs
+    sst_list[['sub_str']] <- sapply(sst_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
+
+    #get summary data -> produces derivative dataframe
+    sst_database <- util_group_sst(data_list = sst_list, ses = 'ses-1', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+  }
+
 
   # Space Game ####
 
@@ -204,27 +227,6 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
 
 
 
-  # Taste-Test  ####
-
-  if ('tastetest' %in% task_list) {
-
-    if (isTRUE(proc_source)) {
-      #organize data into BIDS sourcedata and rawdata
-      proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'tastetest')
-    }
-
-    print('-- creating Taste-Test summary data')
-
-    # get list of available subjects
-    tastetest_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-followup', 'nirs', '*meal')), pattern = '*.tsv', recursive = TRUE))
-    names(tastetest_list) <- 'filename'
-
-    #get list of subject IDs
-    tastetest_list[['sub_str']] <- sapply(tastetest_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
-
-    #get summary data -> produces derivative dataframe
-    tastetest_database <- util_group_tastetest(data_list = tastetest_list, ses = 'followup', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
-  }
 
   if (isTRUE(return_data)){
     task_data <- list(
@@ -233,7 +235,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
       shapegame_database = shapegame_database,
       spacegame_database = spacegame_database,
       nihtoolbox_database = nih_scores_dat,
-      tastetest_database = tastetest_database
+      sst_database = sst_database
     )
 
     return(task_data)

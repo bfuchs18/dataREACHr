@@ -23,7 +23,7 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
   prefix_arg <- methods::hasArg(sourcefile_prefix)
 
   # get files
-  if (grepl('foodview|stop', task_str)) {
+  if (grepl('foodview', task_str)) {
     raw_files <- list.files(path = task_dir, pattern = paste0(sub_id, '.txt'), recursive = TRUE)
   } else if (!grepl('nih|actigraph|rrv|pit', task_str)) {
     raw_files <- list.files(path = task_dir, pattern = task_str)
@@ -42,20 +42,6 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     rename_files <- paste0(sub_str, '_', ses_str, '_task-', raw_files_short, '.tsv')
   }
 
-  # SST ####
-  if (task_str == 'stop'){
-    # set sourcedata directory for task files
-    sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'func')
-
-    raw_files <- raw_files[grepl(paste0('-', sub_id, '.txt|', sub_id, '_1st'), raw_files)]
-    raw_files_short <- substr(raw_files, 1, unlist(gregexpr('-', raw_files))-1)
-
-    if (sub_id == 37){
-      raw_files_short[grepl('stop_prac', raw_files_short)] <- c('stop_prac1', 'stop_prac2')
-    }
-
-    rename_files <- paste0(sub_str, '_', ses_str, '_task-', gsub('stop', 'sst', raw_files_short), '.tsv')
-  }
 
   # Space Game ####
   if (task_str == 'mbmfNovelStakes'){
@@ -117,21 +103,33 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     # set sourcedata directory for task files
     sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
 
-    raw_files <- c(list.files(path = task_dir, pattern = '.csv'), list.files(path = task_dir, pattern = '.txt'))
-    raw_files <- raw_files[!grepl('_csv', raw_files)]
+    # convert .txt files
+    raw_files_txt <- list.files(path = task_dir, pattern = '.txt')
+    raw_files_path <- file.path(task_dir, raw_files_txt)
 
-    # # list of acceptable file names
-    # acc_file_names = c(paste0('rrv_', sub_id, '.txt'), paste0('rrv_', sub_id, '_summary.csv'), paste0('rrv_', sub_id, '_game.csv'), paste0('rrv_', sub_id, '-prac.txt'), paste0('rrv_', sub_id, '-prac_summary.csv'), paste0('rrv_', sub_id, '-prac_game.csv'))
+    csv_dataframes <- sapply(raw_files_path, function(x) util_rrv_parse_text(rrv_file = x, sub_str = sub_str), simplify = FALSE)
 
-    raw_files_short <- sapply(raw_files, function(x) substr(x, unlist(gregexpr(sub_id, x))+nchar(sub_id), nchar(x)), simplify = TRUE, USE.NAMES = FALSE)
+    raw_files_short <- sapply(raw_files_txt, function(x) substr(x, unlist(gregexpr(sub_id, x))+nchar(sub_id), nchar(x)), simplify = TRUE, USE.NAMES = FALSE)
 
-    rename_files <- paste0(sub_str, '_', ses_str, '_task-rrv', raw_files_short)
+    raw_files_short <- gsub('-prac|_prac', '_desc-prac', raw_files_short)
+    rename_files_txt <- paste0(sub_str, '_', ses_str, '_task-rrv', raw_files_short)
 
-    rename_files <- gsub('.csv', '.tsv', rename_files)
-    rename_files <- gsub('.txt', '.tsv', rename_files)
-    # } else {
-    #   print(paste('WARNING: ',task_dir, ' has files that will not be copied into sourcedata because they do not adhere to expected naming conventions for RRV'))
-    # }
+    rename_files <- gsub('.txt', '.tsv', rename_files_txt)
+
+  }
+
+  # SST ####
+  if (task_str == 'stop'){
+    # set sourcedata directory for task files
+    sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'func')
+
+    raw_files_short <- substr(raw_files, 1, unlist(gregexpr('-', raw_files))-1)
+
+    if (sub_id == 37){
+      raw_files_short[grepl('stop_prac', raw_files_short)] <- c('sst_prac1', 'sst_prac2')
+    }
+
+    rename_files <- paste0(sub_str, '_', ses_str, '_task-', gsub('stop', 'sst', raw_files_short), '.tsv')
   }
 
   # Actigraph ####
@@ -183,7 +181,7 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
       write.table(dat_read, source_path, sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
     }
 
-    if (task_str %in% c('foodview', 'stop', 'nih', 'rrv')){
+    if (task_str %in% c('foodview', 'stop', 'nih')){
       mapply(save_fun, file_path=file.path(task_dir, raw_files), source_path = source_paths)
     } else if (task_str %in% c('mbmfNovelStakes', 'actigraph')){
       # copy file into sub_task_source_dir
@@ -194,6 +192,16 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
       }
 
       file.copy(from = file.path(task_dir, raw_files[!grepl('.csv', raw_files)]), to = source_paths[!grepl('.tsv', source_paths)], overwrite = overwrite)
+    } else if (task_str == 'rrv') {
+
+      # write proccessed data
+      save_rrv_fun <- function(source_path, proc_data){
+        write.table(proc_data, source_path, sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+      }
+
+      mapply(save_rrv_fun, source_path = source_paths, proc_data = csv_dataframes)
+
+      file.copy(from = raw_files_path, to = file.path(sub_task_source_dir, rename_files_txt), overwrite = overwrite)
     }
 
     if (isTRUE(overwrite)){

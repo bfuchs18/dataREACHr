@@ -4,14 +4,14 @@
 \alias{util_task_foodview}
 \title{util_task_foodview: Clean and organize Food View task data into BIDS rawdata}
 \usage{
-util_task_foodview(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
+util_task_foodview(sub_str, ses_str, base_wd, overwrite = FALSE)
 }
 \arguments{
 \item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 
 \item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
 
-\item{bids_wd}{string with full path to bids directory that contains the sourcedata/ and rawdata/ directories}
+\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
@@ -25,7 +25,7 @@ This function formats and organizes Food View task data from bids/sourcedata int
 
 \dontrun{
 # process task data for the Food View Task
-util_task_foodview_orgraw(sub_id = 'sub-001', ses = 1, bids_wd = bids_wd)
+util_task_foodview_orgraw(sub_id = 'sub-001', ses = 'ses-1', base_wd = base_wd)
 
 }
 

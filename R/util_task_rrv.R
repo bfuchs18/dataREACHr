@@ -14,141 +14,89 @@
 #'
 #' \dontrun{
 #' # process task data for the Food View Task
-#' rrv_data <- util_task_rrv(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = "/Users/baf44/projects/Keller_Marketing/ParticipantData/bids", return = TRUE)
+#' rrv_data <- util_task_rrv(sub_str = 'sub-001', ses_str = 'ses-1', base_wd = base_wd)
 #'
 #' }
 #' @importFrom utils read.table
 #' @importFrom rlang .data
 #' @export
 
-util_task_rrv <- function(sub_str, ses_str, bids_wd, overwrite = FALSE, return_data = TRUE) {
+util_task_rrv <- function(sub_str, ses_str, base_wd, overwrite = FALSE) {
 
   #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(bids_wd)
+  data_arg <- methods::hasArg(base_wd)
 
   if (isTRUE(data_arg)) {
-    if (!is.character(bids_wd)) {
-      stop("bids_wd must be entered as a string")
-    } else if (!file.exists(bids_wd)) {
-      stop("bids_wd entered, but file does not exist. Check bids_wd string.")
+    if (!is.character(base_wd)) {
+      stop('base_wd must be entered as a string')
+    } else if (!file.exists(base_wd)) {
+      stop('base_wd entered, but file does not exist. Check base_wd string.')
     }
   } else if (isFALSE(data_arg)) {
-    stop("bids_wd must be entered as a string")
-  }
-
-  #### IO setup ####
-  if (.Platform$OS.type == "unix") {
-    slash <- '/'
-  } else {
-    slash <- "\\"
-    print('util_task_rrv.R has not been thoroughly tested on Windows systems, may have data_path errors. Contact Bari at baf44@psu.edu if there are errors')
+    stop('base_wd must be entered as a string')
   }
 
 
   #### Clean Data #####
-
   # get file path
-  rrv_txt_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'rrv_', sub, '.txt')
-  rrv_csv_file <- paste0(bids_wd, slash, 'sourcedata', slash, sub_str, slash, ses_str, slash, 'beh', slash, 'rrv_', sub, '_game.csv')
+  source_beh_file <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh', paste0(sub_str, '_', ses_str, '_task-rrv.tsv'))
 
-  # parse text file if it exists
-  if (file.exists(rrv_txt_file)) {
-
-    rrv_data <- rrv_parse_text(rrv_file = rrv_txt_file, participant_id = sub_str)
-
-  } else if (file.exists(rrv_csv_file)){
-
-    print(paste(sub_str, "has no rrv text file. Processing RRV csv file"))
-
-    # import game.csv
-    game_dat <- read.csv(rrv_csv_file, header = TRUE)
-
-    # update column names
-    colnames(game_dat) <- c("ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")
-
-    # add participant_id column
-    game_dat$participant_id <- sub_str
-
-    # fill in ID column
-    game_dat$ID <- game_dat$ID[1]
-
-    for (session in unique(game_dat$session)) {
-
-      for (screen_number in c("1", "2")) {
-
-        # subset data for a given session and screen
-        subset <- game_dat[game_dat$session == session & game_dat$screen == screen_number, ]
-
-        # extract values from first row
-        session_responses <- subset[1,]$session_responses
-        session_reinforcers <- subset[1,]$session_reinforcers
-        session_average_responses <- subset[1,]$session_average_responses
-        session_average_reinforcers <- subset[1,]$session_average_reinforcers
-
-        # fill in values
-        game_dat$session_responses[game_dat$session == session & game_dat$screen == screen_number] <- session_responses
-        game_dat$session_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- session_reinforcers
-        game_dat$session_average_responses[game_dat$session == session & game_dat$screen == screen_number] <- session_average_responses
-        game_dat$session_average_reinforcers[game_dat$session == session & game_dat$screen == screen_number] <- session_average_reinforcers
-
-        # determine number of blocks within session for given screen (number of rows)
-        session_blocks = nrow(subset)
-
-        # determine number of non-response blocks within session for given screen
-        session_nonresp_blocks = sum(subset$responses == 0)
-
-        #add values to dataframe
-        game_dat$session_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- session_blocks
-        game_dat$session_nonresp_blocks[game_dat$session == session & game_dat$screen == screen_number ] <- session_nonresp_blocks
-      }
-    }
-
-    # convert time column to seconds
-
-    ## create a logical vector to check for 'seconds' in the session_time column
-    is_seconds <- grepl("seconds", game_dat$session_time)
-
-    ## process rows with time in seconds: remove "seconds" string and make numeric
-    seconds_part <- as.numeric(gsub(" seconds", "", game_dat$session_time[is_seconds]))
-
-    ## process rows with time in minutes: convert to seconds
-    minutes_part <- as.numeric(game_dat$session_time[!is_seconds]) * 60
-
-    ## replace values in session_time with processed values
-    game_dat$session_time <- NA # set to NA first, otherwise column will remain "character" type
-    game_dat$session_time[is_seconds] <- round(seconds_part, 3)
-    game_dat$session_time[!is_seconds] <- round(minutes_part, 3)
-
-    # reorder columns -- save as rrv_data
-    rrv_data <- game_dat[, c("participant_id", "ID",	"screen",	"reinforcer",	"type",	"session",	"session_time",	"schedule",	"block",	"block_responses",	"block_reinforcers", "session_blocks", "session_nonresp_blocks",  "session_responses",	"session_reinforcers",	"session_average_responses",	"session_average_reinforcers")]
-
+  # load data, abort processing no file or >1 file matches pattern
+  if (file.exists(source_beh_file)) {
+    rrv_data <- read.table(source_beh_file, header = TRUE, sep = '\t', na.strings='n/a')
   } else {
-    print(paste(sub_str, "has no rrv text or _game.csv file. Aborting processing"))
+    print(paste(sub_str, 'has no RRV tsv.'))
     return()
   }
+
+  names(rrv_data)[names(rrv_data) == 'sub'] <- 'participant_id'
+
+  rrv_data['session_id'] <- 'ses-1'
+
+  # convert time column to seconds
+
+  # ## create a logical vector to check for 'seconds' in the session_time column
+  # is_seconds <- grepl('seconds', rrv_data[['ses_time']])
+  #
+  # ## process rows with time in seconds: remove 'seconds' string and make numeric
+  # seconds_part <- as.numeric(gsub(' seconds', '', rrv_data[is_seconds, 'ses_time']))
+  #
+  # ## process rows with time in minutes: convert to seconds
+  # minutes_part <- as.numeric(rrv_data[!is_seconds, 'ses_time']) * 60
+
+  # ## replace values in session_time with processed values
+  # rrv_data['ses_time'] <- NA # set to NA first, otherwise column will remain 'character' type
+  # rrv_data[is_seconds, 'ses_time'] <- round(seconds_part, 3)
+  # rrv_data[!is_seconds, 'ses_time'] <- round(minutes_part, 3)
+
+  # reorder columns -- save as rrv_data
+  rrv_data <- rrv_data[c('participant_id', 'session_id', names(rrv_data)[!grepl('id', names(rrv_data))])]
 
   #### Export Data  #####
 
   # make raw beh directory if it doesn't exist
-  raw_beh_wd <- paste0(bids_wd, slash, 'rawdata', slash, sub_str, slash, ses_str, slash, 'beh', slash)
+  raw_beh_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, ses_str, 'beh')
+
   if (!dir.exists(raw_beh_wd)) {
     dir.create(raw_beh_wd, recursive = TRUE)
   }
 
   # export files if don't exist or overwrite = TRUE
-  beh_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_ses-', ses, '_task-rrv_beh.tsv'))
+  beh_outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-rrv_events.tsv'))
 
   if (!file.exists(beh_outfile) | isTRUE(overwrite)) {
-   utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = "n/a")
+    utils::write.table(rrv_data, beh_outfile, sep = '\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+
+    if (isTRUE(overwrite)){
+      return('overwrote with new version')
+    } else {
+      return('complete')
+    }
+  } else {
+    return('exists')
   }
 
-
-  #### Return data #####
-
-  if (isTRUE(return_data)) {
-    return(rrv_data)
-  }
 }
 
