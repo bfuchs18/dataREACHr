@@ -7,8 +7,8 @@
 dataREACH(
   base_wd,
   overwrite = FALSE,
+  proc_source = FALSE,
   data_list = "all",
-  data_type = "all",
   micro_protocols = "all",
   micro_data_type = "all",
   overwrite_ggir_derivs = FALSE,
@@ -19,6 +19,8 @@ dataREACH(
 \item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
+
+\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 
 \item{data_list}{list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 \itemize{
@@ -93,9 +95,7 @@ dataREACH(
 \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 }}
 
-\item{overwrite_ggir_derivs}{(logical) whether to re-process and overwrite all GGIR derivative outputs (this is a time intensive process). Default = FALSE.}
-
-\item{return_data}{(logical) return data to working environment. Default = FALSE}
+\item{overwrite_ggir_derivs}{(required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time.}
 }
 \value{
 Does not return anything

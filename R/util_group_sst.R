@@ -7,8 +7,7 @@
 #' @param data_list A data frame with variable 'sub_str' that includes all participants that have task data in rawdata
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
-#' @inheritParams util_copy_to_source
-#' @param return logical indicating if computed summary data should be returned. Default = FALSE
+#' @inheritParams util_group_foodview
 #'
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'
@@ -43,8 +42,6 @@ util_group_sst <- function(data_list, base_wd, overwrite = FALSE, return_data = 
   #### Participant Summary Function #####
   sum_database_fn <- function(sub_str, ses_str, base_wd, format){
 
-    # print(sub_str)
-
     # get directory paths
     raw_wd_beh <- file.path(base_wd, 'bids', 'rawdata', sub_str, ses_str, 'beh')
     raw_wd_func <- file.path(base_wd, 'bids', 'rawdata', sub_str, ses_str, 'func')
@@ -63,17 +60,17 @@ util_group_sst <- function(data_list, base_wd, overwrite = FALSE, return_data = 
 
     # merge
     dat <- rbind(data.table::setDT(func_dat), data.table::setDT(beh_dat), fill = TRUE)
-    dat <- as.data.frame(beh_dat)
+    dat <- as.data.frame(dat)
 
     sum_dat <- util_sst_summary(dat, format)
 
 
-    return(as.data.frame(sum_dat))
+    return(sum_dat)
   }
 
 
   #### Save in derivatives #####
-  deriv_wd <- file.path(base_wd, 'bids', 'phenotype')
+  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'beh')
 
   if (!dir.exists(deriv_wd)) {
     dir.create(deriv_wd, recursive = TRUE)
@@ -85,57 +82,72 @@ util_group_sst <- function(data_list, base_wd, overwrite = FALSE, return_data = 
     # generate summary database
     sum_database <- do.call(rbind.data.frame, t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, format = 'wide'), simplify = FALSE)))
 
-    sum_database[!grepl('_id', names(sum_database))] <- sapply(sum_database[!grepl('_id', names(sum_database))], function(x) round(as.numeric(x), 3))
+    sum_database[!grepl('_id|trial_type', names(sum_database))] <- sapply(sum_database[!grepl('_id|trial_type', names(sum_database))], function(x) round(as.numeric(x), 3))
 
-    sum_database[grepl('_id', names(sum_database))] <- sapply(sum_database[grepl('_id', names(sum_database))], function(x) as.character(x))
+    sum_database[grepl('_id|trial_type', names(sum_database))] <- sapply(sum_database[grepl('_id|trial_type', names(sum_database))], function(x) as.character(x))
 
     write.table(as.data.frame(sum_database), file.path(deriv_wd, 'sst.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
 
     #generate json file for derivative data
-    sst_json <- json_sst_summary()
+    wide_sum_json <- json_sst_summary()
 
     sst_filename_json <- file.path(deriv_wd, 'sst.json')
 
     if ( isTRUE(overwrite) | !file.exists(sst_filename_json) ) {
-      write(sst_json, sst_filename_json)
+      write(wide_sum_json, sst_filename_json)
     }
 
   }
 
-  ## Long Data ####
-  if (!file.exists(file.path(deriv_wd, 'sst_desc-long.tsv')) | isTRUE(overwrite)) {
+  ## Long Data - By Run ####
+  if (!file.exists(file.path(deriv_wd, 'sst_desc-byrun.tsv')) | isTRUE(overwrite)) {
 
     # generate summary database
-    sum_database_long <- do.call(rbind.data.frame, t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, format = 'long'), simplify = FALSE)))
+    sum_database_byrun <- do.call(rbind.data.frame, t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, format = 'byrun'), simplify = FALSE)))
 
-    sum_database_long[!grepl('_id|schedule|^reinforcer', names(sum_database_long))] <- sapply(sum_database_long[!grepl('_id|schedule|^reinforcer', names(sum_database_long))], function(x) round(as.numeric(x), 3))
+    sum_database_byrun[!grepl('_id|trial_type|ad_cond', names(sum_database_byrun))] <- sapply(sum_database_byrun[!grepl('_id|trial_type|ad_cond', names(sum_database_byrun))], function(x) round(as.numeric(x), 3))
 
-    sum_database_long[grepl('_id|schedule|^reinforcer', names(sum_database_long))] <- sapply(sum_database_long[grepl('_id|schedule|^reinforcer', names(sum_database_long))], function(x) as.character(x))
+    sum_database_byrun[grepl('_id|trial_type|ad_cond', names(sum_database_byrun))] <- sapply(sum_database_byrun[grepl('_id|trial_type|ad_cond', names(sum_database_byrun))], function(x) as.character(x))
 
-    write.table(as.data.frame(sum_database_long), file.path(deriv_wd, 'sst_desc-long.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+    write.table(as.data.frame(sum_database_byrun), file.path(deriv_wd, 'sst_desc-byrun.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
 
     #generate json file for derivative data
-    sst_long_json <- json_sst_long_summary()
+    run_sum_json <- json_sst_byrun()
 
-    sst_long_filename_json <- file.path(deriv_wd, 'sst_desc-long.json')
+    sst_byrun_filename_json <- file.path(deriv_wd, 'sst_desc-byrun.json')
 
-    if ( isTRUE(overwrite) | !file.exists(sst_long_filename_json) ) {
-      write(sst_long_json, sst_long_filename_json)
+    if ( isTRUE(overwrite) | !file.exists(sst_byrun_filename_json) ) {
+      write(run_sum_json, sst_byrun_filename_json)
     }
 
   }
 
-  if (isTRUE(return_data)){
-    sst_data <- list(wide_data = list(data = sum_database, meta = sst_json),
-                     long_data = list(data = sum_database_long, meta = sst_long_json))
+  ## Long Data - By Block ####
+  if (!file.exists(file.path(deriv_wd, 'sst_desc-byblock.tsv')) | isTRUE(overwrite)) {
 
-    return(sst_data)
+    # generate summary database
+    sum_database_byblock <- do.call(rbind.data.frame, t(sapply(data_list[['sub_str']], function(x) sum_database_fn(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, format = 'byblock'), simplify = FALSE)))
+
+    sum_database_byblock[!grepl('_id|trial_type|ad_cond|img_cat', names(sum_database_byblock))] <- sapply(sum_database_byblock[!grepl('_id|trial_type|ad_cond|img_cat', names(sum_database_byblock))], function(x) round(as.numeric(x), 3))
+
+    sum_database_byblock[grepl('_id|trial_type|ad_cond|img_cat', names(sum_database_byblock))] <- sapply(sum_database_byblock[grepl('_id|trial_type|ad_cond|img_cat', names(sum_database_byblock))], function(x) as.character(x))
+
+    write.table(as.data.frame(sum_database_byblock), file.path(deriv_wd, 'sst_desc-byblock.tsv'), sep='\t', quote = FALSE, row.names = FALSE, na = 'n/a')
+
+    #generate json file for derivative data
+    block_sum_json <- json_sst_byblock()
+
+    sst_byblock_filename_json <- file.path(deriv_wd, 'sst_desc-byblock.json')
+
+    if ( isTRUE(overwrite) | !file.exists(sst_byblock_filename_json) ) {
+      write(run_sum_json, sst_byblock_filename_json)
+    }
+
+
   }
 
-
-
-  return(list(summary_long_by_run = summary_byrun_df,
-              summary_long_by_block = summary_byblock_df,
-              summary_long_by_cond = summary_bycond_df))
+  return(list(sum_dat = sum_database,
+              sum_dat_byrun = sum_database_byrun,
+              sum_dat_byblock = sum_database_byblock))
 }
 

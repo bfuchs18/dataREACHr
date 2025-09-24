@@ -12,8 +12,6 @@ util_group_pit(data_list, base_wd, overwrite = FALSE, return_data = FALSE)
 \item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
-
-\item{return}{logical indicating if computed summary data should be returned. Default = FALSE}
 }
 \value{
 If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data

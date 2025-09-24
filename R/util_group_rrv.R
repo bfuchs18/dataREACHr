@@ -7,8 +7,7 @@
 #' @param data_list A data frame with variable 'sub_str' that includes all participants that have task data in rawdata
 #' @inheritParams util_copy_to_source
 #' @inheritParams util_copy_to_source
-#' @inheritParams util_copy_to_source
-#' @param return logical indicating if computed summary data should be returned. Default = FALSE
+#' @inheritParams util_group_foodview
 #'
 #' @return If return_data is set to TRUE, will return a list including a clean raw dataset with meta-data
 #'

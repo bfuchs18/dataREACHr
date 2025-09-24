@@ -4,12 +4,14 @@
 \alias{util_task_sst}
 \title{util_task_sst: Clean and organize Stop Signal Task data into BIDS rawdata}
 \usage{
-util_task_sst(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
+util_task_sst(sub_str, ses_str = "ses-1", base_wd, overwrite = FALSE)
 }
 \arguments{
 \item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 
 \item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
+
+\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
@@ -24,7 +26,7 @@ Data from practice and behavioral runs will be organized into bids/rawdata/sub-l
 
 \dontrun{
 # process task data for the Food View Task
-util_task_sst(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
+util_task_sst(sub_str = 'sub-001', ses_str = 'ses-1', base_wd = base_wd)
 
 }
 }

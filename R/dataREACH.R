@@ -11,6 +11,7 @@
 #'
 #' @inheritParams proc_tasks
 #' @inheritParams proc_tasks
+#' @inheritParams proc_task_derivs
 #' @param data_list list of strings matching the notes below to indicate the data to be written. Default = 'all' to export all data and metadata. Options include:
 #' \itemize{
 #'  \item{'participants' - BIDS specified participants.tsv file}
@@ -81,8 +82,7 @@
 #'    \item{'beh_wide' - summary behavioral measures in wide formate by coder. Note: this will write out a summary dataset in bids/phenotype.}
 #'    \item{'events_long' - event level data in log format by coder. Note: this writes out a file per participant into bids/rawdata.}
 #'  }
-#' @inheritParams write_tasks
-#' @inheritParams proc_actigraph
+#' @param overwrite_ggir_derivs (required if 'actigraph' is in data_list or data_list = 'all') overwrite GGIR derivatives. Defult = FLASE, this will take a LONG time.
 #'
 #'
 #' @return Does not return anything
@@ -99,7 +99,7 @@
 #'
 #' @export
 
-dataREACH <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type = 'all', micro_protocols = 'all', micro_data_type = 'all', overwrite_ggir_derivs = FALSE, return_data = FALSE) {
+dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list = 'all', micro_protocols = 'all', micro_data_type = 'all',  overwrite_ggir_derivs = FALSE, return_data = FALSE) {
 
   #### Set up/initial checks #####
 
@@ -173,7 +173,7 @@ dataREACH <- function(base_wd, overwrite = FALSE, data_list = 'all', data_type =
 
     data_list_tasks = data_list[(data_list %in% task_data_options)]
 
-    task_data <- write_tasks(base_wd, overwrite = overwrite, data_list = data_list_tasks, return_data = return_data)
+    task_data <- proc_task_derivs(base_wd, overwrite = overwrite, proc_source = proc_source, data_list = data_list_tasks, return_data = return_data)
 
   }
 

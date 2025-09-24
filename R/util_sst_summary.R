@@ -1,10 +1,10 @@
-#' util_sst_summary: Get summary data from individual participants for t\the Stop Signal Task
+#' util_sst_summary: Get summary data from individual participants for the Stop Signal Task
 #'
 #' This function calculates summary performance data for an individual participant
 #'
 #'
 #' @param ind_dat Processed individual dataset from rawdata for the Stop Signal Task task
-#' @param format Format in which the summary data is returned: 'wide' will return a 1-row summary data.frame(); 'long' will return the summary session response data by session and screen.
+#' @param format Format in which the summary data is returned: 'wide' will return a 3-row summary data.frame() for all trials, behavioral pre-scan trials, and fMRI trials; 'byrun' will return the summary response data by run; 'byblock' will return the summary response data by run and block.
 #'
 #' @return a data.frame with summary data based on format requested
 #'
@@ -32,231 +32,236 @@ util_sst_summary <- function(ind_dat, format) {
     stop('ind_dat must be entered as a data.frame')
   }
 
-  if (format == 'wide') {
+  ## primary summary data funciton ####
+  # define function to get summary metrics for a given subset of data. ----
+  sum_data_fn <- function(sub_dat, cond, cond_var){
 
-    #### Create summary database ####
-
-    # define function to get summary metrics for a given subset of data. ----
-    get_summary_row <- function(jpeg_events){
-      # get_summary_row (internal)
-      # jpeg_events = dataframe of rows from SST events file(s) where stim_file_name contains "jpeg"
-      # returns: a dataframe of 1 row containing summary values
-
-      # subset trials by signal
-      go_trials <- jpeg_events[jpeg_events$signal == 0,]
-      stop_trials <- jpeg_events[jpeg_events$signal == 1,]
-
-      # calculate metrics
-      n_stop_trials = nrow(stop_trials) # number of stop trials
-      n_go_trials = nrow(go_trials) # number of go trials
-      n_go_cor = sum(go_trials$correct == 4) # number of correct go trials
-      n_go_error = sum(go_trials$correct == 2) # number of incorrect go trials (wrong left/right response)
-      n_go_miss = sum(go_trials$correct == 1) # number of go response omissions
-      n_stop_fail = sum(stop_trials$correct == 3) # number of unsuccessful stops
-
-      go_rt_mean = mean(go_trials$response_time, na.rm = TRUE) # average reaction time on go trials, rm trials with no response
-      go_correct_rt_mean = mean(go_trials[go_trials$correct == 4,]$response_time) # average reaction time on correct go trials
-      go_error_rt_mean = mean(go_trials[go_trials$correct == 2,]$response_time) # average reaction time on incorrect correct go trials
-      us_rt_mean = mean(stop_trials[stop_trials$correct == 3,]$response_time)  # average reaction time on unsuccessful stop trials
-      prop_stop_fail = n_stop_fail / n_stop_trials  #proportion of of failed stop trials
-      ssd_mean = mean(stop_trials$trueSSD) #average stop signal delay on stop trials
-
-      # if only 1 block in subset data, get block number
-      if (length(unique(jpeg_events$block)) == 1) {
-        block_num = unique(jpeg_events$block)
-      } else {
-        block_num = NA
-      }
-
-      ## ISSUE: if/else below will error if there are no unsuccessful stop trials, causing us_rt_mean to be NaN -- what is racehorse_check in this case and should ssrt be calculated?
-      if (n_stop_fail == 0) {
-
-        if (is.na(block_num)) {
-          print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "-- cannot check racehorse assumption"))
-        } else {
-          print(paste("n_stop_fail is 0 for", go_trials$sub[1], "run", go_trials$run_num[1], "block", block_num, "-- cannot check racehorse assumption"))
-        }
-
-        racehorse_check = NA
-        # don't calculate ssrt ??
-        ssrt_mean = NA
-        ssrt_int = NA
-
-      } else if ( go_rt_mean > us_rt_mean ){
-        racehorse_check = 1 # meet racehorse assumptions
-
-        #calculate ssrt with mean method
-        ssrt_mean = go_rt_mean - ssd_mean
-
-        # replace omissions with max RT if there are omissions
-        if (n_go_miss > 0) {
-
-          # get max go rt
-          max_go_rt = max(go_trials$response_time, na.rm = TRUE)
-
-          # make copy of go ataset
-          go_trials_replace <- go_trials
-
-          #replace omitted go rt values
-          go_trials_replace$response_time[is.na(go_trials_replace$response_time)] <- max_go_rt
-
-          #get rt at prop_stop_fail percentile
-          nth_rt = quantile(go_trials_replace$response_time, probs = prop_stop_fail, names = FALSE)
-
-        } else {
-
-          # get go trial rt at prop_stop_fail percentile
-          nth_rt = quantile(go_trials$response_time, probs = prop_stop_fail, names = FALSE)
-        }
-
-        #calculate ssrt with integration method
-        ssrt_int = nth_rt - ssd_mean
-
-      } else {
-        racehorse_check = 0 # fail to meet racehorse assumptions
-
-        # don't calculate ssrt
-        ssrt_mean = NA
-        ssrt_int = NA
-      }
-
-      summary_row <-
-        data.frame(
-          sub = go_trials$sub[1],
-          type = go_trials$type[1],
-          run_num = go_trials$run_num[1],
-          block_num = block_num,
-          commerical_cond = go_trials$run_cond[1],
-          img_cat = go_trials$img_cat[1],
-
-          # add summary metrics
-          racehorse_check = racehorse_check,
-          n_stop_trials = n_stop_trials,
-          n_go_trials = n_go_trials,
-          go_rt_mean = go_rt_mean,
-          n_go_cor = n_go_cor,
-          go_correct_rt_mean = go_correct_rt_mean,
-          n_go_error = n_go_error,
-          go_error_rt_mean = go_error_rt_mean,
-          n_go_miss = n_go_miss,
-          prop_stop_fail = prop_stop_fail,
-          us_rt_mean = us_rt_mean,
-          ssd_mean = ssd_mean,
-          ssrt_mean = ssrt_mean,
-          ssrt_int = ssrt_int
-        )
-
-      return(summary_row)
+    if (is.na(cond)) {
+      cond_data <- sub_dat[grepl('jpeg', sub_dat[['stim_file_name']]),]
+    } else {
+      # subset image rows for given cond
+      cond_data <- sub_dat[grepl('jpeg', sub_dat[['stim_file_name']]) & sub_dat[cond_var] == cond,]
     }
 
-    # create output dataframes
-    summary_bycond_df <- data.frame()
+    # subset trials by signal
+    go_trials <- cond_data[cond_data['signal'] == 0,]
+    stop_trials <- cond_data[cond_data['signal'] == 1,]
 
-    # create output dataframes
-    summary_byrun_df <- data.frame()
+    # number of go/stop trials
+    n_stop_trials = nrow(stop_trials)
+    n_go_trials = nrow(go_trials)
 
-    # create output dataframes
-    summary_byblock_df <- data.frame()
+    # number correct/incorrect
+    n_go_cor = sum(go_trials[['correct']] == 4)
+    n_go_error = sum(go_trials[['correct']] == 2)
+    n_go_miss = sum(go_trials[['correct']] == 1)
+    n_stop_fail = sum(stop_trials[['correct']] == 3)
 
+    # response times
+    go_rt_mean = mean(go_trials[['rt']], na.rm = TRUE)
+    go_correct_rt_mean = mean(go_trials[go_trials['correct'] == 4, 'rt'])
+    go_error_rt_mean = mean(go_trials[go_trials['correct'] == 2, 'rt'])
+    us_rt_mean = mean(stop_trials[stop_trials['correct'] == 3, 'rt'])
 
-      # convert response_time unit from seconds to milliseconds
-      combined_data$response_time <- combined_data$response_time*1000
+    # proportion stops fails
+    prop_stop_fail = n_stop_fail / n_stop_trials
 
-      # for each data type (e.g., "beh", "func")
-      for (type in unique(combined_data$type)) {
+    # mean stop signal delay
+    ssd_mean = mean(stop_trials$trueSSD)
 
-        # subset data by type
-        type_data <- combined_data[combined_data$type == type,]
+    if (n_stop_fail == 0) {
 
-        # determine number of runs
-        n_runs <- length(unique(type_data$run_num))
+      racehorse_check = 0
+      ssrt_mean = NA
+      ssrt_int = NA
 
-        # get summary metrics across runs, by condition ----
+    } else if ( go_rt_mean > us_rt_mean ){
+      racehorse_check = 1 # meet racehorse assumptions
 
-        # for each condition (toy, food)
-        for (cond in c("toy", "food")) {
+      #calculate ssrt with mean method
+      ssrt_mean = go_rt_mean - ssd_mean
 
-          # subset image rows for fiven cond
-          cond_jpeg_rows <- type_data[grepl("jpeg", type_data$stim_file_name) & type_data$run_cond == cond,]
+      # replace omissions with max RT if there are omissions
+      if (n_go_miss > 0) {
 
-          # if there are jpeg events and there are no responses
-          if (nrow(cond_jpeg_rows) > 0 & sum(!is.na(cond_jpeg_rows$response_time))) { ## change this so we still get a row in DF if no responses?
-            # if (nrow(type_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
+        # get max go rt
+        max_go_rt = max(go_trials[['rt']], na.rm = TRUE)
 
-            # get dataframe row of summary metrics
-            cond_summary_row <- get_summary_row(cond_jpeg_rows)
-            cond_summary_row$run_num <- NA # replace with NA, as this would reflect the first run_num, but there are multiple when assessing by condition
+        #replace omitted go rt values
+        go_trials[is.na(go_trials['rt']), 'rt'] <- max_go_rt
 
-            # add row to dataframe
-            if (nrow(summary_bycond_df) == 0) {
-              summary_bycond_df <- cond_summary_row
-            } else {
-              summary_bycond_df <- dplyr::bind_rows(summary_bycond_df, cond_summary_row)
-            }
+      }
 
-          }
-        }
+      #get rt at prop_stop_fail percentile
+      nth_rt = quantile(go_trials[['rt']], probs = prop_stop_fail, names = FALSE)
 
+      #calculate ssrt with integration method
+      ssrt_int = nth_rt - ssd_mean
 
-        # get summary metrics by run ----
-        # note: runs are specific to a condition (food, toy), so do not need to also subset by condition
-        for (run in 1:n_runs) {
+    } else {
+      racehorse_check = 0 # fail to meet racehorse assumptions
 
-          # extract foodview data for given run
-          run_data <- type_data[type_data$run_num == run,]
+      # don't calculate ssrt
+      ssrt_mean = NA
+      ssrt_int = NA
+    }
 
-          # subset image rows
-          run_jpeg_rows <- run_data[grep("jpeg", run_data$stim_file_name),]
+    if (!is.na(cond_var) & cond_var == 'block') {
+      sum_dat <- data.frame(img_cat = cond_data[1, 'img_cat'], racehorse_check = racehorse_check, n_stop_trials = n_stop_trials, n_go_trials = n_go_trials, go_rt_mean = go_rt_mean, n_go_cor = n_go_cor, go_correct_rt_mean = go_correct_rt_mean, n_go_error = n_go_error, go_error_rt_mean = go_error_rt_mean, n_go_miss = n_go_miss, prop_stop_fail = prop_stop_fail, us_rt_mean = us_rt_mean, ssd_mean = ssd_mean, ssrt_mean = ssrt_mean, ssrt_int = ssrt_int)
+    } else {
+      sum_dat <- data.frame(racehorse_check = racehorse_check, n_stop_trials = n_stop_trials, n_go_trials = n_go_trials, go_rt_mean = go_rt_mean, n_go_cor = n_go_cor, go_correct_rt_mean = go_correct_rt_mean, n_go_error = n_go_error, go_error_rt_mean = go_error_rt_mean, n_go_miss = n_go_miss, prop_stop_fail = prop_stop_fail, us_rt_mean = us_rt_mean, ssd_mean = ssd_mean, ssrt_mean = ssrt_mean, ssrt_int = ssrt_int)
 
-          # if there are jpeg events and there are no responses
-          if (nrow(run_jpeg_rows) > 0 & sum(!is.na(run_jpeg_rows$response_time))) { ## change this so we still get a row in DF if no responses?
-            # if (nrow(run_jpeg_rows) > 0 ) { ## change this so we still get a row in DF if no responses?
-
-            # get dataframe row of summary metrics
-            run_summary_row <- get_summary_row(run_jpeg_rows)
-
-            # add row to dataframe
-            if (nrow(summary_byrun_df) == 0) {
-              summary_byrun_df <- run_summary_row
-            } else {
-              summary_byrun_df <- dplyr::bind_rows(summary_byrun_df, run_summary_row)
-            }
-
-          }
-
-          # get summary metrics by block ----
-          for (block in unique(run_jpeg_rows$block)) {
-
-            # subset images in block
-            block_rows <- run_jpeg_rows[run_jpeg_rows$block == block,]
-
-            ## change this so we still get a row in DF if no responses?
-            if (nrow(block_rows) > 0 & sum(!is.na(block_rows$response_time))) {
-
-              # get row of summary metrics
-              block_summary_row <- get_summary_row(block_rows)
-
-              # add row to dataframe
-              if (nrow(summary_byblock_df) == 0) {
-                summary_byblock_df <- block_summary_row
-              } else {
-                summary_byblock_df <- dplyr::bind_rows(summary_byblock_df, block_summary_row)
-              }
-            }
-          }
-        }
+      if (!is.na(cond)) {
+        names(sum_dat) <- paste0(cond, '_', names(sum_dat))
       }
     }
 
-  } else {
-    #### process long data ####
 
-    # extract data for candy
-    sum_dat <- ind_dat[ind_dat['block'] == 1 & ind_dat['ses_n_resp'] != 0, c('participant_id', 'session_id', 'screen', 'schedule', 'ses', 'ses_time', 'ses_n_resp', 'ses_reinforcer', 'ses_avg_resp', 'ses_avg_reinforcer', 'ses_blocks', 'ses_nonresp_blocks', 'reinforcer')]
+    return(sum_dat)
+  }
+
+  ## wide/by condition function ####
+  bycond_sumdat <- function(data, type, run){
+    if (type == 'all'){
+      sub_dat <- data
+    } else {
+      sub_dat <- ind_dat[ind_dat['type'] == type,]
+    }
+
+    if(hasArg(run)){
+      sub_dat <- sub_dat[sub_dat['run_num'] == run, ]
+    }
+
+    # overall
+    sum_dat <- sum_data_fn(sub_dat, cond = NA, cond_var = NA)
+
+    # by sweet/savory
+    foodcat_sum_dat <- do.call(cbind.data.frame, sapply(c('sweet', 'savory'), function(x) sum_data_fn(sub_dat, cond = x, cond_var = 'img_cat'), simplify = FALSE, USE.NAMES = FALSE))
+
+    # combind for wide OR by run
+    if (hasArg(run)) {
+      sum_dat <- cbind.data.frame(sum_dat, foodcat_sum_dat)
+
+      sum_dat['run'] <- run
+      sum_dat['ad_cond'] <- sub_dat[1, 'run_cond']
+
+      sum_dat <- sum_dat[c('run', 'ad_cond', names(sum_dat)[!grepl('run|ad_cond', names(sum_dat))])]
+
+    } else {
+      # by ad condition (determined by run)
+      cond_sum_dat <- do.call(cbind.data.frame, sapply(c('food', 'toy'), function(x) sum_data_fn(sub_dat, cond = x, cond_var = 'run_cond'), simplify = FALSE, USE.NAMES = FALSE))
+
+      # combine
+      sum_dat <- cbind.data.frame(sum_dat, cond_sum_dat, foodcat_sum_dat)
+    }
+
+    return(sum_dat)
+  }
+
+  ## long by block function ####
+  byblock_sumdat <- function(data, run){
+    sub_dat <- data[data['run_num'] == run, ]
+
+    # block list
+    block_list <- unique(sub_dat[!is.na(sub_dat['block']), 'block'])
+
+    if (length(block_list) > 0 ) {
+      block_sum_dat <- do.call(rbind.data.frame, sapply(block_list, function(x) sum_data_fn(sub_dat, cond = x, cond_var = 'block'), simplify = FALSE, USE.NAMES = FALSE))
+
+      block_sum_dat['run'] <- run
+      block_sum_dat['ad_cond'] <- sub_dat[1, 'run_cond']
+      block_sum_dat['block'] <- block_list
+
+      block_sum_dat <- block_sum_dat[c('run', 'ad_cond', 'block', names(block_sum_dat)[!grepl('run|ad_cond|block', names(block_sum_dat))])]
+
+      return(block_sum_dat)
+    }
+  }
+
+  ## by run long data function ####
+  byrun_sumdat <- function(data, type, block){
+
+    # get data
+    sub_dat <- ind_dat[ind_dat['type'] == type,]
+
+    # runs
+    run_list <- unique(sub_dat[['run_num']])
+
+    # get by block
+    if (isTRUE(block)){
+      block_sum_dat <- do.call(rbind.data.frame, sapply(run_list, function(x) byblock_sumdat(sub_dat, run = x), simplify = FALSE))
+
+      # add additional information
+      block_sum_dat['trial_type'] <- tolower(type)
+
+      block_sum_dat <- block_sum_dat[c('trial_type', names(block_sum_dat)[!grepl('trial_type', names(block_sum_dat))])]
+
+      return(block_sum_dat)
+
+    } else {
+      # get by condition
+      run_sum_dat <- do.call(rbind.data.frame, sapply(run_list, function(x) bycond_sumdat(sub_dat, type = 'all', run = x), simplify = FALSE))
+
+      # add additional information
+      run_sum_dat['trial_type'] <- tolower(type)
+
+      run_sum_dat <- run_sum_dat[c('trial_type', names(run_sum_dat)[!grepl('trial_type', names(run_sum_dat))])]
+
+      return(run_sum_dat)
+    }
+
   }
 
 
+  #### Create summary database ####
 
-  return(sum_dat)
+  if (format == 'wide') {
+
+    trial_type_list <- unique(ind_dat[['type']])
+
+    if (length(trial_type_list) > 1) {
+      trial_type_list <- c('all', trial_type_list)
+    }
+
+    wide_sum_dat <- do.call(rbind.data.frame, sapply(trial_type_list, function(x) bycond_sumdat(ind_dat, type = x), simplify = FALSE))
+
+    wide_sum_dat['participant_id'] <- ind_dat[1, 'participant_id']
+    wide_sum_dat['session_id'] <- 'ses-1'
+    wide_sum_dat['trial_type'] <- trial_type_list
+
+    wide_sum_dat <- wide_sum_dat[c('participant_id', 'session_id', 'trial_type', names(wide_sum_dat)[!grepl('id|trial_type', names(wide_sum_dat))])]
+
+    wide_sum_json <- json_sst_summary()
+
+    return(wide_sum_dat)
+
+  } else if (format == 'byrun') {
+    #### process long data ####
+    trial_type_list <- unique(ind_dat[['type']])
+
+    run_sum_dat <- do.call(rbind.data.frame, sapply(trial_type_list, function(x) byrun_sumdat(ind_dat, type = x, block = FALSE), simplify = FALSE))
+
+    run_sum_dat['participant_id'] <- ind_dat[1, 'participant_id']
+    run_sum_dat['session_id'] <- 'ses-1'
+
+    run_sum_dat <- run_sum_dat[c('participant_id', 'session_id', names(run_sum_dat)[!grepl('id', names(run_sum_dat))])]
+
+    return(run_sum_dat)
+
+
+  } else if (format == 'byblock') {
+    # by block
+    trial_type_list <- unique(ind_dat[['type']])
+
+    block_sum_dat <- do.call(rbind.data.frame, sapply(trial_type_list, function(x) byrun_sumdat(ind_dat, type = x, block = TRUE), simplify = FALSE))
+
+    block_sum_dat['participant_id'] <- ind_dat[1, 'participant_id']
+    block_sum_dat['session_id'] <- 'ses-1'
+
+    block_sum_dat <- block_sum_dat[c('participant_id', 'session_id', names(block_sum_dat)[!grepl('id', names(block_sum_dat))])]
+
+    return(block_sum_dat)
+
+  }
 }
 

@@ -256,10 +256,23 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
     #organize data into BIDS sourcedata
     sst_list[['sourcedata_done']] <- mapply(util_copy_to_source, sub_id = sst_list[['id']], sub_str = sst_list[['sub_str']], task_dir = file.path(data_path, 'sst_task', paste0('reach_', sprintf('%03d', sst_list[['id']]))), MoreArgs = list(base_wd = base_wd, task_str = 'stop', ses_str = 'ses-1', overwrite = overwrite))
 
-
     #process raw data
     sst_list[['rawproc_done']] <- sapply(sst_list[['sub_str']], function(x) util_task_sst(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
 
+
+    #generate json file for rawdata
+    sst_json_prescan <- json_sst_prescan()
+    sst_filename_json_prescan <- file.path(bids_wd, 'task-sst_acq-prescan_events.json')
+    sst_filename_json_prac <- file.path(bids_wd, 'task-sst_acq-practice_events.json')
+
+    sst_json_fmri <- json_sst_bold()
+    sst_filename_json_fmri <- file.path(bids_wd, 'task-sst_acq-practice_events.json')
+
+    if ( isTRUE(overwrite) | !file.exists(sst_filename_json_prescan) ) {
+      write(sst_json_prescan, sst_filename_json_prescan)
+      write(sst_json_prescan, sst_filename_json_prac)
+      write(sst_json_fmri, sst_filename_json_fmri)
+    }
   }
 
 

@@ -105,9 +105,6 @@ util_task_sst <- function(sub_str, ses_str = 'ses-1', base_wd, overwrite = FALSE
     dataframe['participant_id'] <- sub_str
     dataframe['session_id'] <- 'ses-1'
 
-    # convert resp_time from ms to sec
-    dataframe['rt'] <- dataframe[['rt']] / 1000
-
     # make resp_time NA when dataframe$resp = 0 (indicating no resp)
     dataframe[dataframe['resp'] == 0, 'rt'] <- NA
 
@@ -213,7 +210,7 @@ util_task_sst <- function(sub_str, ses_str = 'ses-1', base_wd, overwrite = FALSE
     run_dat['duration'] <- sapply(seq(1, nrow(run_dat)), function(x) calc_dur(x, run_dat))
 
     # convert resp_time from ms to sec
-    run_dat['rt'] <- run_dat[['rt']]/1000
+    run_dat['rt'] <- run_dat[['rt']]
 
     # make resp_time NA when func_dat$resp = 0 (indicating no resp)
     run_dat[!is.na(run_dat[['resp']]) & run_dat[['resp']] == 0, 'rt'] <- NA
@@ -221,10 +218,7 @@ util_task_sst <- function(sub_str, ses_str = 'ses-1', base_wd, overwrite = FALSE
     # fill in block category
 
     # re-order columns
-    run_dat <- run_dat[c('onset', 'duration', 'participant_id', 'session_id', 'run', 'set', 'run_cond',
-                         'stim_file_name', 'trial_num', 'type', 'block', 'img_cat',
-                         'go_stim', 'signal', 'reqSSD' , 'correct', 'resp',
-                         'rt', 'trueSSD')]
+    run_dat <- run_dat[c('onset', 'duration', 'participant_id', 'session_id', 'run', 'set', 'run_cond','stim_file_name', 'trial_num', 'type', 'block', 'img_cat','go_stim', 'signal', 'reqSSD' , 'correct', 'resp', 'rt', 'trueSSD')]
 
     # rename run column
     names(run_dat)[names(run_dat) == 'run'] <- 'run_num'
@@ -251,9 +245,7 @@ util_task_sst <- function(sub_str, ses_str = 'ses-1', base_wd, overwrite = FALSE
     ## adding this column allows for accurate merging of onset_dat and fmri_dat below
 
     fmri_dat['trial_num'] <- seq.int(nrow(fmri_dat))
-    onset_dat['trial_num'] <- ifelse(grepl('.jpeg', onset_dat[['stim_file_name']]),
-                                     cumsum(grepl('.jpeg', onset_dat[['stim_file_name']])),
-                                     NA)
+    onset_dat['trial_num'] <- ifelse(grepl('.jpeg', onset_dat[['stim_file_name']]), cumsum(grepl('.jpeg', onset_dat[['stim_file_name']])),  NA)
 
     # combine onset_dat (onset data) and fmri_dat (resp data) into func_dat
     func_dat <- merge(onset_dat, fmri_dat, by=c('run', 'set','run_cond','stim_file_name', 'trial_num'), all = TRUE)

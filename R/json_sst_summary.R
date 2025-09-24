@@ -1,0 +1,143 @@
+#' json_sst_summary: Generates json file for the derivative SST behavioral data
+#'
+#' This function generates a json file for SST summary data in wide format
+#'
+#' @return a json file for SST summary data in wide format
+#'
+#'
+#' @export
+
+json_sst_summary <- function() {
+
+  sst_sum_list <- list(
+    'MeasurementToolMetadata' = list(
+      Description = 'Adapted Food Related Stop-Signal Task',
+      Reference = 'Pearce, Alaina L., Kyle Hallisky, Barbara J. Rolls, Stephen J. Wilson, Emma Rose, Charles F. Geier, Hugh Garavan, and Kathleen L. Keller. Children at high familial risk for obesity show executive functioning deficits prior to development of excess weight status. Obesity 31, no. 12 (2023): 2998-3007. https://doi.org/10.1002/oby.23892',
+      TermURL = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10884994/'),
+    'FileLevelMetadata' = list(
+      Description = 'SST behavior summarized by block',
+      Sources = list( 'bids::rawdata/sub*/ses-1/func/sub*sst*events.tsv', 'bids::rawdata/sub*/ses-1/beh/sub*sst*events.tsv'),
+      DatasetType = 'derivative'),
+    participant_id = list( Description = 'Participant ID'),
+    session_id = list( Description = 'BIDS session ID indicating when data was collected',
+                       Levels = list ('ses-1' = 'session 1 / baseline',
+                                      'ses-2' = 'session 2 / follow-up')),
+    trial_type = list(Description = 'task type for each trial',
+                      Levels = list ('beh' = 'behavioral task',
+                                     'fmri' = 'fmri task')),
+    racehorse_check = list(Description = 'check of the racehorse assumption for the Stop-Signal Task: mean go reaction time (go_rt_mean) > mean reaction time during unsuccessful stops (us_rt_mean)',
+                           Levels = list ('1' = 'met assumption',
+                                          '0' = 'failed to meet assumption')),
+    n_stop_trials = list(Description = 'number of stop trials'),
+    n_go_trials = list(Description = 'number of go trials'),
+    go_rt_mean = list(Description = 'average reaction time on go trials with responses',
+                      Unit = 'ms'),
+    n_go_cor = list(Description = 'number of correct go (left/right) responses'),
+    go_correct_rt_mean = list(Description = 'average reaction time for correct go responses',
+                              Unit = 'ms'),
+    n_go_error = list(Description = 'number of go trial errors (left/right)'),
+    go_error_rt_mean = list(Description = 'average reaction time on go trials with errors',
+                            Unit = 'ms'),
+    n_go_miss = list( Description = 'number of missed go trial responses'),
+    prop_stop_fail = list( Description = 'proportion of of failed stop trials'),
+    us_rt_mean = list( Description = 'average reaction time on unsucessful stop trials ',
+                       Unit = 'ms'),
+    ssd_mean = list(Description = 'average stop-signal delay',
+                    Unit = 'ms'),
+    ssrt_mean = list( Description = 'stop-signal reaction time calculated using the mean method (mean go rt - mean ssd). Only calcualted if racehorse assumption is met',
+                       Unit = 'ms'),
+    ssrt_int = list( Description = 'stop-signal reaction time calculated using the integration method (nth rt - mean ssd). Only calcualted if racehorse assumption is met',
+                      Unit = 'ms'),
+    food_n_stop_trials = list(Description = 'Food Advertisement Condition: number of stop trials'),
+    food_n_go_trials = list(Description = 'Food Advertisement Condition: number of go trials'),
+    food_go_rt_mean = list(Description = 'Food Advertisement Condition: average reaction time on go trials with responses',
+                      Unit = 'ms'),
+    food_n_go_cor = list(Description = 'Food Advertisement Condition: number of correct go (left/right) responses'),
+    food_go_correct_rt_mean = list(Description = 'Food Advertisement Condition: average reaction time for correct go responses',
+                              Unit = 'ms'),
+    food_n_go_error = list(Description = 'Food Advertisement Condition: number of go trial errors (left/right)'),
+    food_go_error_rt_mean = list(Description = 'Food Advertisement Condition: average reaction time on go trials with errors',
+                            Unit = 'ms'),
+    food_n_go_miss = list( Description = 'Food Advertisement Condition: number of missed go trial responses'),
+    food_prop_stop_fail = list( Description = 'Food Advertisement Condition: proportion of of failed stop trials'),
+    food_us_rt_mean = list( Description = 'Food Advertisement Condition: average reaction time on unsucessful stop trials ',
+                       Unit = 'ms'),
+    food_ssd_mean = list(Description = 'Food Advertisement Condition: average stop-signal delay',
+                    Unit = 'ms'),
+    food_ssrt_mean = list( Description = 'Food Advertisement Condition: stop-signal reaction time calculated using the mean method (mean go rt - mean ssd). Only calcualted if racehorse assumption is met',
+                      Unit = 'ms'),
+    food_ssrt_int = list( Description = 'Food Advertisement Condition: stop-signal reaction time calculated using the integration method (nth rt - mean ssd). Only calcualted if racehorse assumption is met',
+                     Unit = 'ms'),
+    toy_n_stop_trials = list(Description = 'Toy Advertisement Condition: number of stop trials'),
+    toy_n_go_trials = list(Description = 'Toy Advertisement Condition: number of go trials'),
+    toy_go_rt_mean = list(Description = 'Toy Advertisement Condition: average reaction time on go trials with responses',
+                           Unit = 'ms'),
+    toy_n_go_cor = list(Description = 'Toy Advertisement Condition: number of correct go (left/right) responses'),
+    toy_go_correct_rt_mean = list(Description = 'Toy Advertisement Condition: average reaction time for correct go responses',
+                                   Unit = 'ms'),
+    toy_n_go_error = list(Description = 'Toy Advertisement Condition: number of go trial errors (left/right)'),
+    toy_go_error_rt_mean = list(Description = 'Toy Advertisement Condition: average reaction time on go trials with errors',
+                                 Unit = 'ms'),
+    toy_n_go_miss = list( Description = 'Toy Advertisement Condition: number of missed go trial responses'),
+    toy_prop_stop_fail = list( Description = 'Toy Advertisement Condition: proportion of of failed stop trials'),
+    toy_us_rt_mean = list( Description = 'Toy Advertisement Condition: average reaction time on unsucessful stop trials ',
+                            Unit = 'ms'),
+    toy_ssd_mean = list(Description = 'Toy Advertisement Condition: average stop-signal delay',
+                         Unit = 'ms'),
+    toy_ssrt_mean = list( Description = 'Toy Advertisement Condition: stop-signal reaction time calculated using the mean method (mean go rt - mean ssd). Only calcualted if racehorse assumption is met',
+                           Unit = 'ms'),
+    toy_ssrt_int = list( Description = 'Toy Advertisement Condition: stop-signal reaction time calculated using the integration method (nth rt - mean ssd). Only calcualted if racehorse assumption is met',
+                          Unit = 'ms'),
+    sweet_n_stop_trials = list(Description = 'Sweet Food Image Condition: number of stop trials'),
+    sweet_n_go_trials = list(Description = 'Sweet Food Image Condition: number of go trials'),
+    sweet_go_rt_mean = list(Description = 'Sweet Food Image Condition: average reaction time on go trials with responses',
+                      Unit = 'ms'),
+    sweet_n_go_cor = list(Description = 'Sweet Food Image Condition: number of correct go (left/right) responses'),
+    sweet_go_correct_rt_mean = list(Description = 'Sweet Food Image Condition: average reaction time for correct go responses',
+                                   Unit = 'ms'),
+    sweet_n_go_error = list(Description = 'Sweet Food Image Condition: number of go trial errors (left/right)'),
+    sweet_go_error_rt_mean = list(Description = 'Sweet Food Image Condition: average reaction time on go trials with errors',
+                                 Unit = 'ms'),
+    sweet_n_go_miss = list( Description = 'Sweet Food Image Condition: number of missed go trial responses'),
+    sweet_prop_stop_fail = list( Description = 'Sweet Food Image Condition: proportion of of failed stop trials'),
+    sweet_us_rt_mean = list( Description = 'Sweet Food Image Condition: average reaction time on unsucessful stop trials ',
+                            Unit = 'ms'),
+    sweet_ssd_mean = list(Description = 'Sweet Food Image Condition: average stop-signal delay',
+                         Unit = 'ms'),
+    sweet_ssrt_mean = list( Description = 'Sweet Food Image Condition: stop-signal reaction time calculated using the mean method (mean go rt - mean ssd). Only calcualted if racehorse assumption is met',
+                           Unit = 'ms'),
+    sweet_ssrt_int = list( Description = 'Sweet Food Image Condition: stop-signal reaction time calculated using the integration method (nth rt - mean ssd). Only calcualted if racehorse assumption is met',
+                          Unit = 'ms'),
+    savory_n_stop_trials = list(Description = 'Savory Food Image Condition: number of stop trials'),
+    savory_n_go_trials = list(Description = 'Savory Food Image Condition: number of go trials'),
+    savory_go_rt_mean = list(Description = 'Savory Food Image Condition: average reaction time on go trials with responses',
+                      Unit = 'ms'),
+    savory_n_go_cor = list(Description = 'Savory Food Image Condition: number of correct go (left/right) responses'),
+    savory_go_correct_rt_mean = list(Description = 'Savory Food Image Condition: average reaction time for correct go responses',
+                                  Unit = 'ms'),
+    savory_n_go_error = list(Description = 'Savory Food Image Condition: number of go trial errors (left/right)'),
+    savory_go_error_rt_mean = list(Description = 'Savory Food Image Condition: average reaction time on go trials with errors',
+                                Unit = 'ms'),
+    savory_n_go_miss = list( Description = 'Savory Food Image Condition: number of missed go trial responses'),
+    savory_prop_stop_fail = list( Description = 'Savory Food Image Condition: proportion of of failed stop trials'),
+    savory_us_rt_mean = list( Description = 'Savory Food Image Condition: average reaction time on unsucessful stop trials ',
+                           Unit = 'ms'),
+    savory_ssd_mean = list(Description = 'Savory Food Image Condition: average stop-signal delay',
+                        Unit = 'ms'),
+    savory_ssrt_mean = list( Description = 'Savory Food Image Condition: stop-signal reaction time calculated using the mean method (mean go rt - mean ssd). Only calcualted if racehorse assumption is met',
+                          Unit = 'ms'),
+    savory_ssrt_int = list( Description = 'Savory Food Image Condition: stop-signal reaction time calculated using the integration method (nth rt - mean ssd). Only calcualted if racehorse assumption is met',
+                         Unit = 'ms')
+  )
+
+  # convert and return JSONS ----
+  sst_sum_json <- RJSONIO::toJSON(sst_sum_list, pretty = TRUE)
+
+
+  if (isFALSE(RJSONIO::isValidJSON(sst_sum_json, asText = TRUE))){
+    print('sst_sum_json JSON file may be invalid')
+  }
+
+  return(sst_sum_json)
+
+}

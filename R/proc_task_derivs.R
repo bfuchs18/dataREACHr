@@ -25,7 +25,7 @@
 #' @export
 #'
 
-proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_source, task_list = 'all', return_data = FALSE) {
+proc_task_derivs <- function(base_wd, overwrite = FALSE, aZ = proc_source, task_list = 'all', return_data = FALSE) {
 
   #### 1. Set up/initial checks #####
 
@@ -134,7 +134,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     }
   }
 
-  # Food Choice ####
+  # PIT ####
 
   if ('pit' %in% task_list) {
 
@@ -199,7 +199,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_sour
     sst_list[['sub_str']] <- sapply(sst_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
 
     #get summary data -> produces derivative dataframe
-    sst_database <- util_group_sst(data_list = sst_list, ses = 'ses-1', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+    sst_database <- util_group_sst(data_list = sst_list, base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
   }
 
 
