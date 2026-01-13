@@ -19,7 +19,7 @@
 #'
 
 
-util_merged_demo <- function(visit1_demo, household_all, merged_anthro, date_data) {
+util_merge_demo <- function(visit1_demo, household_all, merged_anthro, date_data) {
 
   # combine demo data from demo_data and household form
   demo_data <- merge(visit1_demo, household_all[c('session_id', 'participant_id', 'demo_education_mom', 'demo_income')], by = 'participant_id', all = TRUE)

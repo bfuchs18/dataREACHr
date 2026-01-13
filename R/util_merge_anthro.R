@@ -19,7 +19,7 @@
 #'
 
 
-util_merged_anthro <- function(visit1_anthro, visit5_anthro, merged_household, date_data) {
+util_merge_anthro <- function(visit1_anthro, visit5_anthro, merged_household, date_data) {
 
   anthro_all <- rbind.data.frame(visit1_anthro, visit5_anthro)
 

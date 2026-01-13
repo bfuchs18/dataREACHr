@@ -19,5 +19,5 @@ pptq_data_formatted <- util_format_pptq_data(pptq_data)
 
 }
 \seealso{
-\code{\link[=util_redcap_child_v1=4]{util_redcap_child_v1=4()}}
+\code{\link[=util_redcap_child_v4]{util_redcap_child_v4()}}
 }

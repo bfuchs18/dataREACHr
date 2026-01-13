@@ -1,4 +1,4 @@
-#' json_sst_prescan: Generates a json file for the SST pre-scan behaviorald data (data in rawdata/beh)
+#' json_sst_prescan: Generates a json file for the SST behaviorald data (data in rawdata/beh)
 #'
 #' This function generates a json file for cleaned stop signal data collected during practice and behavioral task runs
 #'
@@ -7,7 +7,7 @@
 #'
 #' @export
 
-json_sst_prescan <- function() {
+json_sst_beh <- function() {
 
   sst_list <- list(
     'MeasurementToolMetadata' = list(
@@ -18,19 +18,20 @@ json_sst_prescan <- function() {
     session_id = list( Description = 'BIDS session ID indicating when data was collected',
                        Levels = list ('ses-1' = 'session 1 / baseline',
                                       'ses-2' = 'session 2 / follow-up')),
+    run_num = list( Description = 'behavioral SST run number (1-2)'),
+    set = list( Description = 'run set'),
+    run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',
+                     Levels = list ('food' = 'food',
+                                    'toy' = 'toy')),
+    stim_file_name = list( Description = 'basename of stimulus file'),
+    trial_num = list( Description = ''),
     type = list( Description = 'task type',
                  Levels = list ('Prac' = 'pratice task',
                                 'Beh' = 'behavioral task',
                                 'fMRI' = 'fmri task')),
-    run_num = list( Description = 'behavioral SST run number (1-2)'),
-    set = list( Description = 'set of stimuli used in run'),
-    run_cond = list( Description = 'run condition, based on the type of commercials shown during the run',
-                     Levels = list ('food' = 'food',
-                                    'toy' = 'toy')),
     block = list( Description = 'block number within a run',
                   Levels = list ('1' = 'first block',
                                  '2' = 'second block')),
-    stim_file_name = list( Description = 'basename of stimulus file'),
     img_cat = list( Description = 'food image category',
                     Levels = list ('sweet' = 'sweet',
                                    'savory' = 'savory')),
@@ -51,9 +52,10 @@ json_sst_prescan <- function() {
                      Levels = list ('0' = 'no response',
                                     '1' = 'left side',
                                     '2' = 'right side')),
+    trueSSD = list( Description = 'true stop signal delay (signal onset - go onset)'),
     rt = list( Description = 'response time',
-                          Unit = "ms"),
-    trueSSD = list( Description = 'true stop signal delay (signal onset - go onset)'))
+                          Unit = "ms")
+  )
 
 
   # convert formatting to JSON
@@ -61,7 +63,7 @@ json_sst_prescan <- function() {
 
   # double check
   if (isFALSE(RJSONIO::isValidJSON(sst_json, asText = TRUE))){
-    print('sst pre-scan beh JSON file may be invalid')
+    print('sst beh JSON file may be invalid')
   }
 
   return(sst_json)
