@@ -19,7 +19,7 @@
 #'
 
 
-util_merged_intake <- function(child_v1_data, child_v3_data, child_v4_data, child_v5_data, proc_de_data) {
+util_merge_intake <- function(child_v1_data, child_v3_data, child_v4_data, child_v5_data, proc_de_data) {
 
   liking_all <- rbind.data.frame(child_v1_data$liking_data$data, child_v5_data$liking_data$data)
 

@@ -151,7 +151,7 @@ util_rrv_parse_text <- function(rrv_file, sub_str) {
     avg_resp_start_line <- grep('Average Responses', ses_lines)
     total_resp_lines <- ses_lines[(total_resp_start_line+1):(avg_resp_start_line-2)]
 
-    total_resp_data <- as.data.frame(t(sapply(seq(1, length(n_resp_lines)), function(x) proc_rrv_lines(line = x, resp_lines = total_resp_lines))))
+    total_resp_data <- as.data.frame(t(sapply(seq(1, length(total_resp_lines)), function(x) proc_rrv_lines(line = x, resp_lines = total_resp_lines))))
     names(total_resp_data) <- c('screen', 'ses_n_resp', 'ses_reinforcer')
 
     total_resp_data <- sapply(total_resp_data, function(x) as.numeric(x))

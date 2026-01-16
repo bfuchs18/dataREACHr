@@ -18,7 +18,7 @@
 #'
 
 
-util_merged_participants <- function(visit1_demo, merged_demo, date_data) {
+util_merge_participants <- function(visit1_demo, merged_demo, date_data) {
 
   # add merged_demo and date_data (visit dates, visit ages, child sex)
   participants_data <- merge(visit1_demo, date_data, by = 'participant_id', all = TRUE)

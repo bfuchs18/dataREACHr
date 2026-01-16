@@ -20,7 +20,7 @@
 #'
 
 
-util_merged_visitnotes <- function(visit1_notes, visit2_notes, visit3_notes, visit4_notes, visit5_notes) {
+util_merge_visitnotes <- function(visit1_notes, visit2_notes, visit3_notes, visit4_notes, visit5_notes) {
 
   researcher_notes <- merge(visit1_notes[grepl('participant_id|v1', names(visit1_notes))], visit2_notes[grepl('participant_id|v2', names(visit2_notes))], by=c('participant_id'), all = TRUE)
 

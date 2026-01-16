@@ -7,7 +7,7 @@
 proc_task_derivs(
   base_wd,
   overwrite = FALSE,
-  aZ = proc_source,
+  proc_source = proc_source,
   task_list = "all",
   return_data = FALSE
 )
@@ -17,6 +17,8 @@ proc_task_derivs(
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
 
+\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
+
 \item{task_list}{tasks to process. Options include 'all' to process all task data or a list of the following:\itemize{
 \item{'foodview' - fMRI Food Viewing task}
 \item{'nihtoolbox' - NIH Toolbox data}
@@ -25,8 +27,6 @@ proc_task_derivs(
 \item{'spacegame' - Space Game data (need to finish processing in Matlab)}
 \item{'sst' - fMRI Stop-Signal Task data}
 }}
-
-\item{proc_source}{whether to processes the raw data using proc_tasks.R. Default = FALSE}
 }
 \description{
 This function: \itemize{

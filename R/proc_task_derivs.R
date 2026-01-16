@@ -25,7 +25,7 @@
 #' @export
 #'
 
-proc_task_derivs <- function(base_wd, overwrite = FALSE, aZ = proc_source, task_list = 'all', return_data = FALSE) {
+proc_task_derivs <- function(base_wd, overwrite = FALSE, proc_source = proc_source, task_list = 'all', return_data = FALSE) {
 
   #### 1. Set up/initial checks #####
 
@@ -189,7 +189,7 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, aZ = proc_source, task_
       proc_tasks(base_wd = base_wd, overwrite = overwrite, task_list = 'sst')
     }
 
-    print('-- creating Taste-Test summary data')
+    print('-- creating SST summary data')
 
     # get list of available subjects
     sst_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-1', 'beh')), pattern = '*prescan_events.tsv', recursive = TRUE))
@@ -215,17 +215,15 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, aZ = proc_source, task_
     print('-- creating Space Game summary data')
 
     # get list of available subjects
-    spacegame_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-baseline', 'beh')), pattern = '*spacegame_events.tsv', recursive = TRUE))
+    spacegame_list <- as.data.frame(list.files(path = Sys.glob(file.path(raw_wd, 'sub-*', 'ses-1', 'beh')), pattern = '*spacegame_events.tsv', recursive = TRUE))
     names(spacegame_list) <- 'filename'
 
     #get list of subject IDs
     spacegame_list[['sub_str']] <- sapply(spacegame_list[['filename']], function(x) substr(x, 1, unlist(gregexpr('_', x))-1), simplify = TRUE)
 
     #get summary data -> produces derivative dataframe
-    spacegame_database <- util_group_spacegame(data_list = spacegame_list, ses = 'baseline', base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
+    spacegame_database <- util_group_spacegame(data_list = spacegame_list, base_wd = base_wd, overwrite = TRUE, return_data = TRUE)
   }
-
-
 
 
   if (isTRUE(return_data)){
@@ -235,7 +233,8 @@ proc_task_derivs <- function(base_wd, overwrite = FALSE, aZ = proc_source, task_
       shapegame_database = shapegame_database,
       spacegame_database = spacegame_database,
       nihtoolbox_database = nih_scores_dat,
-      sst_database = sst_database
+      sst_database = sst_database,
+      spacegame_database = spacegame_database
     )
 
     return(task_data)

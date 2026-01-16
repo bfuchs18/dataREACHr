@@ -183,7 +183,7 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
 
   ## Merge intake-related data
   # merge intake-related data (paradigm info, liking data, wanting data, intake data, fullness data)
-  merged_intake <- util_merged_intake(child_v1_data, child_v3_data, child_v4_data, child_v5_data, processed_de_data)
+  merged_intake <- util_merge_intake(child_v1_data, child_v3_data, child_v4_data, child_v5_data, processed_de_data)
 
   intake_merge_json <- json_intake()
 
@@ -193,24 +193,24 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
   updates_json <- json_parent_updates()
 
   ## Merge notes into notes database
-  researcher_notes <- util_merged_visitnotes(child_v1_data$visit_data_child, child_v2_data$visit_data_child, child_v3_data$visit_data_child, child_v4_data$visit_data_child, child_v5_data$visit_data_child)
+  researcher_notes <- util_merge_visitnotes(child_v1_data$visit_data_child, child_v2_data$visit_data_child, child_v3_data$visit_data_child, child_v4_data$visit_data_child, child_v5_data$visit_data_child)
 
   notes_json <- json_researcher_notes()
 
   ## Anthro data
-  merged_anthro <- util_merged_anthro(child_v1_data$anthro_data$data, child_v5_data$anthro_data$data,  merged_qs_list$household_all, date_data)
+  merged_anthro <- util_merge_anthro(child_v1_data$anthro_data$data, child_v5_data$anthro_data$data,  merged_qs_list$household_all, date_data)
 
   anthro_merge_json <- json_anthropometrics()
 
   #### Generate demographics dataframe  ####
-  merged_demo <- util_merged_demo(parent_v1_data$demo_data$data, merged_qs_list$household_all, merged_anthro, date_data)
+  merged_demo <- util_merge_demo(parent_v1_data$demo_data$data, merged_qs_list$household_all, merged_anthro, date_data)
 
   merged_demo <- merged_demo[!is.na(merged_demo['participant_id']), ]
 
   demographics_json <- json_demographics()
 
   #### Generate participants dataframe ####
-  participants_data <- util_merged_participants(parent_v1_data$demo_data$data, merged_demo, date_data)
+  participants_data <- util_merge_participants(parent_v1_data$demo_data$data, merged_demo, date_data)
 
   participants_data <- participants_data[!is.na(participants_data['participant_id']), ]
 

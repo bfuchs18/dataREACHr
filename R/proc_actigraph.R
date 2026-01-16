@@ -57,6 +57,8 @@ proc_actigraph <- function(base_wd, overwrite = FALSE, overwrite_ggir_derivs = F
 
 
   ## 2. copy to sourcedata ####
+  print('-- copying Actigraph Data')
+
   # get raw file paths
   actigraph_gt3x_path <- file.path(base_wd, 'actigraph', 'raw', 'gt3x_files')
   actigraph_agd_path <- file.path(base_wd, 'actigraph', 'raw', 'agd_files')
@@ -85,9 +87,9 @@ proc_actigraph <- function(base_wd, overwrite = FALSE, overwrite_ggir_derivs = F
   actigraph_list[['sub_str']] <- sapply(actigraph_list[['id']], function(x) sprintf('sub-%03d', x), simplify = TRUE)
 
   #organize data into BIDS sourcedata
-  actigraph_list[grepl('.agd', actigraph_list[['filename']]), 'sourcedata_done'] <- sapply(actigraph_list[grepl('.agd', actigraph_list[['filename']]), 'id'], function(x) util_copy_to_source(task_dir = actigraph_agd_path, task_str = 'actigraph', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', file_pattern = '.agd', overwrite = overwrite), simplify = TRUE)
+  actigraph_list[grepl('.agd', actigraph_list[['filename']]), 'sourcedata_done'] <- sapply(actigraph_list[grepl('.agd', actigraph_list[['filename']]), 'id'], function(x) util_copy_to_source(task_dir = actigraph_agd_path, task_str = 'actigraph', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', file_pattern = '.agd', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
 
-  actigraph_list[grepl('gt3x', actigraph_list[['filename']]), 'sourcedata_done'] <- sapply(actigraph_list[grepl('gt3x', actigraph_list[['filename']]), 'id'], function(x) util_copy_to_source(task_dir = actigraph_gt3x_path, task_str = 'actigraph', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', file_pattern = '.gt3x', overwrite = overwrite), simplify = TRUE)
+  actigraph_list[grepl('gt3x', actigraph_list[['filename']]), 'sourcedata_done'] <- sapply(actigraph_list[grepl('gt3x', actigraph_list[['filename']]), 'id'], function(x) util_copy_to_source(task_dir = actigraph_gt3x_path, task_str = 'actigraph', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', file_pattern = '.gt3x', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
 
 
   ## 3. get sleep log scored and format correctly ####
@@ -145,19 +147,19 @@ proc_actigraph <- function(base_wd, overwrite = FALSE, overwrite_ggir_derivs = F
   ggir_data <- util_actigraph_ggir(data_list = ggir_data_list, deriv_dir = deriv_dir_ggir, study_name = 'reach', overwrite = overwrite_ggir_derivs, sleepwindowType = "SPT", loglocation = c(), part5_agg2_60seconds = TRUE, part6CR = TRUE)
 
   # 5. post-processing with mMRACH.AC ####
-  deriv_dir_mMARCH <- file.path(base_wd, 'bids', 'derivatives', 'motion', 'ses-1', 'mMARCH')
-
-  #make directory if needed
-  if (!dir.exists(deriv_dir_mMARCH)) {
-    dir.create(deriv_dir_mMARCH, recursive = TRUE)
-  }
-
-  ggir_path <- file.path(deriv_dir_ggir, 'ggir_output')
-
-  filename2id <- function(filename) {
-    newID <- substr(filename, 1, unlist(gregexpr('_', filename))[1]-1)
-    return(as.character(newID))
-  }
+  # deriv_dir_mMARCH <- file.path(base_wd, 'bids', 'derivatives', 'motion', 'ses-1', 'mMARCH')
+  #
+  # #make directory if needed
+  # if (!dir.exists(deriv_dir_mMARCH)) {
+  #   dir.create(deriv_dir_mMARCH, recursive = TRUE)
+  # }
+  #
+  # ggir_path <- file.path(deriv_dir_ggir, 'output_reach')
+  #
+  # filename2id <- function(filename) {
+  #   newID <- substr(filename, 1, unlist(gregexpr('_', filename))[1]-1)
+  #   return(as.character(newID))
+  # }
 
   #run set-up call
   #sapply(0:4, function(x) util_actigraph_mMARCH(mode = x, deriv_dir = deriv_dir_mMARCH, study_name = 'reach', data_list = ggir_data_list, ggir_path = ggir_path, filename2id = filename2id))

@@ -25,7 +25,9 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
   # get files
   if (grepl('foodview', task_str)) {
     raw_files <- list.files(path = task_dir, pattern = paste0(sub_id, '.txt'), recursive = TRUE)
-  } else if (!grepl('nih|actigraph|rrv|pit', task_str)) {
+  } else if (grepl('mbmfNovelStakes', task_str)) {
+    raw_files <- basename(Sys.glob(file.path(task_dir, paste0(task_str, '_', sprintf('%03d', sub_id), '*'))))
+  } else if (!grepl('actigraph|rrv|pit', task_str)) {
     raw_files <- list.files(path = task_dir, pattern = task_str)
   }
 
@@ -34,7 +36,7 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     # set sourcedata directory for task files
     sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'func')
 
-    raw_files <- raw_files[grepl(paste0('-', sub_id, '.txt'), raw_files)]
+    raw_files <- raw_files[grepl(paste0('-', sprintf('%03d', sub_id), '.txt'), raw_files)]
 
     raw_files_short <- basename(raw_files)
     raw_files_short <- substr(raw_files_short, 1, unlist(gregexpr('-', raw_files_short))-1)
@@ -48,9 +50,12 @@ util_copy_to_source <- function(base_wd, task_dir, task_str, sub_str, ses_str, s
     # set sourcedata directory for task files
     sub_task_source_dir <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
 
-    raw_files <- raw_files[grepl(sub_str, raw_files)]
+    raw_files <- raw_files[grepl(sprintf('%03d', sub_id), raw_files)]
+    raw_files <- raw_files[!grepl('cancel', raw_files)]
 
-    raw_files_short <- substr(raw_files, 1, unlist(gregexpr('_', raw_files))-1)
+    raw_files_uscore <- unlist(gregexpr('_', raw_files))
+
+    raw_files_short <- substr(raw_files, 1, raw_files_uscore[1]-1)
 
     rename_files <- paste0(sub_str, '_', ses_str, '_task-', gsub('mbmfNovelStakes', 'space', raw_files_short), '.mat')
 

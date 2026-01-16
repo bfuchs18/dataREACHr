@@ -14,33 +14,33 @@
 #' \dontrun{
 #' # process task data
 #'
-#' spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
+#' spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', base_wd = base_wd)
 #'
 #' }
 #'
 #'
 #' @export
 
-util_task_spacegame <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite = FALSE) {
+util_task_spacegame <- function(sub_str, ses_str, base_wd, overwrite = FALSE) {
 
   #### Set up/initial checks #####
 
   # check that audit_data exist and is a data.frame
-  data_arg <- methods::hasArg(bids_wd)
+  data_arg <- methods::hasArg(base_wd)
 
   if (isTRUE(data_arg)) {
-    if (!is.character(bids_wd)) {
-      stop("bids_wd must be entered as a string")
-    } else if (!file.exists(bids_wd)) {
-      stop("bids_wd entered, but file does not exist. Check bids_wd string.")
+    if (!is.character(base_wd)) {
+      stop("base_wd must be entered as a string")
+    } else if (!file.exists(base_wd)) {
+      stop("base_wd entered, but file does not exist. Check base_wd string.")
     }
   } else if (isFALSE(data_arg)) {
-    stop("bids_wd must be entered as a string")
+    stop("base_wd must be entered as a string")
   }
 
   # get directory paths
-  source_beh_wd <- file.path(bids_wd, 'sourcedata', sub_str, ses_str, 'beh')
-  source_file <- list.files(source_beh_wd, pattern = "mbmfNovelStakes", full.names = TRUE)
+  source_beh_wd <- file.path(base_wd, 'bids', 'sourcedata', sub_str, ses_str, 'beh')
+  source_file <- list.files(source_beh_wd, pattern = "space", full.names = TRUE)
 
   #### Load file #####
 
@@ -90,6 +90,8 @@ util_task_spacegame <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite =
   dat[['missed_earth']] <- ifelse(dat[['timeout_earth']] == 1, 1, 0)
   dat[['missed_planet']] <- ifelse(dat[['timeout_earth']] == 1 | dat[['timeout_planet']] == 1, 1, 0)
 
+  dat[['missed']] <- ifelse(dat[['timeout_earth']] == 1 | dat[['timeout_planet']] == 1, 1, 0)
+
   # get stay for planet by block
   # dat[dat[['block']] == 1, 'stay_planet'] <- sapply(dat[dat[['block']] == 1, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 1 & dat[['trial']] == x, 'state_planet'] == dat[dat[['block']] == 1 & dat[['trial']] == x-1, 'state_planet'], 1, 0)))
   #
@@ -108,6 +110,14 @@ util_task_spacegame <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite =
   #
   # dat[dat[['block']] == 4, 'earth_same'] <- sapply(dat[dat[['block']] == 4, 'trial'], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['block']] == 4 & dat[['trial']] == x, 'state_earth'] == dat[dat[['block']] == 4 & dat[['trial']] == x-1, 'state_earth'], 1, 0)))
 
+  # reward dif
+  dat[['reward_dif']] <- abs(dat[['rewards1']] -  dat[['rewards2']])
+
+  #get info for trial-by-trail analyses (stay probabilities)
+  dat[['prev_reward_diff']] <- c(0, dat[2:nrow(dat), 'reward_dif'])
+  dat[['prev_points']] <- c(0, dat[2:nrow(dat), 'points'])
+  dat[['prev_stake']] <- c(0, dat[2:nrow(dat), 'stake'])
+  dat[['prev_missed']] <- c(0, dat[2:nrow(dat), 'missed'])
 
   # kool didn't consider blocks a reset
   dat[['stay_planet']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['trial']] == x, 'state_planet'] == dat[dat[['trial']] == x-1, 'state_planet'], 1, 0)))
@@ -115,19 +125,19 @@ util_task_spacegame <- function(sub_str, ses_str = 'ses-1', bids_wd, overwrite =
   dat[['earth_same']] <- sapply(dat[['trial']], function(x) ifelse(x == 1, NA, ifelse(dat[dat[['trial']] == x, 'state_earth'] == dat[dat[['trial']] == x-1, 'state_earth'], 1, 0)))
 
   # re-order columns
-  dat <- dat[c('sub', 'date', 'block', 'trial', 'timeout_earth', 'timeout_planet', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'rt_earth', 'rt_planet', 'choice_earth', 'response', 'points', 'stake', 'score', 'rewards1', 'rewards2', 'missed_earth', 'missed_planet', 'earth_same', 'stay_planet')]
+  dat <- dat[c('sub', 'date', 'block', 'trial', 'timeout_earth', 'timeout_planet', 'state_earth', 'state_planet', 'stim_left', 'stim_right', 'rt_earth', 'rt_planet', 'choice_earth', 'response', 'points', 'stake', 'score', 'rewards1', 'rewards2', 'missed_earth', 'missed', 'prev_missed', 'prev_reward_diff', 'prev_points', 'prev_stake', 'earth_same', 'stay_planet')]
 
   #### Save in rawdata #####
 
   # create bids/rawdata directory if it doesn't exist
-  raw_beh_wd <- file.path(bids_wd, 'rawdata', sub_str, ses_str, 'beh')
+  raw_beh_wd <- file.path(base_wd, 'bids', 'rawdata', sub_str, ses_str, 'beh')
 
   if (!dir.exists(raw_beh_wd)) {
     dir.create(raw_beh_wd, recursive = TRUE)
   }
 
   # define output file with path
-  outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-spacegame_beh.tsv'))
+  outfile <- file.path(raw_beh_wd, paste0(sub_str, '_', ses_str, '_task-spacegame_events.tsv'))
 
   # export file if doesn't exist or overwrite = TRUE
   if (!file.exists(outfile) | isTRUE(overwrite)) {

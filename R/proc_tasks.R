@@ -148,7 +148,7 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
     nihtoolbox_filename_events_json <- file.path(bids_wd, 'task-nih_toolbox_events.json')
     nihtoolbox_filename_scores_json <- file.path(bids_wd, 'task-nih_toolbox_scores.json')
 
-    if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_json) ) {
+    if ( isTRUE(overwrite) | !file.exists(nihtoolbox_filename_events_json) ) {
       write(nihtoolbox_events_json, nihtoolbox_filename_events_json)
       write(nihtoolbox_scores_json, nihtoolbox_filename_scores_json)
     }
@@ -297,17 +297,20 @@ proc_tasks <- function(base_wd, overwrite = FALSE, task_list) {
     space_list['id'] <- as.numeric(space_list[['id']])
 
     #organize data into BIDS sourcedata
-    space_list[['sourcedata_done']] <- sapply(space_list[['id']], function(x) util_copy_to_source(task_dir = space_dir, task_str = 'mbmfNovelStakes', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', overwrite = overwrite), simplify = TRUE)
+    space_list[['sourcedata_done']] <- sapply(space_list[['id']], function(x) util_copy_to_source(task_dir = space_dir, task_str = 'mbmfNovelStakes', sub_id = x, sub_str = sprintf('sub-%03d', x), ses_str = 'ses-1', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
 
     #process raw data
-    #foodrating_list[['rawproc_done']] <- sapply(foodrating_list[['sub_str']], function(x) util_task_foodrating(sub_str = x, ses = 'basel ine', base_wd = base_wd, overwrite = overwrite, return = FALSE), simplify = TRUE)
+    space_list[!grepl('26-1', space_list[['sub_str']]), 'rawproc_done'] <- sapply(space_list[!grepl('26-1', space_list[['sub_str']]), 'sub_str'], function(x) util_task_spacegame(sub_str = x, ses_str = 'ses-1', base_wd = base_wd, overwrite = overwrite), simplify = TRUE)
+
+    #generate json file for rawdata
+    space_json <- json_spacegame_events()
+
+    space_filename_json <- file.path(bids_wd, 'task-spacegame_events.json')
+
+    if ( isTRUE(overwrite) | !file.exists(space_filename_json) ) {
+      write(space_json, space_filename_json)
+    }
 
   }
-
-
-
-
-
-
 
 }

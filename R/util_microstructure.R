@@ -194,14 +194,9 @@ util_microstructure <- function(base_wd, file_str, paradigm, commercial_cond, se
 
     obs_unique <- unique(data['ph1_coder'])
 
-    if(nrow(obs_unique) == 1) {
-      return(rep(1, nrow(data)))
-    } else {
+    coder_order <- unlist(sapply(seq(1, nrow(obs_unique)), function(x) c(rep(x, nrow(data[data['ph1_coder'] == obs_unique[x, ], ])))))
 
-      coder_order <- c(rep(1, nrow(data[data['ph1_coder'] == obs_unique[1, ], ])), rep(2, nrow(data[data['ph1_coder'] == obs_unique[2, ], ])))
-
-      return(coder_order)
-    }
+    return(coder_order)
   }
 
   micro_data['coder_order'] <- unlist(sapply(unique(micro_data[['participant_id']]), function(x) coder_info(x), USE.NAMES = FALSE))

@@ -129,8 +129,6 @@ dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list
 
   #### function to export data and metadata ####
 
-  # data for 'all' option - need to add actigraph eventually
-
   # data from redcap
   redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
 
@@ -173,7 +171,7 @@ dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list
 
     data_list_tasks = data_list[(data_list %in% task_data_options)]
 
-    task_data <- proc_task_derivs(base_wd, overwrite = overwrite, proc_source = proc_source, data_list = data_list_tasks, return_data = return_data)
+    task_data <- proc_task_derivs(base_wd, overwrite = overwrite, proc_source = proc_source, task_list = data_list_tasks)
 
   }
 

@@ -4,12 +4,14 @@
 \alias{util_task_spacegame}
 \title{util_task_spacegame: Process raw data from the Space Game (2-stage reinforcement learning task)}
 \usage{
-util_task_spacegame(sub_str, ses_str = "ses-1", bids_wd, overwrite = FALSE)
+util_task_spacegame(sub_str, ses_str, base_wd, overwrite = FALSE)
 }
 \arguments{
 \item{sub_str}{(string) bids-formatted session string. e.g., 'sub-001'}
 
 \item{ses_str}{(string) bids-formatted session string. e.g., 'ses-1'}
+
+\item{base_wd}{(string) full path to directory that contains both the untouchedRaw and bids directories}
 
 \item{overwrite}{(logical) logical indicating whether file should be overwritten}
 }
@@ -25,7 +27,7 @@ Function adapted from Alaina Pearce dataBRAKEr package (https://github.com/alain
 \dontrun{
 # process task data
 
-spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', bids_wd = bids_wd)
+spacegame_task_pardat <- util_task_spacegame(sub_str = 'sub-001', ses_str = 'ses-1', base_wd = base_wd)
 
 }
 

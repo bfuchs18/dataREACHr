@@ -44,15 +44,15 @@ util_actigraph_ggir <- function(data_list, deriv_dir, study_name, overwrite, sle
   # set up call
   ggir_data <- GGIR::GGIR(datadir = data_list,
                           outputdir = deriv_dir,
-                          configfile = 'config_files/util_ggir_config.csv',
+                          configfile = file.path(deriv_dir, 'util_ggir_config.csv'),
                           studyname = study_name,
                           mode = 1:6,
                           overwrite = overwrite,
                           loglocation = loglocation,
-                          colid = colid,
-                          coln = 1,
+                          #colid = colid,
+                          #coln = 1,
                           part5_agg2_60seconds = TRUE,
-                          part6CR = TRUE)
+                          part6CR = FALSE)
 
 
   # rename ouput file
