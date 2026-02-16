@@ -130,7 +130,7 @@ util_redcap_parent_v3 <- function(data, date_data) {
 
   class_data <- class_data[c('participant_id', 'session_id', 'visit_date', names(class_data)[grepl('class', names(class_data))])]
 
-  # score? -- need to develop score script
+  class_json <- json_class()
 
   ## BISBAS Data ####
   bisbas_data <- data[, grepl('_id|bisbas|visit_date', names(data))]
@@ -187,7 +187,7 @@ util_redcap_parent_v3 <- function(data, date_data) {
     spsrq_data = list(data = spsrq_scored, meta = spsrq_json),
     pwlb_data = list(data = pwlb_scored, meta = pwlb_json),
     tfeq_data = list(data = tfeq_scored, meta = tfeq_json),
-    class_data = list(data = class_data, meta = NA),
+    class_data = list(data = class_data, meta = class_json),
     bisbas_data = list(data = bisbas_scored, meta = bisbas_json),
     pstca_data = list(data = pstca_data, meta = NA),
     debq_data = list(data = debq_scored, meta = debq_json),

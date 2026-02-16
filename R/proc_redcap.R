@@ -24,6 +24,7 @@
 #'  \item{'infancy' - compiled demographic information related to infancy}
 #'  \item{'intake' - compiled intake data with computed intake values}
 #'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'mri_assessment' - liking and familiarity ratings for MRI stimuli}
 #'  \item{'parent_updates' - all visit updates}
 #'  \item{'researcher_notes' - all visit notes}
 #'  \item{'audit' - Alcohol Use Disorders Identification Test}
@@ -198,7 +199,7 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
   notes_json <- json_researcher_notes()
 
   ## Anthro data
-  merged_anthro <- util_merge_anthro(child_v1_data$anthro_data$data, child_v5_data$anthro_data$data,  merged_qs_list$household_all, date_data)
+  merged_anthro <- util_merge_anthro(child_v1_data$anthro_data$data, child_v5_data$anthro_data$data, merged_qs_list$household_all, date_data)
 
   anthro_merge_json <- json_anthropometrics()
 
@@ -229,6 +230,7 @@ proc_redcap <- function(redcap_api = FALSE, redcap_visit_data, redcap_de_data) {
     infancy = parent_v1_data[['infancy_data']],
     intake = list(data = merged_intake, meta = intake_merge_json),
     mri_visit = child_v2_data$mri_info,
+    mri_assessment = list(child_v2_data[['mri_assessment_data']]$data, meta = child_v2_data[['mri_assessment_data']]$meta),
     parent_updates = list(data = merged_qs_list$updates_all, meta = updates_json),
     researcher_notes = list(data = researcher_notes, meta = notes_json),
     audit = list(data = merged_qs_list$audit_all,

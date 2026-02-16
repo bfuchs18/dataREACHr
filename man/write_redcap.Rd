@@ -26,6 +26,7 @@ write_redcap(
 \item{'infancy' - compiled demographic information related to infancy}
 \item{'intake' - compiled intake data with computed intake values}
 \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+\item{'mri_assessment' - liking and familiarity ratings for MRI stimuli}
 \item{'parent_updates' - all visit updates}
 \item{'researcher_notes' - all visit notes}
 \item{'audit' - Alcohol Use Disorders Identification Test}

@@ -76,16 +76,16 @@ proc_microstructure <- function(base_wd, intake_data) {
 
     # get relevant intake data
     if (commercial_str == 'food') {
-      intake_ses_data <- intake_data[intake_data['ad_cond_meal'] == 1, ]
-    } else if (commercial_str == 'toy') {
-      intake_ses_data <- intake_data[!is.na(intake_data['ad_cond_meal']) & intake_data['ad_cond_meal'] == 2, ]
-      intake_ses_data <- intake_ses_data[!(intake_ses_data['participant_id'] == 'sub-040' & intake_ses_data['visit_protocol'] == 4), ]
-    } else {
       if (ses_str == 'ses-1'){
         intake_ses_data <- intake_data[intake_data['ad_cond_meal'] == 0 & intake_data['session_id'] == 'ses-1', ]
       } else {
         intake_ses_data <- intake_data[intake_data['session_id'] == 'ses-2', ]
       }
+    } else if (commercial_str == 'toy') {
+      intake_ses_data <- intake_data[!is.na(intake_data['ad_cond_meal']) & intake_data['ad_cond_meal'] == 1, ]
+      intake_ses_data <- intake_ses_data[!(intake_ses_data['participant_id'] == 'sub-040' & intake_ses_data['visit_protocol'] == 4), ]
+    } else {
+      intake_ses_data <- intake_data[intake_data['ad_cond_meal'] == 2, ]
     }
 
     #get summary data

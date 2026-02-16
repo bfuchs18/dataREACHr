@@ -1,4 +1,4 @@
-#' json_class_: Generates a json file for the Children\'s Leisure Activities Study Survey
+#' json_class: Generates a json file for the Children\'s Leisure Activities Study Survey
 #'
 #' This function generates a json file for the scored? Children\'s Leisure Activities Study Survey and raw participant responses.
 #' This function provides accurate json files ONLY if data is processed using score_class function in dataprepr and is only accurate for data collected in Study REACH

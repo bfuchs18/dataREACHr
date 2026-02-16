@@ -15,7 +15,7 @@ json_deriv_beh_dataset_desc <- function() {
     GeneratedBy = list( Name = "dataREACHr",
                         Version = paste0("dataREACHr is not versioned. Datasets were generated on ", Sys.Date(), " using the code from the GitHub repository at that time. Thus, this date serves as a reference point for the specific code version employed."),
                         #Version = packageVersion("datareachr"),
-                        Description = "Datasets were generated using dataREACHr functions: deriv_rrv.R, json_deriv_rrv.R",
+                        Description = "Datasets were generated using dataREACHr wrapper function: dataREACH.R (see package for subfunctions and pipeline)",
                         URL = "https://github.com/bfuchs18/dataREACHr")
     )
 

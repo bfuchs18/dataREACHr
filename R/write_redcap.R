@@ -20,6 +20,7 @@
 #'  \item{'infancy' - compiled demographic information related to infancy}
 #'  \item{'intake' - compiled intake data with computed intake values}
 #'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'mri_assessment' - liking and familiarity ratings for MRI stimuli}
 #'  \item{'parent_updates' - all visit updates}
 #'  \item{'researcher_notes' - all visit notes}
 #'  \item{'audit' - Alcohol Use Disorders Identification Test}
@@ -132,7 +133,7 @@ write_redcap <- function(base_wd, overwrite = FALSE, data_list = 'all', return_d
 
   #### function to export data and metadata ####
 
-  data_list_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
+  data_list_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'mri_assessment', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
 
   if (length(data_list) == 1) {
     if (data_list == 'all'){

@@ -209,7 +209,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
   intake_v1['session_id'] <- 'ses-1'
   intake_v1['visit_protocol'] <- 1
-  intake_v1['ad_cond_meal'] <- 0
+  intake_v1['ad_cond_meal'] <- 2
 
   # merge with date data for v1
   intake_v1 <- merge(intake_v1, date_data[c('participant_id', 'v1_date')], by = 'participant_id', all.x = TRUE)
@@ -233,7 +233,7 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
     intake_v1_unmerged['session_id'] <- 'ses-1'
     intake_v1_unmerged['visit_protocol'] <- 1
-    intake_v1_unmerged['ad_cond_meal'] <- 0
+    intake_v1_unmerged['ad_cond_meal'] <- 2
 
     # fix names
     names(intake_v1_unmerged) <- gsub('_v1', '', names(intake_v1_unmerged))
@@ -269,6 +269,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
   intake_v3['session_id'] <- 'ses-1'
   intake_v3['visit_protocol'] <- 3
+  intake_v3['ad_cond_eah_v3'] <- intake_v3[['ad_cond_eah_v3']] - 1
+  intake_v3['ad_cond_meal_v3'] <- intake_v3[['ad_cond_meal_v3']] - 1
 
   # merge with date data for v3
   intake_v3 <- merge(intake_v3, date_data[c('participant_id', 'v3_date')], by = 'participant_id', all.x = TRUE)
@@ -292,6 +294,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
     intake_v3_unmerged['session_id'] <- 'ses-1'
     intake_v3_unmerged['visit_protocol'] <- 3
+    intake_v3_unmerged['ad_cond_meal_v3'] <- intake_v3_unmerged[['ad_cond_meal_v3']] - 1
+    intake_v3_unmerged['ad_cond_eah_v3'] <- intake_v3_unmerged[['ad_cond_eah_v3']] - 1
 
     #fix names
     names(intake_v3_unmerged) <- gsub('_v3', '', names(intake_v3_unmerged))
@@ -325,6 +329,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
   intake_v4['session_id'] <- 'ses-1'
   intake_v4['visit_protocol'] <- 4
+  intake_v4['ad_cond_meal_v4'] <- intake_v4[['ad_cond_meal_v4']] - 1
+  intake_v4['ad_cond_eah_v4'] <- intake_v4[['ad_cond_eah_v4']] - 1
 
   #fix names
   names(intake_v4) <- gsub('_v4', '', names(intake_v4))
@@ -347,6 +353,8 @@ util_redcap_de <- function(redcap_api = FALSE, redcap_de_data, date_data) {
 
     intake_v4_unmerged['session_id'] <- 'ses-1'
     intake_v4_unmerged['visit_protocol'] <- 4
+    intake_v4_unmerged['ad_cond_meal_v4'] <- intake_v4_unmerged[['ad_cond_meal_v4']] - 1
+    intake_v4_unmerged['ad_cond_eah_v4'] <- intake_v4_unmerged[['ad_cond_eah_v4']] - 1
 
     #fix names
     names(intake_v4_unmerged) <- gsub('_v4', '', names(intake_v4_unmerged))

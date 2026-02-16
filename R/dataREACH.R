@@ -30,6 +30,7 @@
 #'  \item{'infancy' - compiled demographic information related to infancy}
 #'  \item{'intake' - compiled intake data with computed intake values}
 #'  \item{'mri_visit' - MRI visit information including Freddy and CAMS}
+#'  \item{'mri_assessment' - liking and familiarity ratings for MRI stimuli}
 #'  \item{'parent_updates' - all visit updates}
 #'  \item{'researcher_notes' - all visit notes}
 #'  \item{'audit' - Alcohol Use Disorders Identification Test}
@@ -104,7 +105,7 @@ dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list
   #### Set up/initial checks #####
 
   phenotype_wd <- file.path(base_wd, 'bids', 'phenotype')
-
+  deriv_wd <- file.path(base_wd, 'bids', 'derivatives', 'beh')
   # check that base_wd exist and is a string
   data_arg <- methods::hasArg(base_wd)
 
@@ -118,7 +119,7 @@ dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list
     stop('base_wd must be entered as a string')
   }
 
-  ## dataset description - requried by BIDS ####
+  ## dataset descriptions - required by BIDS ####
   # export dataset_description.json
   json_dataset_desc <- json_dataset_desc()
   filename_dataset_json <- file.path(phenotype_wd, 'dataset_description.json')
@@ -127,17 +128,25 @@ dataREACH <- function(base_wd, overwrite = FALSE, proc_source = FALSE, data_list
     write(json_dataset_desc, filename_dataset_json)
   }
 
+  # export derivatives .json
+  json_deriv_beh_dataset_desc <- json_deriv_beh_dataset_desc()
+  filename_deriv_beh_dataset_json <- file.path(deriv_wd, 'dataset_description.json')
+
+  if ( isTRUE(overwrite) | !file.exists(filename_deriv_beh_dataset_json) ) {
+    write(json_deriv_beh_dataset_desc, filename_deriv_beh_dataset_json)
+  }
+
   #### function to export data and metadata ####
 
   # data from redcap
-  redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
+  redcap_data_options <- c('participants', 'anthropometrics', 'demographics', 'dxa', 'household', 'infancy', 'intake', 'mri_visit', 'mri_assessment', 'parent_updates', 'researcher_notes', 'audit', 'bes', 'bisbas', 'brief2', 'cbq', 'cchip', 'cebq', 'cfpq', 'cfq', 'chaos', 'class', 'cshq', 'debq', 'efcr', 'ffbs', 'fsq', 'hfi', 'hfias', 'hfssm', 'kbas', 'lbc', 'loc', 'pmum', 'pptq', 'pss', 'pstca', 'puberty', 'pwlb', 'rank', 'scpf', 'sic', 'sleeplog', 'spsrq', 'stq', 'tfeq')
 
   # task data
   task_data_options <- c('sst','foodview','spacegame','nih_toolbox','rrv','pit')
 
   if (length(data_list) == 1) {
     if (data_list == 'all') {
-      data_list = c(redcap_data_options, 'microstructure', task_data_options)
+      data_list = c(redcap_data_options, 'actigraph', 'microstructure', task_data_options)
     }
   }
 

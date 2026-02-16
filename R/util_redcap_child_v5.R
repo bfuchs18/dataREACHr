@@ -216,7 +216,7 @@ util_redcap_child_v5 <- function(data) {
   anthro_data <- data[, grepl('_id|height|weight|^visit', names(data))]
 
   # remove extra columns, add columns, and re-order
-  anthro_data <- anthro_data[, !grepl('dxa_id|check|notes|puberty|cooked', names(anthro_data))]
+  anthro_data <- anthro_data[, !grepl('dxa|check|notes|puberty|cooked', names(anthro_data))]
 
   anthro_data <- anthro_data[c('participant_id', 'session_id', 'visit_protocol', 'visit_date', names(anthro_data)[grepl('height|weight', names(anthro_data))])]
 

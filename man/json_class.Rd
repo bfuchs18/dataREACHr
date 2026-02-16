@@ -2,7 +2,7 @@
 % Please edit documentation in R/json_class.R
 \name{json_class}
 \alias{json_class}
-\title{json_class_: Generates a json file for the Children\'s Leisure Activities Study Survey}
+\title{json_class: Generates a json file for the Children\'s Leisure Activities Study Survey}
 \usage{
 json_class()
 }
