@@ -147,19 +147,17 @@ proc_actigraph <- function(base_wd, overwrite = FALSE, overwrite_ggir_derivs = F
   ggir_data <- util_actigraph_ggir(data_list = ggir_data_list, deriv_dir = deriv_dir_ggir, study_name = 'reach', overwrite = overwrite_ggir_derivs, sleepwindowType = "SPT", loglocation = c(), part5_agg2_60seconds = TRUE, part6CR = TRUE)
 
   # 5. post-processing with mMRACH.AC ####
-  # deriv_dir_mMARCH <- file.path(base_wd, 'bids', 'derivatives', 'motion', 'ses-1', 'mMARCH')
-  #
-  # #make directory if needed
-  # if (!dir.exists(deriv_dir_mMARCH)) {
-  #   dir.create(deriv_dir_mMARCH, recursive = TRUE)
-  # }
-  #
-  # ggir_path <- file.path(deriv_dir_ggir, 'output_reach')
-  #
-  # filename2id <- function(filename) {
-  #   newID <- substr(filename, 1, unlist(gregexpr('_', filename))[1]-1)
-  #   return(as.character(newID))
-  # }
+  deriv_dir_mMARCH <- file.path(base_wd, 'bids', 'derivatives', 'motion', 'ses-1', 'mMARCH')
+
+  #make directory if needed
+  if (!dir.exists(deriv_dir_mMARCH)) {
+    dir.create(deriv_dir_mMARCH, recursive = TRUE)
+  }
+
+ filename2id <- function(filename) {
+    newID <- substr(filename, 1, unlist(gregexpr('_', filename))[1]-1)
+    return(as.character(newID))
+  }
 
   #run set-up call
   #sapply(0:4, function(x) util_actigraph_mMARCH(mode = x, deriv_dir = deriv_dir_mMARCH, study_name = 'reach', data_list = ggir_data_list, ggir_path = ggir_path, filename2id = filename2id))

@@ -52,7 +52,7 @@ util_actigraph_ggir <- function(data_list, deriv_dir, study_name, overwrite, sle
                           #colid = colid,
                           #coln = 1,
                           part5_agg2_60seconds = TRUE,
-                          part6CR = FALSE)
+                          part6CR = TRUE)
 
 
   # rename ouput file
